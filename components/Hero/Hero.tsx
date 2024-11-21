@@ -7,10 +7,10 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-white mt-10 dark:from-gray-900 dark:to-gray-800 dark:text-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-white pt-10 dark:from-gray-900 dark:to-gray-800 dark:text-white">
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
-          <div className="bg-gradient-to-r from-purple-500 to-indigo-600 dark:from-purple-700 dark:to-indigo-800 rounded-lg shadow-xl p-8 md:p-12 text-white">
+          <div className="bg-gradient-to-r from-fuchsia-500 to-pink-500 dark:from-fuchsia-600 dark:to-pink-600 rounded-lg shadow-xl p-8 md:p-12 text-white">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Welcome to OrbitBlog
             </h1>
@@ -18,7 +18,11 @@ export default function Hero() {
               Discover insightful articles, expert opinions, and the latest
               trends.
             </p>
-            <Button variant="secondary" size="lg">
+            <Button
+              variant="secondary"
+              size="lg"
+              className="bg-white text-fuchsia-600 hover:bg-gray-100"
+            >
               Start Reading
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
@@ -51,7 +55,10 @@ export default function Hero() {
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       5 min read
                     </span>
-                    <Button variant="link" className="dark:text-indigo-400">
+                    <Button
+                      variant="link"
+                      className="text-fuchsia-600 dark:text-fuchsia-400"
+                    >
                       Read More
                     </Button>
                   </div>
@@ -88,7 +95,10 @@ export default function Hero() {
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       3 days ago • 8 min read
                     </span>
-                    <Button variant="link" className="dark:text-indigo-400">
+                    <Button
+                      variant="link"
+                      className="text-fuchsia-600 dark:text-fuchsia-400"
+                    >
                       Continue Reading
                     </Button>
                   </div>
@@ -111,7 +121,10 @@ export default function Hero() {
               placeholder="Enter your email"
               className="md:w-2/3"
             />
-            <Button type="submit" className="md:w-1/3">
+            <Button
+              type="submit"
+              className="md:w-1/3 bg-fuchsia-600 text-white hover:bg-fuchsia-700 dark:bg-fuchsia-500 dark:hover:bg-fuchsia-600"
+            >
               Subscribe
             </Button>
           </form>

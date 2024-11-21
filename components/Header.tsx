@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { BookOpen, Menu } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { ThemeSwitcher } from "../app/utils/ThemeSwitcher";
+import { ThemeSwitcher } from "../utils/ThemeSwitcher";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -15,8 +15,8 @@ type Props = {
 
 const Header = ({ active }: Props) => {
   return (
-    <div className="w-full relative">
-      <header className="shadow-sm w-full fixed top-0 left-0 bg-background z-50">
+    <div className="w-full relative ">
+      <header className=" backdrop-blur w-full fixed top-0 left-0 shadow-sm dark:bg-gray-900/70 bg-slate-50/60  z-50 dark:border-b-2">
         <div className="mx-2 px-2 py-2 flex items-center justify-between">
           <Link href="/" className="flex items-center ">
             <BookOpen className="mr-4 h-6 w-6 text-fuchsia-600 dark:text-fuchsia-500" />
