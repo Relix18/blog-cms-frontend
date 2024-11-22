@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,12 +27,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
+import useAuth from "@/app/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
   const [hidden, setHidden] = useState(true);
+  const { loginUser, isAuthenticated, getLoggedUser } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/");
+    }
+    getLoggedUser();
+  }, [isAuthenticated]);
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -47,8 +58,13 @@ export default function SignUpPage() {
     setSuccess("");
 
     startTransition(() => {
-      console.log(values);
-      setSuccess("Logged In");
+      loginUser(values)
+        .then(() => {
+          setSuccess("Logged In");
+        })
+        .catch((err) => {
+          setError(err?.response.data.message);
+        });
     });
   };
 

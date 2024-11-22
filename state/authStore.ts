@@ -6,6 +6,7 @@ interface IAuth {
   isAuthenticated: boolean;
   activationCode: string | null;
   login: (user: User, token: string) => void;
+  getUser: (user: User) => void;
   register: (token: string, activationCode: string) => void;
   socialAuth: (user: User, token: string) => void;
   activation: () => void;
@@ -28,6 +29,7 @@ const useAuthStore = create<IAuth>((set) => ({
   register: (token, activationCode) => set({ token, activationCode }),
   socialAuth: (user, token) => set({ user, token, isAuthenticated: true }),
   login: (user, token) => set({ user, token, isAuthenticated: true }),
+  getUser: (user) => set({ user, isAuthenticated: true }),
   logout: () => set({ user: null, token: null, isAuthenticated: false }),
 }));
 

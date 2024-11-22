@@ -33,26 +33,43 @@ interface LoginUser {
 export const registerApi = async (
   credentials: SignupCredentials
 ): Promise<RegisterUser> => {
-  const { data } = await axios.post("/api/v1/register", credentials);
+  const { data } = await axios.post("/api/v1/register", credentials, {
+    withCredentials: true,
+  });
   return data;
 };
 
 export const activationApi = async (credentials: { code: string }) => {
-  const { data } = await axios.post("/api/v1/activation", credentials);
+  const { data } = await axios.post("/api/v1/activation", credentials, {
+    withCredentials: true,
+  });
   return data;
 };
 
 export const socialAuthApi = async (
   credentials: SocialCredentials
 ): Promise<LoginUser> => {
-  const { data } = await axios.post("/api/v1/social", credentials);
+  const { data } = await axios.post("/api/v1/social", credentials, {
+    withCredentials: true,
+  });
   return data;
 };
 
 export const loginApi = async (
   credentials: LoginCredentials
 ): Promise<LoginUser> => {
-  const { data } = await axios.post("/api/v1/login", credentials);
+  const { data } = await axios.post(
+    "http://localhost:4000/api/v1/login",
+    credentials,
+    { withCredentials: true }
+  );
+  return data;
+};
+
+export const getUserApi = async () => {
+  const { data } = await axios.get("http://localhost:4000/api/v1/me", {
+    withCredentials: true,
+  });
   return data;
 };
 

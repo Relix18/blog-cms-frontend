@@ -4,6 +4,7 @@ import {
   logoutApi,
   registerApi,
   socialAuthApi,
+  getUserApi,
 } from "@/state/api/authApi";
 import useAuthStore from "../../state/authStore";
 
@@ -15,6 +16,7 @@ const useAuth = () => {
     socialAuth,
     login,
     logout,
+    getUser,
     register,
     activation,
   } = useAuthStore();
@@ -45,8 +47,15 @@ const useAuth = () => {
     email: string;
     password: string;
   }) => {
-    const { user, token } = await loginApi(credentials);
-    login(user, token);
+    const data = await loginApi(credentials);
+    login(data.user, data.token);
+    return data;
+  };
+
+  const getLoggedUser = async () => {
+    const { user } = await getUserApi();
+    getUser(user);
+    return;
   };
 
   const logoutUser = async () => {
@@ -61,6 +70,7 @@ const useAuth = () => {
     registerUser,
     activateUser,
     socialAuthUser,
+    getLoggedUser,
     loginUser,
     logoutUser,
   };
