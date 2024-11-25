@@ -1,7 +1,12 @@
-import type { Metadata } from "next";
+"use client";
+
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "../utils/ThemeProvider";
+import { useEffect, useState } from "react";
+import useAuth from "./hooks/useAuth";
+import Loader from "@/components/Loader/Loader";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -14,12 +19,6 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: "OrbitBlog",
-  description:
-    "Explore cutting-edge insights and visionary ideas on OrbitBlog. Dive into a world of innovation, tech trends, and creative narratives that shape the future.",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,15 +29,32 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute={"class"}
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider
+            attribute={"class"}
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Custom>{children}</Custom>
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );
 }
+
+const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [loading, setLoading] = useState(true);
+  const { getLoggedUser } = useAuth();
+  useEffect(() => {
+    const fetchData = async () => {
+      await getLoggedUser().finally(() => {
+        setLoading(false);
+      });
+    };
+    fetchData();
+  }, []);
+
+  return <>{loading ? <Loader /> : <>{children}</>}</>;
+};

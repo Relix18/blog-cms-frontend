@@ -5,34 +5,42 @@ import {
   registerApi,
   socialAuthApi,
   getUserApi,
+  resendOtp,
+  forgotPasswordApi,
+  resetPasswordApi,
 } from "@/state/api/authApi";
 import useAuthStore from "../../state/authStore";
 
 const useAuth = () => {
-  const {
-    user,
-    token,
-    isAuthenticated,
-    socialAuth,
-    login,
-    logout,
-    getUser,
-    register,
-    activation,
-  } = useAuthStore();
+  const { user, token, isAuthenticated, socialAuth, login, logout, getUser } =
+    useAuthStore();
 
   const registerUser = async (credentials: {
     name: string;
     email: string;
     password: string;
   }) => {
-    const { token, activationCode } = await registerApi(credentials);
-    register(token, activationCode);
+    return await registerApi(credentials);
   };
 
-  const activateUser = async (credentials: { code: string }) => {
+  const activateUser = async (credentials: { otp: string }) => {
     await activationApi(credentials);
-    activation();
+  };
+
+  const resendOTP = async () => {
+    return await resendOtp();
+  };
+
+  const forgotPassword = async (credentials: { email: string }) => {
+    return await forgotPasswordApi(credentials);
+  };
+
+  const resetPassword = async (credentials: {
+    password: string;
+    confirmPassword: string;
+    token: string;
+  }) => {
+    return await resetPasswordApi(credentials);
   };
 
   const socialAuthUser = async (credential: {
@@ -55,7 +63,6 @@ const useAuth = () => {
   const getLoggedUser = async () => {
     const { user } = await getUserApi();
     getUser(user);
-    return;
   };
 
   const logoutUser = async () => {
@@ -69,6 +76,9 @@ const useAuth = () => {
     isAuthenticated,
     registerUser,
     activateUser,
+    resendOTP,
+    forgotPassword,
+    resetPassword,
     socialAuthUser,
     getLoggedUser,
     loginUser,

@@ -4,16 +4,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BookOpen, Menu } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import { ThemeSwitcher } from "../utils/ThemeSwitcher";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import useAuth from "@/app/hooks/useAuth";
+import { useSession } from "next-auth/react";
 
 type Props = {
   active: number;
 };
 
 const Header = ({ active }: Props) => {
+  const { data } = useSession();
+  const { user, isAuthenticated, socialAuthUser } = useAuth();
+
+  useEffect(() => {
+    if (!user) {
+      if (data) {
+        socialAuthUser({ name: data.user?.name, email: data.user?.email });
+      }
+    }
+  }, [data, socialAuthUser]);
+
   return (
     <div className="w-full relative ">
       <header className=" backdrop-blur w-full fixed top-0 left-0 shadow-sm dark:bg-gray-900/70 bg-slate-50/60  z-50 dark:border-b-2">
@@ -65,10 +78,15 @@ const Header = ({ active }: Props) => {
             </form>
 
             <ThemeSwitcher />
-            <Link className="md:flex hidden" href={""}>
+            <Link
+              className="md:flex hidden"
+              href={isAuthenticated ? "/profile" : "/login"}
+            >
               <Avatar>
                 <AvatarImage
-                  src="/male.png"
+                  src={
+                    user?.profile?.avatar ? user?.profile.avatar : "/male.png"
+                  }
                   className="hue-rotate-60"
                   alt="user"
                 />
@@ -88,7 +106,11 @@ const Header = ({ active }: Props) => {
                     <Avatar className="h-8 w-8">
                       <AvatarImage
                         className="hue-rotate-60"
-                        src="/male.png"
+                        src={
+                          user?.profile?.avatar
+                            ? user?.profile.avatar
+                            : "/male.png"
+                        }
                         alt="user"
                       />
                       <AvatarFallback>User</AvatarFallback>

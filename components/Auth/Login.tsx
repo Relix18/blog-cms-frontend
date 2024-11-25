@@ -28,22 +28,17 @@ import { useForm } from "react-hook-form";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import useAuth from "@/app/hooks/useAuth";
-import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import Loader from "../Loader/Loader";
 
 export default function SignUpPage() {
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [isPending, startTransition] = useTransition();
+  const [pending, setPending] = useState<boolean>(false);
   const [hidden, setHidden] = useState(true);
-  const { loginUser, isAuthenticated, getLoggedUser } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/");
-    }
-    getLoggedUser();
-  }, [isAuthenticated]);
+  const { loginUser, socialAuthUser } = useAuth();
+  const { data } = useSession();
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -53,9 +48,21 @@ export default function SignUpPage() {
     },
   });
 
+  useEffect(() => {
+    if (data) {
+      socialAuthUser({
+        name: data.user?.name as string,
+        email: data.user?.email as string,
+      }).catch((err) => {
+        setError(err?.res.data.message);
+      });
+    }
+  }, [data, socialAuthUser]);
+
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
+    setPending(true);
 
     startTransition(() => {
       loginUser(values)
@@ -64,6 +71,9 @@ export default function SignUpPage() {
         })
         .catch((err) => {
           setError(err?.response.data.message);
+        })
+        .finally(() => {
+          setPending(false);
         });
     });
   };
@@ -142,7 +152,7 @@ export default function SignUpPage() {
                   disabled={isPending}
                   className="w-full bg-fuchsia-600 hover:bg-fuchsia-700 text-white"
                 >
-                  Login
+                  Login {pending && <Loader isButton={true} />}
                 </Button>
               </div>
             </form>
@@ -162,7 +172,7 @@ export default function SignUpPage() {
           <div className="grid grid-cols-2 gap-4">
             <Button
               variant="outline"
-              onClick={() => socialSignIn("github")}
+              onClick={() => signIn("github")}
               className="border-fuchsia-600 text-fuchsia-600 hover:bg-fuchsia-50 dark:hover:bg-background dark:hover:text-primary"
             >
               <Github className="mr-2 h-4 w-4" />
@@ -170,7 +180,7 @@ export default function SignUpPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => socialSignIn("google")}
+              onClick={() => signIn("google")}
               className="border-fuchsia-600 text-fuchsia-600 hover:bg-fuchsia-50 dark:hover:bg-background dark:hover:text-primary"
             >
               <Mail className="mr-2 h-4 w-4" />
@@ -184,6 +194,15 @@ export default function SignUpPage() {
               className="font-semibold text-fuchsia-600 hover:underline"
             >
               Sign up
+            </Link>
+          </div>
+          <div className="text-center text-sm text-fuchsia-900">
+            Forgot your password?{" "}
+            <Link
+              href="/forgot-password"
+              className="font-semibold text-fuchsia-600 hover:underline"
+            >
+              Reset it here
             </Link>
           </div>
         </CardFooter>
