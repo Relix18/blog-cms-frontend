@@ -1,3 +1,4 @@
+"use client";
 import {
   activationApi,
   loginApi,
@@ -12,7 +13,7 @@ import {
 import useAuthStore from "../../state/authStore";
 
 const useAuth = () => {
-  const { user, token, isAuthenticated, socialAuth, login, logout, getUser } =
+  const { user, isAuthenticated, socialAuth, login, logout, getUser } =
     useAuthStore();
 
   const registerUser = async (credentials: {
@@ -46,9 +47,10 @@ const useAuth = () => {
   const socialAuthUser = async (credential: {
     name: string;
     email: string;
+    avatar: string;
   }) => {
-    const { user, token } = await socialAuthApi(credential);
-    socialAuth(user, token);
+    const { user } = await socialAuthApi(credential);
+    socialAuth(user);
   };
 
   const loginUser = async (credentials: {
@@ -56,7 +58,7 @@ const useAuth = () => {
     password: string;
   }) => {
     const data = await loginApi(credentials);
-    login(data.user, data.token);
+    login(data.user);
     return data;
   };
 
@@ -72,7 +74,7 @@ const useAuth = () => {
 
   return {
     user,
-    token,
+
     isAuthenticated,
     registerUser,
     activateUser,

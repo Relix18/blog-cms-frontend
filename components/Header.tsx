@@ -12,17 +12,21 @@ import useAuth from "@/app/hooks/useAuth";
 import { useSession } from "next-auth/react";
 
 type Props = {
-  active: number;
+  active?: number;
+  isProfile?: boolean;
 };
 
-const Header = ({ active }: Props) => {
+const Header = ({ active, isProfile }: Props) => {
   const { data } = useSession();
   const { user, isAuthenticated, socialAuthUser } = useAuth();
 
   useEffect(() => {
     if (!user) {
       if (data) {
-        socialAuthUser({ name: data.user?.name, email: data.user?.email });
+        socialAuthUser({
+          name: data.user?.name as string,
+          email: data.user?.email as string,
+        });
       }
     }
   }, [data, socialAuthUser]);
@@ -50,7 +54,7 @@ const Header = ({ active }: Props) => {
             </Link>
             <Link
               href="#"
-              className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+              className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500"
             >
               Categories
             </Link>
@@ -61,7 +65,7 @@ const Header = ({ active }: Props) => {
               Contact
             </Link>
           </nav>
-          <form className={"flex md:hidden w-full"}>
+          <form className={`md:hidden flex  w-full`}>
             <Input
               type="search"
               placeholder="Search..."
@@ -69,7 +73,35 @@ const Header = ({ active }: Props) => {
             />
           </form>
           <div className="flex items-center space-x-2">
-            <form className={"hidden md:flex"}>
+            {isProfile && (
+              <div className="hidden md:flex gap-4">
+                <Link
+                  href="#"
+                  className={`${
+                    user?.role !== "ADMIN" && "hidden"
+                  } text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500`}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="#"
+                  className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+                >
+                  New Post
+                </Link>
+                <Link
+                  href="#"
+                  className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+                >
+                  Analytics
+                </Link>
+              </div>
+            )}
+            <form
+              className={` ${
+                isProfile ? "md:hidden" : "md:flex"
+              } hidden md:flex`}
+            >
               <Input
                 type="search"
                 placeholder="Search..."
@@ -82,7 +114,7 @@ const Header = ({ active }: Props) => {
               className="md:flex hidden"
               href={isAuthenticated ? "/profile" : "/login"}
             >
-              <Avatar>
+              <Avatar className={isProfile && "hidden"}>
                 <AvatarImage
                   src={
                     user?.profile?.avatar ? user?.profile.avatar : "/male.png"
@@ -117,6 +149,7 @@ const Header = ({ active }: Props) => {
                     </Avatar>
                     Relix
                   </span>
+
                   <Link
                     href="#"
                     className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "

@@ -17,6 +17,7 @@ interface SignupCredentials {
 interface SocialCredentials {
   name: string;
   email: string;
+  avatar: string;
 }
 
 interface RegisterUser {
@@ -26,7 +27,6 @@ interface RegisterUser {
 
 interface LoginUser {
   user: User;
-  token: string;
 }
 
 export const registerApi = async (
@@ -97,5 +97,7 @@ export const getUserApi = async () => {
 };
 
 export const logoutApi = async () => {
-  await axios.post(`${baseUrl}logout`);
+  await axios.get(`${baseUrl}logout`, {
+    withCredentials: true,
+  });
 };

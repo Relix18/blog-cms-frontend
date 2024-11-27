@@ -54,6 +54,7 @@ export default function SignUpPage() {
       socialAuthUser({
         name: data.user?.name as string,
         email: data.user?.email as string,
+        avatar: data.user?.image as string,
       }).catch((err) => {
         setError(err?.res.data.message);
       });
