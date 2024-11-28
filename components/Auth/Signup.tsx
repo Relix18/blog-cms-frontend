@@ -26,19 +26,21 @@ import { RegisterSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FormError } from "../form-error";
-import useAuth from "@/app/hooks/useAuth";
 import Verificaiton from "./Verification";
 import Loader from "../Loader/Loader";
 import { useSession, signIn } from "next-auth/react";
+import {
+  useRegisterMutation,
+  useSocialAuthMutation,
+} from "@/state/api/auth/authApi";
 
 export default function SignUpPage() {
   const [error, setError] = useState<string | undefined>(undefined);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  const [isPending, startTransition] = useTransition();
-  const [pending, setPending] = useState<boolean>(false);
   const [hidden, setHidden] = useState(true);
   const { data } = useSession();
-  const { registerUser, socialAuthUser } = useAuth();
+  const [register, { isSuccess, isLoading, error: err }] =
+    useRegisterMutation();
+  const [socialAuth, { error: socialErr }] = useSocialAuthMutation();
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -51,32 +53,27 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (data) {
-      socialAuthUser({
+      socialAuth({
         name: data.user?.name as string,
         email: data.user?.email as string,
         avatar: data.user?.image as string,
-      }).catch((err) => {
-        setError(err?.res.data.message);
       });
     }
-  }, [data, socialAuthUser]);
 
-  const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
+    if (socialErr) {
+      setError(socialErr?.data?.message);
+    }
+  }, [data, socialAuth, socialErr]);
+
+  useEffect(() => {
     setError("");
-    setPending(true);
+    if (err) {
+      setError(err?.data?.message);
+    }
+  }, [err]);
 
-    startTransition(() => {
-      registerUser(values)
-        .then(() => {
-          setIsSuccess(true);
-        })
-        .catch((err) => {
-          setError(err?.response.data.message);
-        })
-        .finally(() => {
-          setPending(false);
-        });
-    });
+  const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
+    await register(values);
   };
 
   return (
@@ -104,7 +101,7 @@ export default function SignUpPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            disabled={isPending}
+                            disabled={isLoading}
                             className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
                           />
                         </FormControl>
@@ -121,7 +118,7 @@ export default function SignUpPage() {
                         <FormControl>
                           <Input
                             {...field}
-                            disabled={isPending}
+                            disabled={isLoading}
                             type="email"
                             className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
                           />
@@ -140,7 +137,7 @@ export default function SignUpPage() {
                           <div className="flex relative">
                             <Input
                               {...field}
-                              disabled={isPending}
+                              disabled={isLoading}
                               type={hidden ? "password" : "text"}
                               className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
                             />
@@ -166,10 +163,10 @@ export default function SignUpPage() {
                   <FormError message={error} />
                   <Button
                     type="submit"
-                    disabled={isPending}
+                    disabled={isLoading}
                     className="w-full bg-fuchsia-600 hover:bg-fuchsia-700 text-white"
                   >
-                    Sign Up {pending && <Loader isButton={true} />}
+                    Sign Up {isLoading && <Loader isButton={true} />}
                   </Button>
                 </div>
               </form>

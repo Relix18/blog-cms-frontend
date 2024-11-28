@@ -4,10 +4,11 @@ import Profile from "@/components/Profile/Profile";
 import React from "react";
 import Protected from "../hooks/useProtected";
 import Heading from "@/utils/Heading";
-import useAuth from "../hooks/useAuth";
+import { useSelector } from "react-redux";
+import { getLoggedUser } from "@/state/api/auth/authSlice";
 
 const page = () => {
-  const { user } = useAuth();
+  const user = useSelector(getLoggedUser);
 
   return (
     <>

@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
-import useAuth from "./useAuth";
 import React from "react";
+import useAuth from "./useAuth";
 
 interface props {
   children: React.ReactNode;
 }
 
 const Protected = ({ children }: props) => {
-  const { isAuthenticated } = useAuth();
+  const isAuthenticated = useAuth();
 
   return isAuthenticated ? children : redirect("/");
 };

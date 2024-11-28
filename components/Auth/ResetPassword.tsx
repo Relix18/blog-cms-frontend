@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,18 +25,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
-import useAuth from "@/app/hooks/useAuth";
 import Loader from "../Loader/Loader";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useResetPasswordMutation } from "@/state/api/auth/authApi";
 
 export default function ResetPassword() {
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
-  const [isPending, startTransition] = useTransition();
-  const [pending, setPending] = useState<boolean>(false);
-  const { resetPassword } = useAuth();
-  const { token } = useParams();
+  const [resetPassword, { data, error: isError, isSuccess, isLoading }] =
+    useResetPasswordMutation();
+  const params = useParams();
 
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
@@ -46,29 +45,26 @@ export default function ResetPassword() {
     },
   });
 
+  useEffect(() => {
+    if (isError) {
+      setError(isError?.data?.message);
+    }
+    if (isSuccess) {
+      setSuccess(data.message);
+    }
+  }, [isError, isSuccess, data]);
+
   const onSubmit = async (value: z.infer<typeof ResetPasswordSchema>) => {
     setError("");
     setSuccess("");
-    setPending(true);
 
     const values = {
-      token,
+      token: params?.token,
       password: value.password,
       confirmPassword: value.confirmPassword,
     };
 
-    startTransition(() => {
-      resetPassword(values)
-        .then((data) => {
-          setSuccess(data.message);
-        })
-        .catch((err) => {
-          setError(err?.response.data.message);
-        })
-        .finally(() => {
-          setPending(false);
-        });
-    });
+    await resetPassword(values);
   };
 
   return (
@@ -95,7 +91,7 @@ export default function ResetPassword() {
                       <FormControl>
                         <Input
                           {...field}
-                          disabled={isPending}
+                          disabled={isLoading}
                           type={"password"}
                           className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
                         />
@@ -113,7 +109,7 @@ export default function ResetPassword() {
                       <FormControl>
                         <Input
                           {...field}
-                          disabled={isPending}
+                          disabled={isLoading}
                           type={"password"}
                           className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
                         />
@@ -127,10 +123,10 @@ export default function ResetPassword() {
                 <FormSuccess message={success} />
                 <Button
                   type="submit"
-                  disabled={isPending}
+                  disabled={isLoading}
                   className="w-full bg-fuchsia-600 hover:bg-fuchsia-700 text-white"
                 >
-                  Reset Password {pending && <Loader isButton={true} />}
+                  Reset Password {isLoading && <Loader isButton={true} />}
                 </Button>
               </div>
             </form>

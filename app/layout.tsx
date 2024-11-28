@@ -3,10 +3,12 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "../utils/ThemeProvider";
-import { useEffect, useState } from "react";
-import useAuth from "./hooks/useAuth";
 import Loader from "@/components/Loader/Loader";
 import { SessionProvider } from "next-auth/react";
+import { Provider } from "react-redux";
+import { store } from "@/state/store";
+import { useGetUserQuery } from "@/state/api/user/userApi";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,32 +31,26 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider>
-          <ThemeProvider
-            attribute={"class"}
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Custom>{children}</Custom>
-          </ThemeProvider>
-        </SessionProvider>
+        <Provider store={store}>
+          <SessionProvider>
+            <ThemeProvider
+              attribute={"class"}
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <Custom>{children}</Custom>
+              <Toaster />
+            </ThemeProvider>
+          </SessionProvider>
+        </Provider>
       </body>
     </html>
   );
 }
 
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [loading, setLoading] = useState(true);
-  const { getLoggedUser } = useAuth();
-  useEffect(() => {
-    const fetchData = async () => {
-      await getLoggedUser().finally(() => {
-        setLoading(false);
-      });
-    };
-    fetchData();
-  }, []);
+  const { isLoading } = useGetUserQuery({});
 
-  return <>{loading ? <Loader /> : <>{children}</>}</>;
+  return <>{isLoading ? <Loader /> : <>{children}</>}</>;
 };

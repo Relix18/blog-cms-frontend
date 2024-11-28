@@ -23,7 +23,7 @@ import { VerificationSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
-import { useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import Loader from "../Loader/Loader";
 import {
   InputOTP,
@@ -31,61 +31,60 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "../ui/input-otp";
-import useAuth from "@/app/hooks/useAuth";
 import { useRouter } from "next/navigation";
+import {
+  useActivateUserMutation,
+  useResendOtpMutation,
+} from "@/state/api/auth/authApi";
 
 const Verificaiton = () => {
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
-  const [isPending, startTransition] = useTransition();
-  const [pending, setPending] = useState<boolean>(false);
-  const { activateUser, resendOTP } = useAuth();
+  const [activateUser, { error: err, isLoading, isSuccess }] =
+    useActivateUserMutation();
+  const [
+    resendOTP,
+    { data: successMessage, isSuccess: resendSuccess, error: resendError },
+  ] = useResendOtpMutation();
+
   const router = useRouter();
 
   const form = useForm<z.infer<typeof VerificationSchema>>({
     resolver: zodResolver(VerificationSchema),
-    defaultValues: {},
+    defaultValues: {
+      otp: "",
+    },
   });
 
-  const onSubmit = (values: z.infer<typeof VerificationSchema>) => {
-    setSuccess("");
-    setError("");
+  useEffect(() => {
+    if (err) {
+      const { data } = err;
+      setError(data?.message);
+    }
+    if (isSuccess) {
+      router.push("/");
+    }
+  }, [err, isSuccess, router]);
 
-    startTransition(() => {
-      setPending(false);
-      activateUser(values)
-        .then(() => {
-          setPending(true);
-          setSuccess("Email Verified Successfully");
-          router.push("/");
-        })
-        .catch((err) => {
-          setError(err?.response.data.message);
-        })
-        .finally(() => {
-          setPending(false);
-        });
-    });
+  useEffect(() => {
+    if (resendError) {
+      const { data } = resendError;
+      setError(data?.message);
+    }
+    if (resendSuccess) {
+      setSuccess(successMessage?.message);
+    }
+  }, [resendSuccess, resendError]);
+
+  const onSubmit = async (values: z.infer<typeof VerificationSchema>) => {
+    setError("");
+    await activateUser(values);
   };
 
-  const resendOtpHandler = () => {
+  const resendOtpHandler = async () => {
     setSuccess("");
     setError("");
-
-    startTransition(() => {
-      setPending(false);
-      resendOTP()
-        .then((data) => {
-          setPending(true);
-          setSuccess(data.message);
-        })
-        .catch((err) => {
-          setError(err?.response.data.message);
-        })
-        .finally(() => {
-          setPending(false);
-        });
-    });
+    await resendOTP();
   };
 
   return (
@@ -131,10 +130,10 @@ const Verificaiton = () => {
               <FormSuccess message={success} />
               <Button
                 type="submit"
-                disabled={isPending}
+                disabled={isLoading}
                 className="w-full bg-fuchsia-600 hover:bg-fuchsia-700 text-white"
               >
-                Verify OTP {pending && <Loader isButton={true} />}
+                Verify OTP {isLoading && <Loader isButton={true} />}
               </Button>
             </div>
           </form>

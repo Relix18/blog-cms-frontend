@@ -8,8 +8,11 @@ import React, { useEffect } from "react";
 import { ThemeSwitcher } from "../utils/ThemeSwitcher";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import useAuth from "@/app/hooks/useAuth";
 import { useSession } from "next-auth/react";
+import { useSocialAuthMutation } from "@/state/api/auth/authApi";
+import useAuth from "@/app/hooks/useAuth";
+import { useSelector } from "react-redux";
+import { getLoggedUser } from "@/state/api/auth/authSlice";
 
 type Props = {
   active?: number;
@@ -18,18 +21,21 @@ type Props = {
 
 const Header = ({ active, isProfile }: Props) => {
   const { data } = useSession();
-  const { user, isAuthenticated, socialAuthUser } = useAuth();
+  const [socialAuth] = useSocialAuthMutation();
+  const isAuthenticated = useAuth();
+  const user = useSelector(getLoggedUser);
 
   useEffect(() => {
-    if (!user) {
+    if (!user && !isAuthenticated) {
       if (data) {
-        socialAuthUser({
+        socialAuth({
           name: data.user?.name as string,
           email: data.user?.email as string,
+          avatar: data.user?.image as string,
         });
       }
     }
-  }, [data, socialAuthUser]);
+  }, [data, socialAuth]);
 
   return (
     <div className="w-full relative ">
@@ -114,12 +120,11 @@ const Header = ({ active, isProfile }: Props) => {
               className="md:flex hidden"
               href={isAuthenticated ? "/profile" : "/login"}
             >
-              <Avatar className={isProfile && "hidden"}>
+              <Avatar className={isProfile ? "hidden" : ""}>
                 <AvatarImage
                   src={
                     user?.profile?.avatar ? user?.profile.avatar : "/male.png"
                   }
-                  className="hue-rotate-60"
                   alt="user"
                 />
                 <AvatarFallback>User</AvatarFallback>

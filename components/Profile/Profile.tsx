@@ -1,22 +1,19 @@
 "use client";
 import {
   Edit3,
-  Eye,
-  EyeOff,
+  Facebook,
   Github,
+  Instagram,
+  Linkedin,
   Mail,
   MessageSquare,
   ThumbsUp,
-  Twitter,
 } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Button } from "../ui/button";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
-import useAuth from "@/app/hooks/useAuth";
+
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { signOut } from "next-auth/react";
 
@@ -27,19 +24,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { useLogoutQuery } from "@/state/api/auth/authApi";
+import Settings from "./Settings";
+import { useSelector } from "react-redux";
+import { getLoggedUser } from "@/state/api/auth/authSlice";
 
-type Props = {};
+const Profile = () => {
+  const [logoutUser, setLogoutUser] = useState<boolean>(false);
+  const user = useSelector(getLoggedUser);
+  const {} = useLogoutQuery(undefined, { skip: !logoutUser ? true : false });
+  const [activeTab, setActiveTab] = useState(
+    user?.role === "USER" ? "activity" : "posts"
+  );
 
-const Profile = (props: Props) => {
-  const [showCurrentPassword, setShowCurrentPassword] =
-    useState<boolean>(false);
-  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState("posts");
-  const { user, logoutUser } = useAuth();
-
-  const signoutHanlder = () => {
-    logoutUser();
-    signOut();
+  const signoutHanlder = async () => {
+    setLogoutUser(true);
+    await signOut();
   };
 
   return (
@@ -85,31 +85,58 @@ const Profile = (props: Props) => {
                   </div>
 
                   <div className="flex justify-center sm:justify-start space-x-4 mt-4">
-                    <Link
-                      href="#"
-                      className="text-fuchsia-600  hover:text-fuchsia-700 "
-                    >
-                      <Mail className="h-5 w-5" />
-                    </Link>
-                    <Link
-                      href="#"
-                      className="text-fuchsia-600  hover:text-fuchsia-700"
-                    >
-                      <Github className="h-5 w-5" />
-                    </Link>
-                    <Link
-                      href="#"
-                      className="text-fuchsia-600  hover:text-fuchsia-700 "
-                    >
-                      <Twitter className="h-5 w-5" />
-                    </Link>
+                    {user?.profile?.social?.mailLink && (
+                      <Link
+                        href={`mailto:${user.profile?.social.mailLink}`}
+                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                      >
+                        <Mail className="h-5 w-5" />
+                      </Link>
+                    )}
+                    {user?.profile?.social?.instaLink && (
+                      <Link
+                        href={user.profile?.social.instaLink}
+                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                      >
+                        <Instagram className="h-5 w-5" />
+                      </Link>
+                    )}
+                    {user?.profile?.social?.githubLink && (
+                      <Link
+                        href={user.profile?.social.githubLink}
+                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Github className="h-5 w-5" />
+                      </Link>
+                    )}
+                    {user?.profile?.social?.facebookLink && (
+                      <Link
+                        href={user.profile?.social.facebookLink}
+                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Facebook className="h-5 w-5" />
+                      </Link>
+                    )}
+                    {user?.profile?.social?.linkedinLink && (
+                      <Link
+                        href={user.profile?.social.linkedinLink}
+                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Linkedin className="h-5 w-5" />
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
               <Tabs
                 onValueChange={setActiveTab}
                 value={activeTab}
-                defaultValue="posts"
                 className="w-full"
               >
                 <div>
@@ -125,7 +152,7 @@ const Profile = (props: Props) => {
                     <TabsTrigger value="settings">Settings</TabsTrigger>
                     <Button
                       onClick={signoutHanlder}
-                      className="px-2 block bg-transparent hover:bg-transparent text-fuchsia-600 dark:text-red-700"
+                      className="px-2 block bg-transparent hover:bg-transparent text-red-700"
                     >
                       Sign Out
                     </Button>
@@ -178,8 +205,9 @@ const Profile = (props: Props) => {
                               Edit
                             </Button>
                             <Button
-                              variant="link"
-                              className="text-fuchsia-600 "
+                              variant={"default"}
+                              size={"sm"}
+                              className="bg-fuchsia-600 text-white hover:bg-fuchsia-700 "
                             >
                               View
                             </Button>
@@ -211,7 +239,7 @@ const Profile = (props: Props) => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-fuchsia-600 dark:text-fuchsia-400 border-fuchsia-600 dark:border-fuchsia-400"
+                              className="text-fuchsia-600 border-fuchsia-600"
                             >
                               Edit
                             </Button>
@@ -294,163 +322,7 @@ const Profile = (props: Props) => {
                     ))}
                   </div>
                 </TabsContent>
-                <TabsContent value="settings">
-                  <form className="space-y-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Display Name</Label>
-                      <Input id="name" defaultValue={user?.name} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        defaultValue={user?.email}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="bio">Bio</Label>
-                      <Textarea
-                        id="bio"
-                        defaultValue={user?.profile?.bio || ""}
-                      />
-                    </div>
-
-                    <TabsContent value="activity">
-                      <div className="space-y-6">
-                        {[1, 2, 3].map((activity) => (
-                          <div
-                            key={activity}
-                            className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0 last:pb-0"
-                          >
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                              {activity === 1
-                                ? "Commented on"
-                                : activity === 2
-                                ? "Liked"
-                                : "Bookmarked"}{" "}
-                              <Link
-                                href="#"
-                                className="text-fuchsia-600 dark:text-fuchsia-400 hover:underline"
-                              >
-                                "The Future of AI in Everyday Life"
-                              </Link>
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-300 mb-2">
-                              {activity === 1 &&
-                                "Great article! I especially enjoyed the section on AI in healthcare."}
-                            </p>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
-                              {activity} day{activity !== 1 ? "s" : ""} ago
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="bookmarks">
-                      <div className="space-y-6">
-                        {[1, 2, 3].map((bookmark) => (
-                          <article
-                            key={bookmark}
-                            className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0 last:pb-0"
-                          >
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                              <Link
-                                href="#"
-                                className="hover:text-fuchsia-600 dark:hover:text-fuchsia-400"
-                              >
-                                Exciting Tech Trend {bookmark}
-                              </Link>
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-300 mb-4">
-                              A brief preview of the article content. This is
-                              where you'd see a summary or the first few lines
-                              of the bookmarked post.
-                            </p>
-                            <div className="flex flex-wrap justify-between items-center gap-2">
-                              <span className="text-sm text-gray-500 dark:text-gray-400">
-                                Bookmarked on May {bookmark + 10}, 2023
-                              </span>
-                              <Button
-                                variant="link"
-                                className="text-fuchsia-600 dark:text-fuchsia-400"
-                              >
-                                Read More
-                              </Button>
-                            </div>
-                          </article>
-                        ))}
-                      </div>
-                    </TabsContent>
-
-                    <Button
-                      type="submit"
-                      className="w-full sm:w-auto bg-fuchsia-600 text-white hover:bg-fuchsia-700"
-                    >
-                      Save Changes
-                    </Button>
-                  </form>
-                  <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                      Change Password
-                    </h3>
-                    <form className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="current-password">
-                          Current Password
-                        </Label>
-                        <div className="relative">
-                          <Input
-                            id="current-password"
-                            type={showCurrentPassword ? "text" : "password"}
-                            className="pr-10"
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setShowCurrentPassword(!showCurrentPassword)
-                            }
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
-                          >
-                            {showCurrentPassword ? (
-                              <EyeOff className="h-5 w-5" aria-hidden="true" />
-                            ) : (
-                              <Eye className="h-5 w-5" aria-hidden="true" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="new-password">New Password</Label>
-                        <div className="relative">
-                          <Input
-                            id="new-password"
-                            type={showNewPassword ? "text" : "password"}
-                            className="pr-10"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500"
-                          >
-                            {showNewPassword ? (
-                              <EyeOff className="h-5 w-5" aria-hidden="true" />
-                            ) : (
-                              <Eye className="h-5 w-5" aria-hidden="true" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      <Button
-                        type="submit"
-                        className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
-                      >
-                        Change Password
-                      </Button>
-                    </form>
-                  </div>
-                </TabsContent>
+                <Settings user={user} />
               </Tabs>
             </div>
           </div>
