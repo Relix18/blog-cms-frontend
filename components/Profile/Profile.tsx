@@ -10,7 +10,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Button } from "../ui/button";
 
@@ -28,19 +28,47 @@ import { useLogoutQuery } from "@/state/api/auth/authApi";
 import Settings from "./Settings";
 import { useSelector } from "react-redux";
 import { getLoggedUser } from "@/state/api/auth/authSlice";
+import { Label } from "@radix-ui/react-label";
+import { Input } from "../ui/input";
+import { useUpdateAvatarMutation } from "@/state/api/user/userApi";
+import { useToast } from "@/hooks/use-toast";
 
 const Profile = () => {
   const [logoutUser, setLogoutUser] = useState<boolean>(false);
   const user = useSelector(getLoggedUser);
+  const [updateAvatar, { isSuccess, error }] = useUpdateAvatarMutation();
   const {} = useLogoutQuery(undefined, { skip: !logoutUser ? true : false });
   const [activeTab, setActiveTab] = useState(
     user?.role === "USER" ? "activity" : "posts"
   );
+  const { toast } = useToast();
 
-  const signoutHanlder = async () => {
+  const signoutHandler = async () => {
     setLogoutUser(true);
     await signOut();
   };
+
+  const imageHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileReader = new FileReader();
+
+    fileReader.onload = async () => {
+      const avatar = fileReader.result;
+      if (fileReader.readyState === 2) {
+        updateAvatar({ avatar });
+      }
+    };
+    if (!e.target.files) return;
+    fileReader.readAsDataURL(e.target.files[0]);
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({ title: "Profile picture updated successfully" });
+    }
+    if (error) {
+      console.log(error);
+    }
+  }, [isSuccess, error]);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-10 dark:bg-background">
@@ -61,9 +89,19 @@ const Profile = () => {
                     />
                     <AvatarFallback>JD</AvatarFallback>
                   </Avatar>
-                  <span className="w-6 h-6 items-center cursor-pointer text-white flex justify-center rounded-full absolute bottom-2 right-2 bg-gray-500">
-                    <Edit3 className="w-4 h-4    " />
-                  </span>
+                  <Input
+                    type="file"
+                    name=""
+                    id="avatar"
+                    className="hidden"
+                    onChange={imageHanlder}
+                    accept="image/png, image/jpg, image/jpeg, image/webp"
+                  />
+                  <Label htmlFor="avatar">
+                    <span className="w-6 h-6 items-center cursor-pointer text-white flex justify-center rounded-full absolute bottom-2 right-2 bg-gray-500">
+                      <Edit3 className="w-4 h-4    " />
+                    </span>
+                  </Label>
                 </div>
                 <div className="text-center sm:text-left">
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
@@ -151,7 +189,7 @@ const Profile = () => {
                     <TabsTrigger value="like">Liked Posts</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
                     <Button
-                      onClick={signoutHanlder}
+                      onClick={signoutHandler}
                       className="px-2 block bg-transparent hover:bg-transparent text-red-700"
                     >
                       Sign Out

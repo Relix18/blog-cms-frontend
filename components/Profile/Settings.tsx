@@ -5,7 +5,6 @@ import { Eye, EyeOff } from "lucide-react";
 import { Input } from "../ui/input";
 import { TabsContent } from "../ui/tabs";
 import { Textarea } from "../ui/textarea";
-import { User } from "@/state/api/user/userApi";
 import { useForm } from "react-hook-form";
 import { ChangePasswordSchme, ProfileSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +23,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import Loader from "../Loader/Loader";
 import { FormError } from "../form-error";
+import { User } from "@/state/api/auth/authSlice";
 
 type Props = {
   user: User | null;
@@ -125,7 +125,6 @@ const Settings = ({ user }: Props) => {
                       type="email"
                       readOnly
                       disabled={isLoading}
-                      className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
                     />
                   </FormControl>
                   <FormMessage />

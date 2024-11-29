@@ -71,8 +71,8 @@ export const ProfileSchema = z.object({
     .min(1, {
       message: "Bio is required",
     })
-    .max(50, {
-      message: "Maximum words limit is 50.",
+    .max(100, {
+      message: "Maximum words limit is 100.",
     }),
   githubLink: z.string().url().optional().or(z.literal("")),
   instaLink: z.string().url().optional().or(z.literal("")),
