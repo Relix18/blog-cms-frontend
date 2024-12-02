@@ -1,15 +1,16 @@
 import { redirect } from "next/navigation";
-import useAuth from "./useAuth";
 import React from "react";
+import { getLoggedUser } from "@/state/api/auth/authSlice";
+import { useSelector } from "react-redux";
 
 interface props {
   children: React.ReactNode;
 }
 
-const AdminProtected = ({ children }: props) => {
-  const { user } = useAuth();
+const useAdminProtected = ({ children }: props) => {
+  const { user } = useSelector(getLoggedUser);
 
   return user?.role === "ADMIN" ? children : redirect("/");
 };
 
-export default AdminProtected;
+export default useAdminProtected;

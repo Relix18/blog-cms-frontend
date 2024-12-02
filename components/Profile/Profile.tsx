@@ -74,7 +74,7 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50 pt-10 dark:bg-background">
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <div className="bg-white dark:bg-muted/50 shadow rounded-lg overflow-hidden">
             <div className="p-6 sm:p-8 md:p-10">
               <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
                 <div className="relative">
@@ -190,7 +190,7 @@ const Profile = () => {
                     <TabsTrigger value="settings">Settings</TabsTrigger>
                     <Button
                       onClick={signoutHandler}
-                      className="px-2 block bg-transparent hover:bg-transparent text-red-700"
+                      className="px-2 block bg-transparent hover:bg-transparent text-red-600 font-bold"
                     >
                       Sign Out
                     </Button>

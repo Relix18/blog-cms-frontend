@@ -114,7 +114,7 @@ const Header = ({ active, isProfile }: Props) => {
                   Dashboard
                 </Link>
                 <Link
-                  href="#"
+                  href="/post/new-post"
                   className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
                 >
                   New Post
@@ -188,25 +188,25 @@ const Header = ({ active, isProfile }: Props) => {
                   </span>
 
                   <Link
-                    href="#"
+                    href="/profile"
                     className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
                   >
                     <UserCircle className="mr-2 h-5 w-5 " /> Profile
                   </Link>
                   <Link
-                    href="#"
+                    href="/"
                     className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
                   >
                     <HomeIcon className="h-5 w-5 mr-2" /> Home
                   </Link>
                   <Link
-                    href="#"
+                    href="/categories"
                     className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
                   >
                     <Blocks className="h-5 w-5 mr-2" /> Categories
                   </Link>
                   <Link
-                    href="#"
+                    href="/contact-us"
                     className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
                   >
                     <LucideContact className="mr-2 h-5 w-5" /> Contact
@@ -220,7 +220,7 @@ const Header = ({ active, isProfile }: Props) => {
                 <SheetFooter className="absolute bottom-2">
                   <Button
                     onClick={logoutHandler}
-                    className="bg-transparent hover:bg-transparent text-md px-0 text-destructive"
+                    className="bg-transparent hover:bg-transparent text-md px-0 text-destructive font-bold"
                   >
                     <LogOutIcon /> Sign Out
                   </Button>

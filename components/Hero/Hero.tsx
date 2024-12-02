@@ -3,11 +3,20 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 
 export default function Hero() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-white pt-10 dark:from-gray-900 dark:to-gray-800 dark:text-white">
+    <div className="min-h-screen pt-10">
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
           <div className="bg-gradient-to-r from-fuchsia-500 to-pink-500 dark:from-fuchsia-600 dark:to-pink-600 rounded-lg shadow-xl p-8 md:p-12 text-white">
@@ -18,11 +27,7 @@ export default function Hero() {
               Discover insightful articles, expert opinions, and the latest
               trends.
             </p>
-            <Button
-              variant="secondary"
-              size="lg"
-              className="bg-white text-fuchsia-600 hover:bg-gray-100"
-            >
+            <Button variant="secondary" size="lg">
               Start Reading
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
@@ -33,16 +38,16 @@ export default function Hero() {
           <h2 className="text-3xl font-bold mb-6">Featured Posts</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3].map((post) => (
-              <article
+              <Card
                 key={post}
-                className="bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105"
+                className="transition-transform hover:scale-105 bg-muted/25"
               >
-                <img
-                  src={`/placeholder.svg?height=200&width=400&text=Featured+Image+${post}`}
+                <Image
+                  src={``}
                   alt={`Featured post ${post}`}
                   className="w-full h-48 object-cover"
                 />
-                <div className="p-6">
+                <CardContent>
                   <h3 className="text-xl font-semibold mb-2 dark:text-white">
                     Exciting Blog Post Title {post}
                   </h3>
@@ -62,8 +67,8 @@ export default function Hero() {
                       Read More
                     </Button>
                   </div>
-                </div>
-              </article>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </section>
@@ -72,16 +77,17 @@ export default function Hero() {
           <h2 className="text-3xl font-bold mb-6">Latest Posts</h2>
           <div className="space-y-8">
             {[1, 2, 3, 4].map((post) => (
-              <article
+              <Card
                 key={post}
-                className="flex flex-col md:flex-row bg-white dark:bg-gray-700 rounded-lg shadow-md overflow-hidden"
+                className="flex flex-col md:flex-row bg-muted/25"
               >
-                <img
-                  src={`/placeholder.svg?height=250&width=400&text=Post+Image+${post}`}
+                <Image
+                  src={``}
                   alt={`Post ${post}`}
                   className="w-full md:w-1/3 h-48 md:h-auto object-cover"
                 />
-                <div className="p-6 md:w-2/3">
+
+                <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-2 dark:text-white">
                     Interesting Article Title {post}
                   </h3>
@@ -102,33 +108,35 @@ export default function Hero() {
                       Continue Reading
                     </Button>
                   </div>
-                </div>
-              </article>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </section>
 
-        <section className="bg-gray-100 dark:bg-gray-700 rounded-lg p-8 mb-16">
-          <h2 className="text-3xl font-bold mb-4 dark:text-white">
-            Stay Updated
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Subscribe to our newsletter for the latest blog posts and updates.
-          </p>
-          <form className="flex flex-col md:flex-row gap-4">
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              className="md:w-2/3"
-            />
-            <Button
-              type="submit"
-              className="md:w-1/3 bg-fuchsia-600 text-white hover:bg-fuchsia-700 dark:bg-fuchsia-500 dark:hover:bg-fuchsia-600"
-            >
-              Subscribe
-            </Button>
-          </form>
-        </section>
+        <Card className="bg-muted/25">
+          <CardContent className="p-8">
+            <h2 className="text-3xl font-bold mb-4 dark:text-white">
+              Stay Updated
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              Subscribe to our newsletter for the latest blog posts and updates.
+            </p>
+            <form className="flex flex-col md:flex-row gap-4">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                className="md:w-2/3"
+              />
+              <Button
+                type="submit"
+                className="md:w-1/3 bg-fuchsia-600 text-white hover:bg-fuchsia-700 dark:bg-fuchsia-500 dark:hover:bg-fuchsia-600"
+              >
+                Subscribe
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </main>
 
       <footer className="bg-gray-800 dark:bg-gray-900 text-white py-8">
