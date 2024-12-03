@@ -27,6 +27,10 @@ input::-webkit-inner-spin-button {
 .ql-container {
   background-color: hsl(220, 13%, 91%);
 }
+
+.dark .ql-toolbar {
+  background-color: hsl(240, 1%, 70%);
+}
 .dark .ql-container {
   background-color: hsl(213, 18%, 12%);
 }
