@@ -7,12 +7,35 @@ type EditorProps = {
   onChange: (value: string) => void;
 };
 
+const formats = [
+  "background",
+  "bold",
+  "color",
+  "font",
+  "code",
+  "italic",
+  "link",
+  "size",
+  "strike",
+  "script",
+  "underline",
+  "blockquote",
+  "header",
+  "indent",
+  "list",
+  "align",
+  "direction",
+  "code-block",
+  "formula",
+  // 'image'
+  // 'video'
+];
+
 export default function Editor({ value, onChange }: EditorProps) {
   const quillRef = useRef<HTMLDivElement>(null);
   const [quill, setQuill] = useState<Quill | null>(null);
 
   useEffect(() => {
-    // Initialize Quill only once
     if (quillRef.current && !quill) {
       const quillInstance = new Quill(quillRef.current, {
         theme: "snow",
@@ -28,19 +51,18 @@ export default function Editor({ value, onChange }: EditorProps) {
             ["clean"],
           ],
         },
+        formats: formats,
       });
 
       setQuill(quillInstance);
 
-      // Set initial content
       quillInstance.root.innerHTML = value;
 
-      // Listen for changes in Quill content and update form state
       quillInstance.on("text-change", () => {
         onChange(quillInstance.root.innerHTML);
       });
     }
-  }, [quill, value, onChange]); // Run once on mount and when value changes
+  }, [quill, value, onChange]);
 
-  return <div ref={quillRef} style={{ height: "300px" }} />;
+  return <div ref={quillRef} style={{ height: "500px" }} />;
 }

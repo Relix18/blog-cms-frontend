@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,18 +20,50 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Editor from "./QuillEditor";
+import imageCompression from "browser-image-compression";
+import {
+  useCreatePostMutation,
+  useGetCategoryQuery,
+  usePublishPostMutation,
+} from "@/state/api/post/postApi";
+import { useToast } from "@/hooks/use-toast";
+import Loader from "@/components/Loader/Loader";
+import { useRouter } from "next/navigation";
 
 export default function CreateNewPost() {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [categories, setCategories] = useState([
-    { value: "technology", label: "Technology" },
-    { value: "lifestyle", label: "Lifestyle" },
-    { value: "travel", label: "Travel" },
-    { value: "food", label: "Food" },
-    { value: "health", label: "Health" },
-  ]);
+  const { data: category } = useGetCategoryQuery({ skip: false });
+  const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [creatPost, { isLoading, isSuccess, error }] = useCreatePostMutation();
+  const [
+    publishPost,
+    { isLoading: publishLoading, isSuccess: isPublished, error: publishError },
+  ] = usePublishPostMutation();
+  const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    setCategories(category?.categories);
+    if (isSuccess) {
+      toast({ title: "Post created and saved as draft." });
+      postForm.reset();
+      router.back();
+    }
+    if (error) {
+      toast({ title: error?.data.message });
+    }
+  }, [isSuccess, error, toast, category]);
+
+  useEffect(() => {
+    if (isPublished) {
+      toast({ title: "Post published successfully." });
+    }
+    if (publishError) {
+      toast({ title: publishError?.data.message });
+    }
+  }, [isPublished, publishError, toast]);
 
   const postForm = useForm<z.infer<typeof PostSchmea>>({
     resolver: zodResolver(PostSchmea),
@@ -39,36 +71,36 @@ export default function CreateNewPost() {
       title: "",
       description: "",
       content: "",
-      category: [],
-      metaTitle: "",
-      metaDescription: "",
-      metaKeyword: "",
+      categories: [],
     },
   });
 
-  const onSubmit = (values: z.infer<typeof PostSchmea>) => {
-    const formData = {
-      ...values,
-      image: imagePreview,
-      category: selectedCategories.map((cat) => cat.value),
-    };
-    console.log(formData);
+  const slug = (title: string) => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "");
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(file);
-        setImagePreview(reader.result as string);
-      };
-      reader.onerror = () => {
-        console.error("Error reading file");
-        setImage(null);
-        setImagePreview(null);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const options = { maxWidthOrHeight: 800, useWebWorker: true };
+        const compressedFile = await imageCompression(file, options);
+
+        const base64 = await imageCompression.getDataUrlFromFile(
+          compressedFile
+        );
+
+        setImage(compressedFile);
+        setImagePreview(base64);
+      } catch (error) {
+        console.error("Error compressing image:", error);
+      }
     }
   };
 
@@ -76,8 +108,8 @@ export default function CreateNewPost() {
     setSelectedCategories(selectedOptions);
 
     postForm.setValue(
-      "category",
-      selectedOptions.map((option) => option.value) // Send only the values
+      "categories",
+      selectedOptions.map((option) => option.value)
     );
 
     selectedOptions.forEach((option) => {
@@ -87,11 +119,31 @@ export default function CreateNewPost() {
     });
   };
 
+  const onSubmit = async (
+    values: z.infer<typeof PostSchmea>,
+    e: React.BaseSyntheticEvent
+  ) => {
+    const action = e.nativeEvent?.submitter?.value;
+    const formData = {
+      ...values,
+      slug: slug(values.title),
+      metaTitle: values.title,
+      metaDescription: values.description,
+      metaKeyword: selectedCategories.map((cat) => cat.value).join(", "),
+      featuredImage: imagePreview,
+      categories: selectedCategories.map((cat) => cat.value),
+    };
+    const { data } = await creatPost(formData);
+    if (action === "Publish") {
+      await publishPost(data.post.id);
+    }
+  };
+
   return (
-    <div className="min-h-screen pt-10 ">
+    <div className="min-h-screen bg-gray-50 pt-10 ">
       <main className="container mx-auto px-4 py-8 ">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-muted/50 shadow rounded-lg overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-white dark:bg-muted/50 shadow rounded-lg ">
             <div className="p-6 sm:p-8 md:p-10">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
                 Create New Post
@@ -115,7 +167,7 @@ export default function CreateNewPost() {
                             <Input
                               {...field}
                               placeholder="Enter post title"
-                              //   disabled={isLoading}
+                              disabled={isLoading}
                               className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
                             />
                           </FormControl>
@@ -135,6 +187,7 @@ export default function CreateNewPost() {
                         <input
                           id="image"
                           type="file"
+                          disabled={isLoading}
                           accept="image/*"
                           onChange={handleImageChange}
                           className="hidden"
@@ -161,7 +214,7 @@ export default function CreateNewPost() {
                             alt="Preview"
                             width={300}
                             height={300}
-                            className="rounded-md w-full object-cover"
+                            className="rounded-md w-full h-[400px] object-fill"
                           />
                         </div>
                       )}
@@ -172,7 +225,7 @@ export default function CreateNewPost() {
                     <FormField
                       control={postForm.control}
                       name="content"
-                      render={({ field }) => (
+                      render={() => (
                         <FormItem>
                           <FormLabel>
                             Content{" "}
@@ -181,6 +234,7 @@ export default function CreateNewPost() {
                           <FormControl>
                             <Controller
                               name="content"
+                              disabled={isLoading}
                               control={postForm.control}
                               render={({ field }) => (
                                 <Editor
@@ -209,6 +263,7 @@ export default function CreateNewPost() {
                             <Input
                               {...field}
                               id="description"
+                              disabled={isLoading}
                               placeholder="Enter a short description of your post"
                               className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
                             />
@@ -222,7 +277,7 @@ export default function CreateNewPost() {
                   <div className="space-y-2">
                     <FormField
                       control={postForm.control}
-                      name="category"
+                      name="categories"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
@@ -232,9 +287,10 @@ export default function CreateNewPost() {
                           <FormControl>
                             <CreatableSelect
                               {...field}
-                              id="category"
+                              id="categories"
+                              disabled={isLoading}
                               isMulti
-                              value={selectedCategories} // Bind with selected categories state
+                              value={selectedCategories}
                               onChange={handleCategoryChange}
                               options={categories}
                               placeholder="Select or create categories"
@@ -251,93 +307,24 @@ export default function CreateNewPost() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <FormField
-                      control={postForm.control}
-                      name="metaTitle"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Meta Title{" "}
-                            <span className=" text-gray-400">
-                              (for better seo, optional)
-                            </span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              id="metaTitle"
-                              placeholder="Enter meta title"
-                              className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <FormField
-                      control={postForm.control}
-                      name="metaDescription"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Meta Description{" "}
-                            <span className=" text-gray-400">
-                              (for better seo, optional)
-                            </span>
-                          </FormLabel>
-                          <FormControl>
-                            <Textarea
-                              {...field}
-                              id="metaDescription"
-                              placeholder="Enter meta description"
-                              className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <FormField
-                      control={postForm.control}
-                      name="metaKeyword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Meta Keywords{" "}
-                            <span className=" text-gray-400">
-                              (for better seo, optional)
-                            </span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              id="metaKeywords"
-                              placeholder="Enter meta keywords, separated by commas"
-                              className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
                   <div className="flex justify-end space-x-4">
-                    <Button type="button" variant="outline">
-                      Save as Draft
+                    <Button
+                      type="submit"
+                      value={"Draft"}
+                      name="action"
+                      variant="outline"
+                    >
+                      Save as Draft {isLoading && <Loader isButton={true} />}
                     </Button>
                     <Button
                       type="submit"
+                      value={"Publish"}
+                      name="action"
                       className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
                     >
-                      Publish Post
+                      Publish Post{" "}
+                      {isLoading ||
+                        (publishLoading && <Loader isButton={true} />)}
                     </Button>
                   </div>
                 </form>

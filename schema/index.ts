@@ -96,8 +96,5 @@ export const PostSchmea = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   content: z.string().min(1, "Content is required"),
-  category: z.array(z.string()).min(1, "At least one category is required"),
-  metaTitle: z.string().optional(),
-  metaDescription: z.string().optional(),
-  metaKeyword: z.string().optional(),
+  categories: z.array(z.string()).min(1, "At least one category is required"),
 });
