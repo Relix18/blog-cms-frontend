@@ -24,7 +24,7 @@ const PublishedPost = ({ posts, isLoading }: Props) => {
       )}
       {published?.length === 0 ? (
         <div className="flex justify-center items-center h-[200px] text-lg text-gray-400">
-          No draft post available
+          Not published any post yet.
         </div>
       ) : (
         <div className="space-y-6">
@@ -53,11 +53,12 @@ const PublishedPost = ({ posts, isLoading }: Props) => {
                     <Link href={`post/edit-post/${post.slug}`}>Edit</Link>
                   </Button>
                   <Button
+                    asChild
                     variant={"default"}
                     size={"sm"}
                     className="bg-fuchsia-600 text-white hover:bg-fuchsia-700 "
                   >
-                    View
+                    <Link href={`post/view/${post.slug}`}>View</Link>
                   </Button>
                 </div>
               </div>

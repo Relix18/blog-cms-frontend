@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Upload } from "lucide-react";
 import Image from "next/image";
 import { Controller, useForm } from "react-hook-form";
 import CreatableSelect from "react-select/creatable";
-import { PostSchmea } from "@/schema";
+import { MultiValue } from "react-select";
+import { PostSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -29,13 +29,30 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import Loader from "@/components/Loader/Loader";
 import { useRouter } from "next/navigation";
+import { isApiResponse } from "@/types/types";
+
+interface CategoryOption {
+  value: string;
+  label: string;
+}
+
+interface CategoryResponse {
+  categories: CategoryOption[];
+}
 
 export default function CreateNewPost() {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { data: category } = useGetCategoryQuery({ skip: false });
-  const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const { data: category } = useGetCategoryQuery(undefined, {
+    skip: false,
+  }) as { data: CategoryResponse };
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<
+    CategoryOption[]
+  >([]);
+  const [submitAction, setSubmitAction] = useState<"Draft" | "Publish">(
+    "Draft"
+  );
   const [creatPost, { isLoading, isSuccess, error }] = useCreatePostMutation();
   const [
     publishPost,
@@ -45,28 +62,16 @@ export default function CreateNewPost() {
   const router = useRouter();
 
   useEffect(() => {
-    setCategories(category?.categories);
-    if (isSuccess) {
-      toast({ title: "Post created and saved as draft." });
-      postForm.reset();
-      router.back();
-    }
-    if (error) {
-      toast({ title: error?.data.message });
-    }
-  }, [isSuccess, error, toast, category]);
-
-  useEffect(() => {
     if (isPublished) {
       toast({ title: "Post published successfully." });
     }
-    if (publishError) {
-      toast({ title: publishError?.data.message });
+    if (isApiResponse(publishError)) {
+      toast({ title: publishError?.data?.message });
     }
   }, [isPublished, publishError, toast]);
 
-  const postForm = useForm<z.infer<typeof PostSchmea>>({
-    resolver: zodResolver(PostSchmea),
+  const postForm = useForm<z.infer<typeof PostSchema>>({
+    resolver: zodResolver(PostSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -74,6 +79,20 @@ export default function CreateNewPost() {
       categories: [],
     },
   });
+
+  useEffect(() => {
+    if (category) setCategories(category.categories);
+
+    if (isSuccess) {
+      toast({ title: "Post created and saved as draft." });
+      postForm.reset();
+      router.back();
+    }
+
+    if (isApiResponse(error)) {
+      toast({ title: error?.data?.message || "An error occurred." });
+    }
+  }, [isSuccess, error, toast, category, router, postForm]);
 
   const slug = (title: string) => {
     return title
@@ -104,26 +123,25 @@ export default function CreateNewPost() {
     }
   };
 
-  const handleCategoryChange = (selectedOptions) => {
-    setSelectedCategories(selectedOptions);
+  const handleCategoryChange = (
+    selectedOptions: MultiValue<CategoryOption>
+  ) => {
+    const selected = selectedOptions as CategoryOption[];
+    setSelectedCategories(selected);
 
     postForm.setValue(
       "categories",
-      selectedOptions.map((option) => option.value)
+      selected.map((option) => option.value)
     );
 
-    selectedOptions.forEach((option) => {
+    selected.forEach((option) => {
       if (!categories.some((cat) => cat.value === option.value)) {
         setCategories((prevCategories) => [...prevCategories, option]);
       }
     });
   };
 
-  const onSubmit = async (
-    values: z.infer<typeof PostSchmea>,
-    e: React.BaseSyntheticEvent
-  ) => {
-    const action = e.nativeEvent?.submitter?.value;
+  const onSubmit = async (values: z.infer<typeof PostSchema>) => {
     const formData = {
       ...values,
       slug: slug(values.title),
@@ -133,8 +151,11 @@ export default function CreateNewPost() {
       featuredImage: imagePreview,
       categories: selectedCategories.map((cat) => cat.value),
     };
+
+    console.log(formData);
     const { data } = await creatPost(formData);
-    if (action === "Publish") {
+
+    if (submitAction === "Publish" && data?.post?.id) {
       await publishPost(data.post.id);
     }
   };
@@ -288,7 +309,6 @@ export default function CreateNewPost() {
                             <CreatableSelect
                               {...field}
                               id="categories"
-                              disabled={isLoading}
                               isMulti
                               value={selectedCategories}
                               onChange={handleCategoryChange}
@@ -310,7 +330,10 @@ export default function CreateNewPost() {
                   <div className="flex justify-end space-x-4">
                     <Button
                       type="submit"
-                      value={"Draft"}
+                      onClick={() => {
+                        setSubmitAction("Draft");
+                        postForm.handleSubmit(onSubmit)();
+                      }}
                       name="action"
                       variant="outline"
                     >
@@ -318,7 +341,10 @@ export default function CreateNewPost() {
                     </Button>
                     <Button
                       type="submit"
-                      value={"Publish"}
+                      onClick={() => {
+                        setSubmitAction("Publish");
+                        postForm.handleSubmit(onSubmit)();
+                      }}
                       name="action"
                       className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
                     >

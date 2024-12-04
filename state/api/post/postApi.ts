@@ -32,7 +32,7 @@ export const post = createApi({
       }),
       providesTags: ["AuthorPost"],
     }),
-    getPostById: builder.query({
+    getPostBySlug: builder.query({
       query: (slug) => ({
         url: `get-single-post/${slug}`,
         method: "GET",
@@ -70,6 +70,6 @@ export const {
   useGetAuthorPostQuery,
   useGetPostsQuery,
   useGetCategoryQuery,
-  useGetPostByIdQuery,
+  useGetPostBySlugQuery,
   useUpdatePostMutation,
 } = post;

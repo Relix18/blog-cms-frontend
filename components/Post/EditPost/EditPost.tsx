@@ -21,7 +21,7 @@ import {
 import Editor from "../NewPost/QuillEditor";
 import imageCompression from "browser-image-compression";
 import {
-  useGetPostByIdQuery,
+  useGetPostBySlugQuery,
   useGetCategoryQuery,
   useUpdatePostMutation,
 } from "@/state/api/post/postApi";
@@ -52,7 +52,7 @@ export default function EditPost({ slug }: Props) {
   >([]);
 
   const { data: category } = useGetCategoryQuery({ skip: false });
-  const { data: postData, isLoading } = useGetPostByIdQuery(slug);
+  const { data: postData, isLoading } = useGetPostBySlugQuery(slug);
   const [updatePost, { isSuccess, isLoading: isUpdating, error }] =
     useUpdatePostMutation();
   const { toast } = useToast();
@@ -97,9 +97,9 @@ export default function EditPost({ slug }: Props) {
       router.back();
     }
     if (isApiResponse(error)) {
-      toast({ title: error?.data.message });
+      toast({ variant: "destructive", title: error?.data.message });
     }
-  }, [isSuccess, error, toast]);
+  }, [isSuccess, error, toast, router]);
 
   const generateSlug = (title: string) => {
     return title
