@@ -30,12 +30,15 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useResetPasswordMutation } from "@/state/api/auth/authApi";
 
-export default function ResetPassword() {
+interface props {
+  token: string;
+}
+
+export default function ResetPassword({ token }: props) {
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [resetPassword, { data, error: isError, isSuccess, isLoading }] =
     useResetPasswordMutation();
-  const params = useParams();
 
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
@@ -59,7 +62,7 @@ export default function ResetPassword() {
     setSuccess("");
 
     const values = {
-      token: params?.token,
+      token,
       password: value.password,
       confirmPassword: value.confirmPassword,
     };

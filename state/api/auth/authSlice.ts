@@ -1,34 +1,8 @@
+import { IUser } from "@/types/types";
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "ADMIN" | "AUTHOR" | "USER";
-  isSocial: boolean;
-  profile: Profile;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface Profile {
-  id: number;
-  avatar: string;
-  bio: string | null;
-  social: SOCIAL;
-}
-
-interface SOCIAL {
-  id: number;
-  facebookLink: string | null;
-  githubLink: string | null;
-  instaLink: string | null;
-  linkedinLink: string | null;
-  mailLink: string | null;
-}
-
 interface InitialState {
-  user: User | null;
+  user: IUser | null;
 }
 
 const initialState: InitialState = {

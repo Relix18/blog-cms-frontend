@@ -92,9 +92,19 @@ export const ChangePasswordSchme = z.object({
     }),
 });
 
-export const PostSchmea = z.object({
+export const PostSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   content: z.string().min(1, "Content is required"),
-  categories: z.array(z.string()).min(1, "At least one category is required"),
+  categories: z
+    .array(
+      z.union([
+        z.string(),
+        z.object({
+          value: z.string(),
+          label: z.string().optional(),
+        }),
+      ])
+    )
+    .min(1, "At least one category is required"),
 });

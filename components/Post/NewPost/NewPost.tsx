@@ -214,7 +214,7 @@ export default function CreateNewPost() {
                             alt="Preview"
                             width={300}
                             height={300}
-                            className="rounded-md w-full h-[400px] object-fill"
+                            className="rounded-md w-full  object-fill"
                           />
                         </div>
                       )}

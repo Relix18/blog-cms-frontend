@@ -32,6 +32,22 @@ export const post = createApi({
       }),
       providesTags: ["AuthorPost"],
     }),
+    getPostById: builder.query({
+      query: (slug) => ({
+        url: `get-single-post/${slug}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    updatePost: builder.mutation({
+      query: (data) => ({
+        url: `update-post/${data.id}`,
+        method: "PUT",
+        body: data.post,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Post", "AuthorPost"],
+    }),
     getPosts: builder.query({
       query: () => ({
         url: "get-all-posts",
@@ -54,4 +70,6 @@ export const {
   useGetAuthorPostQuery,
   useGetPostsQuery,
   useGetCategoryQuery,
+  useGetPostByIdQuery,
+  useUpdatePostMutation,
 } = post;

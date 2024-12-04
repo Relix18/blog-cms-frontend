@@ -1,10 +1,8 @@
 import ResetPassword from "@/components/Auth/ResetPassword";
 import React from "react";
 
-type Props = {};
-
-const page = (props: Props) => {
-  return <ResetPassword />;
+const page = ({ params }: any) => {
+  return <ResetPassword token={params.token} />;
 };
 
 export default page;

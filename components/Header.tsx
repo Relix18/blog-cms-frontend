@@ -6,6 +6,7 @@ import {
   Blocks,
   BookOpen,
   HomeIcon,
+  LogIn,
   LogOutIcon,
   LucideContact,
   Menu,
@@ -30,6 +31,18 @@ import {
 import useAuth from "@/app/hooks/useAuth";
 import { useSelector } from "react-redux";
 import { getLoggedUser } from "@/state/api/auth/authSlice";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import { useRouter } from "next/navigation";
 
 type Props = {
   active?: number;
@@ -43,6 +56,7 @@ const Header = ({ active, isProfile }: Props) => {
   const isAuthenticated = useAuth();
   const {} = useLogoutQuery(undefined, { skip: !logoutUser ? true : false });
   const user = useSelector(getLoggedUser);
+  const router = useRouter();
 
   useEffect(() => {
     if (!user && !isAuthenticated) {
@@ -59,6 +73,7 @@ const Header = ({ active, isProfile }: Props) => {
   const logoutHandler = async () => {
     setLogoutUser(true);
     await signOut();
+    router.push("/");
   };
 
   return (
@@ -172,27 +187,38 @@ const Header = ({ active, isProfile }: Props) => {
               </SheetTrigger>
               <SheetContent>
                 <nav className="flex flex-col gap-4">
-                  <span className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={
-                          user?.profile?.avatar
-                            ? user?.profile.avatar
-                            : "/male.png"
-                        }
-                        alt="user"
-                      />
-                      <AvatarFallback>User</AvatarFallback>
-                    </Avatar>
-                    Relix
-                  </span>
+                  {isAuthenticated ? (
+                    <>
+                      <span className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage
+                            src={
+                              user?.profile?.avatar
+                                ? user?.profile.avatar
+                                : "/male.png"
+                            }
+                            alt="user"
+                          />
+                          <AvatarFallback>User</AvatarFallback>
+                        </Avatar>
+                        {user?.name}
+                      </span>
 
-                  <Link
-                    href="/profile"
-                    className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
-                  >
-                    <UserCircle className="mr-2 h-5 w-5 " /> Profile
-                  </Link>
+                      <Link
+                        href="/profile"
+                        className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+                      >
+                        <UserCircle className="mr-2 h-5 w-5 " /> Profile
+                      </Link>
+                    </>
+                  ) : (
+                    <Link
+                      href={"/login"}
+                      className="flex items-center text-md text-fuchsia-600 font-bold"
+                    >
+                      <LogIn className="mr-2" /> Login
+                    </Link>
+                  )}
                   <Link
                     href="/"
                     className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
@@ -217,13 +243,36 @@ const Header = ({ active, isProfile }: Props) => {
                     </Button>
                   )}
                 </nav>
+
                 <SheetFooter className="absolute bottom-2">
-                  <Button
-                    onClick={logoutHandler}
-                    className="bg-transparent hover:bg-transparent text-md px-0 text-destructive font-bold"
-                  >
-                    <LogOutIcon /> Sign Out
-                  </Button>
+                  {isAuthenticated && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button className="bg-transparent hover:bg-transparent text-md px-0 text-destructive font-bold">
+                          <LogOutIcon /> Sign Out
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            You will be logged out of your account and
+                            redirected to the home page. This action cannot be
+                            undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive hover:bg-destructive/80"
+                            onClick={logoutHandler}
+                          >
+                            Sign Out
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </SheetFooter>
               </SheetContent>
             </Sheet>

@@ -23,10 +23,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import Loader from "../Loader/Loader";
 import { FormError } from "../form-error";
-import { User } from "@/state/api/auth/authSlice";
+import { IUser } from "@/types/types";
 
 type Props = {
-  user: User | null;
+  user: IUser | null;
 };
 
 const Settings = ({ user }: Props) => {

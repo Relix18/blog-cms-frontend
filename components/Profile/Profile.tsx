@@ -32,20 +32,37 @@ import { Label } from "@radix-ui/react-label";
 import { Input } from "../ui/input";
 import { useUpdateAvatarMutation } from "@/state/api/user/userApi";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { useRouter } from "next/navigation";
+import Drafts from "./Drafts";
+import { useGetAuthorPostQuery } from "@/state/api/post/postApi";
+import PublishedPost from "./PublishedPost";
+import useUIStore from "@/app/hooks/useUIStore";
 
 const Profile = () => {
   const [logoutUser, setLogoutUser] = useState<boolean>(false);
   const user = useSelector(getLoggedUser);
   const [updateAvatar, { isSuccess, error }] = useUpdateAvatarMutation();
   const {} = useLogoutQuery(undefined, { skip: !logoutUser ? true : false });
-  const [activeTab, setActiveTab] = useState(
-    user?.role === "USER" ? "activity" : "posts"
-  );
+  const { data: authorPost, isLoading } = useGetAuthorPostQuery({});
   const { toast } = useToast();
+  const router = useRouter();
+  const { setActiveTab, activeTab } = useUIStore();
 
   const signoutHandler = async () => {
     setLogoutUser(true);
     await signOut();
+    router.push("/");
   };
 
   const imageHanlder = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +85,7 @@ const Profile = () => {
     if (error) {
       console.log(error);
     }
-  }, [isSuccess, error]);
+  }, [isSuccess, error, toast]);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-10 dark:bg-background">
@@ -188,12 +205,34 @@ const Profile = () => {
                     <TabsTrigger value="activity">Recent Activity</TabsTrigger>
                     <TabsTrigger value="like">Liked Posts</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
-                    <Button
-                      onClick={signoutHandler}
-                      className="px-2 block bg-transparent hover:bg-transparent text-red-600 font-bold"
-                    >
-                      Sign Out
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button className="px-2 block bg-transparent hover:bg-transparent text-red-600 font-bold">
+                          Sign Out
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            You will be logged out of your account and
+                            redirected to the home page. This action cannot be
+                            undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive hover:bg-destructive/80"
+                            onClick={signoutHandler}
+                          >
+                            Sign Out
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TabsList>
                   <div className="sm:hidden">
                     <Select
@@ -215,85 +254,8 @@ const Profile = () => {
                     </Select>
                   </div>
                 </div>
-                <TabsContent value="posts">
-                  <div className="space-y-6">
-                    {[1, 2, 3].map((post) => (
-                      <article
-                        key={post}
-                        className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0 last:pb-0"
-                      >
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                          Exciting Blog Post Title {post}
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-300 mb-4">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing
-                          elit. Sed do eiusmod tempor incididunt ut labore et
-                          dolore magna aliqua.
-                        </p>
-                        <div className="flex flex-wrap justify-between items-center gap-2">
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            Published on May {post}, 2023
-                          </span>
-                          <div className="space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-fuchsia-600  border-fuchsia-600 "
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              variant={"default"}
-                              size={"sm"}
-                              className="bg-fuchsia-600 text-white hover:bg-fuchsia-700 "
-                            >
-                              View
-                            </Button>
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </TabsContent>
-                <TabsContent value="drafts">
-                  <div className="space-y-6">
-                    {[1, 2].map((draft) => (
-                      <article
-                        key={draft}
-                        className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0 last:pb-0"
-                      >
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                          Draft Post Title {draft}
-                        </h2>
-                        <p className="text-gray-600 dark:text-gray-300 mb-4">
-                          This is a draft post. It's not visible to the public
-                          yet. You can continue editing or publish when ready.
-                        </p>
-                        <div className="flex flex-wrap justify-between items-center gap-2">
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            Last edited on June {draft}, 2023
-                          </span>
-                          <div className="space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-fuchsia-600 border-fuchsia-600"
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              variant="default"
-                              size="sm"
-                              className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
-                            >
-                              Publish
-                            </Button>
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </TabsContent>
+                <PublishedPost posts={authorPost?.post} isLoading={isLoading} />
+                <Drafts posts={authorPost?.post} isLoading={isLoading} />
                 <TabsContent value="activity">
                   <div className="space-y-6">
                     {[1, 2, 3].map((activity) => (
