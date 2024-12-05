@@ -18,3 +18,21 @@ export function ProfilePostLoader() {
     </div>
   );
 }
+
+export function PostDetailLoader() {
+  return (
+    <div className="">
+      <Skeleton className="h-12" />
+      <div className="md:w-[80%] w-[95%] mt-4 space-y-2 flex flex-col m-auto">
+        <Skeleton className="h-14 w-[100%]" />
+        <Skeleton className="h-14 w-[40%]" />
+        <div className="flex pb-2 space-x-2">
+          <Skeleton className="h-6 w-[12%]" />
+          <Skeleton className="h-6 w-[12%]" />
+          <Skeleton className="h-6 w-[12%]" />
+        </div>
+        <Skeleton className="h-[400px] w-[100%]" />
+      </div>
+    </div>
+  );
+}

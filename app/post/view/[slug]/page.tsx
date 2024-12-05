@@ -1,6 +1,7 @@
 "use client";
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import Loader from "@/components/Loader/Loader";
+import { PostDetailLoader } from "@/components/Loader/SkeletonLoader";
 import PostDetail from "@/components/Post/ViewPost/PostDetail";
 import { useGetPostBySlugQuery } from "@/state/api/post/postApi";
 import Heading from "@/utils/Heading";
@@ -15,7 +16,7 @@ export default function Page({ params }: Props) {
   const { data, isLoading } = useGetPostBySlugQuery(slug);
 
   if (isLoading) {
-    return <Loader />;
+    return <PostDetailLoader />;
   }
 
   return (
@@ -27,6 +28,7 @@ export default function Page({ params }: Props) {
       />
       <Header />
       <PostDetail data={data?.post} />
+      <Footer />
     </>
   );
 }

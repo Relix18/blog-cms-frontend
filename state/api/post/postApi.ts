@@ -36,7 +36,6 @@ export const post = createApi({
       query: (slug) => ({
         url: `get-single-post/${slug}`,
         method: "GET",
-        credentials: "include",
       }),
       providesTags: ["Post"],
     }),
@@ -96,6 +95,14 @@ export const post = createApi({
       }),
       invalidatesTags: ["Post"],
     }),
+    viewUpdate: builder.mutation({
+      query: (slug) => ({
+        url: `post-view/${slug}`,
+        method: "POST",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Post"],
+    }),
   }),
 });
 
@@ -111,4 +118,5 @@ export const {
   useGetCommentQuery,
   useCommentReplyMutation,
   useLikePostMutation,
+  useViewUpdateMutation,
 } = post;

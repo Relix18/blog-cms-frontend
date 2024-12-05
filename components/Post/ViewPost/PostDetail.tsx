@@ -21,21 +21,29 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { MdWhatsapp } from "react-icons/md";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useCommentReplyMutation,
   useGetCommentQuery,
   useLikePostMutation,
   usePostCommentMutation,
+  useViewUpdateMutation,
 } from "@/state/api/post/postApi";
 import Loader from "@/components/Loader/Loader";
 import { useToast } from "@/hooks/use-toast";
 import { format as ago } from "timeago.js";
 import { useSelector } from "react-redux";
 import { getLoggedUser } from "@/state/api/auth/authSlice";
+import Pusher from "pusher-js";
+import { useRelatedPostMutation } from "@/state/api/feature/featureApi";
+import ScrollProgressBar from "@/utils/ScrollProgressBar";
 
 interface Props {
   data: IPost;
+}
+
+interface RelatedPost {
+  post: IPost;
 }
 
 export default function SingleBlogPost({ data }: Props) {
@@ -46,14 +54,20 @@ export default function SingleBlogPost({ data }: Props) {
   );
   const [isLiked, setIsLiked] = useState(false);
   const [comment, setComment] = useState("");
+  const [likeCount, setLikeCount] = useState<number | null>(null);
   const { data: getComment } = useGetCommentQuery(data.slug);
   const [postComment, { isLoading, isSuccess }] = usePostCommentMutation();
   const [commentReply] = useCommentReplyMutation();
+  const [viewUpdate] = useViewUpdateMutation();
   const [likePost] = useLikePostMutation();
+  const [relatedPost, { data: relatedPosts }] = useRelatedPostMutation();
   const user = useSelector(getLoggedUser);
-  console.log(data);
   const url = window.location.href;
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const contentRef = useRef(null);
+  let ticking = false;
   const { toast } = useToast();
+
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
     url
   )}`;
@@ -67,101 +81,72 @@ export default function SingleBlogPost({ data }: Props) {
     data.title
   )}%20${encodeURIComponent(url)}`;
 
-  const post = {
-    title: "The Future of Artificial Intelligence: Promises and Perils",
-    author: "Jane Doe",
-    date: "May 15, 2023",
-    readTime: "8 min read",
-    image: "/placeholder.svg?height=400&width=800",
-    content: `Artificial Intelligence (AI) has become an integral part of our daily lives, revolutionizing industries and reshaping the way we interact with technology. As we stand on the brink of a new era, it's crucial to examine both the promises and perils that AI presents to our society.
+  useEffect(() => {
+    const updateViewCount = async () => {
+      const viewedPosts = JSON.parse(
+        localStorage.getItem("viewedPosts") || "{}"
+      );
 
-    The Promises of AI:
-    
-    1. Enhanced Efficiency: AI has the potential to automate repetitive tasks, freeing up human resources for more creative and complex problem-solving.
-    
-    2. Medical Breakthroughs: AI-powered systems can analyze vast amounts of medical data, potentially leading to faster diagnoses and more effective treatments.
-    
-    3. Environmental Conservation: AI can help optimize resource usage, predict natural disasters, and contribute to sustainable practices.
-    
-    4. Personalized Experiences: From content recommendations to customized learning paths, AI can tailor experiences to individual preferences and needs.
-    
-    The Perils of AI:
-    
-    1. Job Displacement: As AI becomes more advanced, there's a risk of widespread job losses in certain sectors.
-    
-    2. Privacy Concerns: The vast amount of data required to train AI systems raises questions about data privacy and security.
-    
-    3. Algorithmic Bias: AI systems can perpetuate and amplify existing biases if not carefully designed and monitored.
-    
-    4. Ethical Dilemmas: As AI becomes more autonomous, we face complex ethical questions about decision-making and accountability.
-    
-    Conclusion:
-    
-    The future of AI is both exciting and challenging. As we continue to develop and implement AI technologies, it's crucial that we do so with careful consideration of their impact on society. By addressing the potential perils proactively and harnessing the promises responsibly, we can work towards a future where AI truly benefits humanity as a whole.`,
-    tags: ["Artificial Intelligence", "Technology", "Ethics", "Future"],
-    comments: [
-      {
-        id: 1,
-        author: "John Smith",
-        content:
-          "Great article! I'm particularly interested in the ethical implications of AI decision-making.",
-        avatar: "/placeholder.svg?height=40&width=40",
-        replies: [
-          {
-            id: 2,
-            author: "Jane Doe",
-            content:
-              "Thank you, John! The ethical implications are indeed a crucial aspect to consider. We need to ensure that AI systems are designed with strong ethical guidelines.",
-            avatar: "/placeholder.svg?height=40&width=40",
-          },
-          {
-            id: 3,
-            author: "Alex Johnson",
-            content:
-              "I agree with both of you. Perhaps we could establish an international ethics board for AI development?",
-            avatar: "/placeholder.svg?height=40&width=40",
-          },
-        ],
-      },
-      {
-        id: 4,
-        author: "Emily Brown",
-        content:
-          "I'd love to see more discussion on how we can mitigate job displacement as AI advances.",
-        avatar: "/placeholder.svg?height=40&width=40",
-        replies: [
-          {
-            id: 5,
-            author: "Michael Lee",
-            content:
-              "Great point, Emily. We should focus on reskilling programs and creating new job categories that complement AI rather than compete with it.",
-            avatar: "/placeholder.svg?height=40&width=40",
-          },
-          {
-            id: 6,
-            author: "Sarah Parker",
-            content:
-              "Education systems need to adapt quickly to prepare the workforce for an AI-driven future.",
-            avatar: "/placeholder.svg?height=40&width=40",
-          },
-        ],
-      },
-    ],
-    relatedPosts: [
-      {
-        title: "Machine Learning: A Beginner's Guide",
-        image: "/placeholder.svg?height=100&width=200",
-      },
-      {
-        title: "The Role of AI in Climate Change Mitigation",
-        image: "/placeholder.svg?height=100&width=200",
-      },
-      {
-        title: "Ethical Considerations in AI Development",
-        image: "/placeholder.svg?height=100&width=200",
-      },
-    ],
+      const now = Date.now();
+      const postLastViewed = viewedPosts[data.id];
+
+      if (!postLastViewed || now - postLastViewed > 900000) {
+        viewUpdate(data.slug);
+        localStorage.setItem(
+          "viewedPosts",
+          JSON.stringify({
+            ...viewedPosts,
+            [data.id]: now,
+          })
+        );
+      }
+    };
+
+    updateViewCount();
+  }, [data, viewUpdate]);
+
+  const cleanUpExpiredViews = () => {
+    const viewedPosts = JSON.parse(localStorage.getItem("viewedPosts") || "{}");
+    const now = Date.now();
+
+    const validEntries = Object.fromEntries(
+      Object.entries(viewedPosts).filter(
+        ([_, timestamp]) => now - timestamp <= 900000
+      )
+    );
+
+    localStorage.setItem("viewedPosts", JSON.stringify(validEntries));
   };
+
+  useEffect(() => {
+    const relPost = {
+      currentId: data.id,
+      value: data.categories[0].category.value,
+    };
+    relatedPost(relPost);
+    cleanUpExpiredViews();
+  }, [relatedPost, data]);
+
+  useEffect(() => {
+    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+    });
+
+    const channel = pusher.subscribe("post-channel");
+
+    channel.bind(
+      "like-updated",
+      (eventData: { postId: number; likeCount: number }) => {
+        if (eventData.postId === data.id) {
+          setLikeCount(eventData.likeCount);
+        }
+      }
+    );
+
+    return () => {
+      pusher.unsubscribe("post-channel");
+    };
+  }, [data]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -170,15 +155,45 @@ export default function SingleBlogPost({ data }: Props) {
   }, [isSuccess, toast]);
 
   useEffect(() => {
-    const isPostLiked = data.likes.find((like) => like.userId === user.id);
+    const isPostLiked = data.likes.find((like) => like.userId === user?.id);
     setIsLiked(isPostLiked ? true : false);
   }, [data, user]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (ticking) return; // If we're already in the middle of an update, do nothing
+      ticking = true; // Set the flag to indicate we're in the process of updating
+
+      // Throttle the scroll position update
+      requestAnimationFrame(() => {
+        const scrollPosition = window.scrollY;
+        const documentHeight = document.documentElement.scrollHeight;
+        const windowHeight = window.innerHeight;
+        const scrollPercentage =
+          (scrollPosition / (documentHeight - windowHeight)) * 100;
+
+        setScrollProgress(scrollPercentage); // Update scroll progress state
+        ticking = false; // Reset the flag
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const handleAddComment = async (slug: string) => {
     const data = {
       slug,
       comment,
     };
+    if (!user) {
+      return toast({
+        title: "You must be logged in to leave a comment.",
+      });
+    }
     await postComment(data);
     setComment("");
   };
@@ -198,6 +213,12 @@ export default function SingleBlogPost({ data }: Props) {
       commentId,
       reply: replyContent,
     };
+
+    if (!user) {
+      return toast({
+        title: "You must be logged in to reply.",
+      });
+    }
     await commentReply(data);
     setReplyingTo(null);
     setReplyContent("");
@@ -208,16 +229,20 @@ export default function SingleBlogPost({ data }: Props) {
   };
 
   const handleLike = async (postId: number) => {
+    if (!user) {
+      return toast({ title: "You must be logged in to leave a like." });
+    }
     setIsLiked(!isLiked);
+
     await likePost({ postId });
-    console.log(`Post ${isLiked ? "unliked" : "liked"}`);
   };
 
   return (
     <div className="min-h-screen pt-10 ">
-      <main className="container mx-auto px-4 py-8">
+      <ScrollProgressBar progress={scrollProgress} color="#ef46ef" />
+      <div ref={contentRef} className="container  mx-auto px-4 py-8">
         <article className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold  mb-4">{post.title}</h1>
+          <h1 className="text-4xl font-bold  mb-4">{data.title}</h1>
           <div className="flex items-center space-x-4 mb-6">
             <div className="flex items-center text-gray-600 dark:text-gray-400">
               <User className="h-5 w-5 mr-2" />
@@ -287,7 +312,7 @@ export default function SingleBlogPost({ data }: Props) {
               {isLiked ? "Liked" : "Like"}
             </Button>
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {data.likes.length} likes
+              {likeCount || data.likes.length} likes
             </span>
           </div>
         </article>
@@ -309,6 +334,7 @@ export default function SingleBlogPost({ data }: Props) {
               <Button
                 onClick={() => handleAddComment(data.slug)}
                 className="w-full"
+                disabled={!comment}
               >
                 <Send className="h-4 w-4 mr-2" />
                 Add Comment {isLoading && <Loader isButton={true} />}
@@ -377,7 +403,10 @@ export default function SingleBlogPost({ data }: Props) {
                           placeholder="Write your reply..."
                           className="mb-2"
                         />
-                        <Button onClick={() => submitReply(comment.id)}>
+                        <Button
+                          disabled={!replyContent}
+                          onClick={() => submitReply(comment.id)}
+                        >
                           Submit Reply
                         </Button>
                       </div>
@@ -429,31 +458,36 @@ export default function SingleBlogPost({ data }: Props) {
             Related Posts
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {post.relatedPosts.map((relatedPost, index) => (
-              <Card key={index}>
-                <CardContent className="p-4">
-                  <Image
-                    src={relatedPost.image}
-                    alt={relatedPost.title}
-                    width={200}
-                    height={100}
-                    className="rounded-lg mb-2 object-cover"
-                  />
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {relatedPost.title}
-                  </h3>
-                  <Button
-                    variant="link"
-                    className="p-0 h-auto text-fuchsia-600 dark:text-fuchsia-400"
-                  >
-                    Read More
-                  </Button>
-                </CardContent>
+            {relatedPosts?.post[0].posts.map((relatedPost: RelatedPost) => (
+              <Card key={relatedPost.post.id}>
+                <Link href={`/post/view/${relatedPost.post.slug}`}>
+                  <CardContent className="p-4">
+                    <Image
+                      src={relatedPost.post.featuredImage}
+                      alt={relatedPost.post.title}
+                      width={200}
+                      height={100}
+                      className="rounded-lg mb-2 w-full object-cover"
+                    />
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      {relatedPost.post.title}
+                    </h3>
+                    <div className="flex items-center mt-2 text-[14px]">
+                      <div className="flex font-bold items-center text-gray-600 dark:text-gray-400">
+                        {relatedPost.post.author.name}
+                      </div>
+                      <Separator orientation="vertical" className="mx-2 h-4" />
+                      <div className="flex items-center text-gray-600 dark:text-gray-400">
+                        {format(relatedPost.post.publishedAt, "MMMM dd, yyyy")}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Link>
               </Card>
             ))}
           </div>
         </section>
-      </main>
+      </div>
     </div>
   );
 }
