@@ -27,7 +27,7 @@ import {
 } from "@/state/api/post/postApi";
 import Loader from "@/components/Loader/Loader";
 import { useToast } from "@/hooks/use-toast";
-import { isApiResponse } from "@/types/types";
+import { IPost, isApiResponse } from "@/types/types";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -37,10 +37,6 @@ interface Props {
 interface CategoryOption {
   value: string;
   label: string;
-}
-
-interface ICategory {
-  category: CategoryOption;
 }
 
 export default function EditPost({ slug }: Props) {
@@ -71,18 +67,18 @@ export default function EditPost({ slug }: Props) {
   useEffect(() => {
     setCategories(category?.categories || []);
     if (postData?.post) {
-      const post = postData.post;
+      const post: IPost = postData.post;
       postForm.reset({
         title: post.title,
         description: post.description,
         content: post.content,
-        categories: post.categories.map((cat: ICategory) => ({
+        categories: post.categories.map((cat) => ({
           value: cat.category.value || "",
           label: cat.category.label || "",
         })),
       });
       setSelectedCategories(
-        post.categories.map((cat: ICategory) => ({
+        post.categories.map((cat) => ({
           value: cat.category.value,
           label: cat.category.label,
         }))

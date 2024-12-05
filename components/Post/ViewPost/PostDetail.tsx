@@ -3,24 +3,36 @@ import Image from "next/image";
 import {
   Calendar,
   User,
-  MessageCircle,
   Facebook,
   Twitter,
   Linkedin,
   ChevronUp,
   ChevronDown,
+  Heart,
+  Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { IPost } from "@/types/types";
+import { IComment, IPost } from "@/types/types";
 import { format } from "date-fns";
 import Link from "next/link";
 import { MdWhatsapp } from "react-icons/md";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  useCommentReplyMutation,
+  useGetCommentQuery,
+  useLikePostMutation,
+  usePostCommentMutation,
+} from "@/state/api/post/postApi";
+import Loader from "@/components/Loader/Loader";
+import { useToast } from "@/hooks/use-toast";
+import { format as ago } from "timeago.js";
+import { useSelector } from "react-redux";
+import { getLoggedUser } from "@/state/api/auth/authSlice";
 
 interface Props {
   data: IPost;
@@ -32,8 +44,16 @@ export default function SingleBlogPost({ data }: Props) {
   const [showReplies, setShowReplies] = useState<{ [key: number]: boolean }>(
     {}
   );
+  const [isLiked, setIsLiked] = useState(false);
+  const [comment, setComment] = useState("");
+  const { data: getComment } = useGetCommentQuery(data.slug);
+  const [postComment, { isLoading, isSuccess }] = usePostCommentMutation();
+  const [commentReply] = useCommentReplyMutation();
+  const [likePost] = useLikePostMutation();
+  const user = useSelector(getLoggedUser);
   console.log(data);
   const url = window.location.href;
+  const { toast } = useToast();
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
     url
   )}`;
@@ -143,6 +163,26 @@ export default function SingleBlogPost({ data }: Props) {
     ],
   };
 
+  useEffect(() => {
+    if (isSuccess) {
+      toast({ title: "Thanks for the comment." });
+    }
+  }, [isSuccess, toast]);
+
+  useEffect(() => {
+    const isPostLiked = data.likes.find((like) => like.userId === user.id);
+    setIsLiked(isPostLiked ? true : false);
+  }, [data, user]);
+
+  const handleAddComment = async (slug: string) => {
+    const data = {
+      slug,
+      comment,
+    };
+    await postComment(data);
+    setComment("");
+  };
+
   const handleReply = (commentId: number) => {
     if (replyingTo === commentId) {
       setReplyingTo(null);
@@ -153,14 +193,24 @@ export default function SingleBlogPost({ data }: Props) {
     }
   };
 
-  const submitReply = (commentId: number) => {
-    console.log(`Submitting reply to comment ${commentId}: ${replyContent}`);
+  const submitReply = async (commentId: number) => {
+    const data = {
+      commentId,
+      reply: replyContent,
+    };
+    await commentReply(data);
     setReplyingTo(null);
     setReplyContent("");
   };
 
   const toggleReplies = (commentId: number) => {
     setShowReplies((prev) => ({ ...prev, [commentId]: !prev[commentId] }));
+  };
+
+  const handleLike = async (postId: number) => {
+    setIsLiked(!isLiked);
+    await likePost({ postId });
+    console.log(`Post ${isLiked ? "unliked" : "liked"}`);
   };
 
   return (
@@ -224,6 +274,22 @@ export default function SingleBlogPost({ data }: Props) {
               </Link>
             </Button>
           </div>
+          <div className="flex items-center space-x-2 mb-8">
+            <Button
+              variant={isLiked ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleLike(data.id)}
+              className={isLiked ? "bg-fuchsia-600 hover:bg-fuchsia-700" : ""}
+            >
+              <Heart
+                className={`h-4 w-4 mr-2 ${isLiked ? "fill-current" : ""}`}
+              />
+              {isLiked ? "Liked" : "Like"}
+            </Button>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {data.likes.length} likes
+            </span>
+          </div>
         </article>
 
         <Separator className="my-8" />
@@ -232,22 +298,50 @@ export default function SingleBlogPost({ data }: Props) {
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Comments
           </h2>
-          {post.comments.map((comment) => (
+          <Card className="mb-4">
+            <CardContent className="p-4">
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Write your comment..."
+                className="mb-2"
+              />
+              <Button
+                onClick={() => handleAddComment(data.slug)}
+                className="w-full"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Add Comment {isLoading && <Loader isButton={true} />}
+              </Button>
+            </CardContent>
+          </Card>
+          {getComment?.comments?.length === 0 && (
+            <div className="flex justify-center items-center h-[50px] text-lg text-gray-400">
+              No comments yet.
+            </div>
+          )}
+          {getComment?.comments?.map((comment: IComment) => (
             <Card key={comment.id} className="mb-4">
               <CardContent className="p-4">
                 <div className="flex items-start space-x-4">
                   <Avatar>
-                    <AvatarImage src={comment.avatar} alt={comment.author} />
-                    <AvatarFallback>{comment.author[0]}</AvatarFallback>
+                    <AvatarImage
+                      src={comment.user.profile?.avatar || "/male.png"}
+                      alt={comment.user.name}
+                    />
+                    <AvatarFallback>{comment.user.name[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex-grow">
                     <h3 className="font-semibold text-gray-900 dark:text-white">
-                      {comment.author}
+                      {comment.user.name}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400">
                       {comment.content}
                     </p>
-                    <div className="flex items-center mt-2 space-x-4">
+                    <div className="flex text-sm items-center mt-2 space-x-4">
+                      <h3 className="text-gray-600 dark:text-gray-400">
+                        {ago(comment.createdAt, "en_US")}
+                      </h3>
                       <Button
                         variant="link"
                         className="p-0 h-auto text-fuchsia-600 dark:text-fuchsia-400"
@@ -301,18 +395,23 @@ export default function SingleBlogPost({ data }: Props) {
                         >
                           <Avatar>
                             <AvatarImage
-                              src={reply.avatar}
-                              alt={reply.author}
+                              src={comment.user.profile?.avatar || "/male.png"}
+                              alt={reply.user.name}
                             />
-                            <AvatarFallback>{reply.author[0]}</AvatarFallback>
+                            <AvatarFallback>
+                              {reply.user.name[0]}
+                            </AvatarFallback>
                           </Avatar>
                           <div>
                             <h4 className="font-semibold text-gray-900 dark:text-white">
-                              {reply.author}
+                              {reply.user.name}
                             </h4>
                             <p className="text-gray-600 dark:text-gray-400">
                               {reply.content}
                             </p>
+                            <h3 className="text-gray-600 text-sm pt-2 dark:text-gray-400">
+                              {ago(reply.createdAt, "en_US")}
+                            </h3>
                           </div>
                         </div>
                       ))}
@@ -321,9 +420,6 @@ export default function SingleBlogPost({ data }: Props) {
               </CardContent>
             </Card>
           ))}
-          <Button className="mt-4">
-            <MessageCircle className="mr-2 h-4 w-4" /> Add Comment
-          </Button>
         </section>
 
         <Separator className="my-8" />

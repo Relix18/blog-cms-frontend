@@ -30,7 +30,7 @@ export interface IPost {
   title: string;
   slug: string;
   content: string;
-  categories: string[];
+  categories: ICategory[];
   description: string;
   featuredImage: string;
   published: boolean;
@@ -39,8 +39,8 @@ export interface IPost {
   authorId: string;
   views: number;
   minRead: number;
-  likes: ILike;
-  comments: IComment;
+  likes: ILike[];
+  comments: IComment[];
   metaTitle: string | null;
   metaDescription: string | null;
   metaKeyword: string | null;
@@ -48,13 +48,24 @@ export interface IPost {
   updatedAt: Date;
 }
 
+export interface ICategory {
+  category: { value: string; label: string; id: number };
+}
+
 export interface IReply {
-  reply: string;
+  id: number;
+  content: string;
   commentId: number;
+  user: IUser;
+  createdAt: Date;
 }
 
 export interface IComment {
-  comment: string;
+  content: string;
+  createdAt: Date;
+  id: number;
+  user: IUser;
+  replies: IReply[];
 }
 
 export interface ILike {

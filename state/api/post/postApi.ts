@@ -5,7 +5,7 @@ export const post = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:4000/api/v1/",
   }),
-  tagTypes: ["Post", "AuthorPost", "Category"],
+  tagTypes: ["Post", "AuthorPost", "Category", "Comment"],
   endpoints: (builder) => ({
     createPost: builder.mutation({
       query: (data) => ({
@@ -38,6 +38,7 @@ export const post = createApi({
         method: "GET",
         credentials: "include",
       }),
+      providesTags: ["Post"],
     }),
     updatePost: builder.mutation({
       query: (data) => ({
@@ -61,6 +62,40 @@ export const post = createApi({
       }),
       providesTags: ["Category"],
     }),
+    postComment: builder.mutation({
+      query: (data) => ({
+        url: `post-comment/${data.slug}`,
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Comment"],
+    }),
+    commentReply: builder.mutation({
+      query: (data) => ({
+        url: `comment-reply`,
+        method: "POST",
+        credentials: "include",
+        body: data,
+      }),
+      invalidatesTags: ["Comment"],
+    }),
+    getComment: builder.query({
+      query: (slug) => ({
+        url: `get-comments/${slug}`,
+        method: "GET",
+      }),
+      providesTags: ["Comment"],
+    }),
+    likePost: builder.mutation({
+      query: (postId) => ({
+        url: `like-post`,
+        method: "POST",
+        body: postId,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Post"],
+    }),
   }),
 });
 
@@ -72,4 +107,8 @@ export const {
   useGetCategoryQuery,
   useGetPostBySlugQuery,
   useUpdatePostMutation,
+  usePostCommentMutation,
+  useGetCommentQuery,
+  useCommentReplyMutation,
+  useLikePostMutation,
 } = post;

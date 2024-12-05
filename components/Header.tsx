@@ -170,9 +170,7 @@ const Header = ({ active, isProfile }: Props) => {
             >
               <Avatar className={isProfile ? "hidden" : ""}>
                 <AvatarImage
-                  src={
-                    user?.profile?.avatar ? user?.profile.avatar : "/male.png"
-                  }
+                  src={user?.profile?.avatar || "/male.png"}
                   alt="user"
                 />
                 <AvatarFallback>User</AvatarFallback>
@@ -192,11 +190,7 @@ const Header = ({ active, isProfile }: Props) => {
                       <span className="flex items-center gap-2">
                         <Avatar className="h-8 w-8">
                           <AvatarImage
-                            src={
-                              user?.profile?.avatar
-                                ? user?.profile.avatar
-                                : "/male.png"
-                            }
+                            src={user?.profile?.avatar || "/male.png"}
                             alt="user"
                           />
                           <AvatarFallback>User</AvatarFallback>
