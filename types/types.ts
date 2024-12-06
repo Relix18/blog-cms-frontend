@@ -49,7 +49,13 @@ export interface IPost {
 }
 
 export interface ICategory {
-  category: { value: string; label: string; id: number };
+  category: Category;
+}
+
+export interface Category {
+  value: string;
+  label: string;
+  id: number;
 }
 
 export interface IReply {
@@ -73,6 +79,13 @@ export interface ILike {
   postId: number;
   userId: string;
   createdAt: Date;
+}
+
+export interface IAuthor {
+  id: string;
+  name: string;
+  profile: { avatar: string; bio: string };
+  _count: { posts: number };
 }
 
 export interface ApiErrorResponse {

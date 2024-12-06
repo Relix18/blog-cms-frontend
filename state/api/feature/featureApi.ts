@@ -13,7 +13,25 @@ export const feature = createApi({
         body: data,
       }),
     }),
+    featuredPost: builder.query({
+      query: () => "featured-post",
+    }),
+    latestPost: builder.query({
+      query: () => "latest-post",
+    }),
+    popularCategory: builder.query({
+      query: () => "popular-categories",
+    }),
+    featuredAuthor: builder.query({
+      query: () => "featured-author",
+    }),
   }),
 });
 
-export const { useRelatedPostMutation } = feature;
+export const {
+  useRelatedPostMutation,
+  useFeaturedPostQuery,
+  useLatestPostQuery,
+  usePopularCategoryQuery,
+  useFeaturedAuthorQuery,
+} = feature;

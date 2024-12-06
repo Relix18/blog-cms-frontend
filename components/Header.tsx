@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import {
   Blocks,
   BookOpen,
+  ChevronDown,
   HomeIcon,
   LogIn,
   LogOutIcon,
@@ -43,6 +44,9 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { useGetCategoryQuery } from "@/state/api/post/postApi";
+import { Category } from "@/types/types";
 
 type Props = {
   active?: number;
@@ -56,6 +60,7 @@ const Header = ({ active, isProfile }: Props) => {
   const isAuthenticated = useAuth();
   const {} = useLogoutQuery(undefined, { skip: !logoutUser ? true : false });
   const user = useSelector(getLoggedUser);
+  const { data: categories } = useGetCategoryQuery({});
   const router = useRouter();
 
   useEffect(() => {
@@ -68,7 +73,9 @@ const Header = ({ active, isProfile }: Props) => {
         });
       }
     }
-  }, [data, socialAuth]);
+  }, [data, socialAuth, isAuthenticated, user]);
+
+  console.log(categories);
 
   const logoutHandler = async () => {
     setLogoutUser(true);
@@ -86,7 +93,7 @@ const Header = ({ active, isProfile }: Props) => {
               OrbitBlog
             </span>
           </Link>
-          <nav className="hidden md:flex space-x-4">
+          <nav className="hidden items-center md:flex space-x-4">
             <Link
               href="#"
               className={
@@ -97,12 +104,31 @@ const Header = ({ active, isProfile }: Props) => {
             >
               Home
             </Link>
-            <Link
-              href="#"
-              className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500"
-            >
-              Categories
-            </Link>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"link"}
+                  className="justify-start text-[16px] font-normal text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-400"
+                >
+                  Categories <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-0">
+                <div className="max-h-80 overflow-y-auto">
+                  {categories?.categories.map((category: Category) => (
+                    <Link
+                      href={`filter?category=${category.value}`}
+                      key={category.id}
+                      className="w-full justify-start"
+                    >
+                      <Button variant="ghost" className="w-full justify-start">
+                        {category.label}
+                      </Button>
+                    </Link>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
             <Link
               href="#"
               className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "

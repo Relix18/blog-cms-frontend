@@ -1,138 +1,242 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ChevronRight } from "lucide-react";
+import {
+  ChevronRight,
+  TrendingUp,
+  Clock,
+  BookOpen,
+  UserCircle,
+  Newspaper,
+} from "lucide-react";
 import Image from "next/image";
 import { Card, CardContent } from "../ui/card";
 import Footer from "../Footer";
+import {
+  useFeaturedAuthorQuery,
+  useFeaturedPostQuery,
+  useLatestPostQuery,
+  usePopularCategoryQuery,
+} from "@/state/api/feature/featureApi";
+import { IPost, Category, IAuthor } from "@/types/types";
+import { format as ago } from "timeago.js";
+import Link from "next/link";
+import { FeaturedPostLoader, LatestPostLoader } from "../Loader/SkeletonLoader";
 
-export default function Hero() {
+const Hero = () => {
+  const { data: featuredPost, isLoading: featureLoading } =
+    useFeaturedPostQuery({});
+  const { data: latestPost, isLoading } = useLatestPostQuery({});
+  const { data: category } = usePopularCategoryQuery({});
+  const { data: featuredAuthor } = useFeaturedAuthorQuery({});
+
+  const author: IAuthor = featuredAuthor?.featuredAuthor;
+
   return (
-    <div className="min-h-screen pt-10">
+    <div className="min-h-screen pt-10 bg-gradient-to-b ">
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
-          <div className="bg-gradient-to-r from-fuchsia-500 to-pink-500 dark:from-fuchsia-600 dark:to-pink-600 rounded-lg shadow-xl p-8 md:p-12 text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Welcome to OrbitBlog
-            </h1>
-            <p className="text-lg md:text-xl mb-6">
-              Discover insightful articles, expert opinions, and the latest
-              trends.
-            </p>
-            <Button variant="secondary" size="lg">
-              Start Reading
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
+          <div className="bg-gradient-to-r from-fuchsia-500 to-pink-500 dark:from-fuchsia-600 dark:to-pink-600 rounded-lg shadow-xl p-8 md:p-12 text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-black opacity-20"></div>
+            <div className="relative z-10">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in-up">
+                Welcome to OrbitBlog
+              </h1>
+              <p className="text-lg md:text-xl mb-6 animate-fade-in-up animation-delay-200">
+                Discover insightful articles, expert opinions, and the latest
+                trends.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-400">
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  className="w-full sm:w-auto"
+                >
+                  Start Reading
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </section>
 
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-6">Featured Posts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map((post) => (
-              <Card
-                key={post}
-                className="transition-transform hover:scale-105 bg-muted/25"
-              >
-                <Image
-                  src={``}
-                  alt={`Featured post ${post}`}
-                  className="w-full h-48 object-cover"
-                />
-                <CardContent>
-                  <h3 className="text-xl font-semibold mb-2 dark:text-white">
-                    Exciting Blog Post Title {post}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      5 min read
-                    </span>
-                    <Button
-                      variant="link"
-                      className="text-fuchsia-600 dark:text-fuchsia-400"
-                    >
-                      Read More
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <h2 className="text-3xl font-bold mb-6 flex items-center">
+            <TrendingUp className="mr-2" /> Featured Posts
+          </h2>
+          {!featureLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredPost?.featuredPost.map((post: IPost) => (
+                <Card
+                  key={post.id}
+                  className="transition-all duration-300 hover:scale-105 hover:shadow-lg bg-white dark:bg-gray-800 overflow-hidden"
+                >
+                  <Image
+                    src={post.featuredImage}
+                    width={300}
+                    height={300}
+                    alt={`Featured post ${post}`}
+                    className="w-full h-48 object-cover"
+                  />
+                  <Link href={`post/view/${post.slug}`}>
+                    <CardContent className="p-6">
+                      <h3 className="text-xl font-semibold mb-2 line-clamp-2 dark:text-white">
+                        {post.title}
+                      </h3>
+                      <p className="text-gray-600 line-clamp-3 dark:text-gray-300 mb-4">
+                        {post.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Image
+                            src={post.author.profile.avatar}
+                            width={32}
+                            height={32}
+                            alt={post.author.name}
+                            className="rounded-full mr-2"
+                          />
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {post.author.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1 text-gray-500 dark:text-gray-400" />
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {post.minRead} min read
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Link>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <FeaturedPostLoader />
+          )}
         </section>
 
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-6">Latest Posts</h2>
-          <div className="space-y-8">
-            {[1, 2, 3, 4].map((post) => (
-              <Card
-                key={post}
-                className="flex flex-col md:flex-row bg-muted/25"
-              >
-                <Image
-                  src={``}
-                  alt={`Post ${post}`}
-                  className="w-full md:w-1/3 h-48 md:h-auto object-cover"
-                />
+          <h2 className="text-3xl font-bold mb-6 flex items-center">
+            <Newspaper className="mr-2" /> Latest Posts
+          </h2>
+          {!isLoading ? (
+            <div className="space-y-8">
+              {latestPost?.latestPost.map((post: IPost) => (
+                <Card
+                  key={post.id}
+                  className="flex flex-col md:flex-row bg-white dark:bg-gray-800 overflow-hidden transition-all duration-300 hover:shadow-lg"
+                >
+                  <Image
+                    src={post.featuredImage}
+                    alt={post.title}
+                    width={300}
+                    height={300}
+                    className="w-full md:w-1/3 h-48 md:h-auto object-cover"
+                  />
+                  <Link href={`post/view/${post.slug}`}>
+                    <CardContent className="p-6 flex-1">
+                      <h3 className="text-xl font-semibold mb-2 dark:text-white">
+                        {post.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+                        {post.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <Image
+                            src={post.author.profile.avatar}
+                            width={32}
+                            height={32}
+                            alt={post.author.name}
+                            className="rounded-full mr-2"
+                          />
+                          <span className="text-sm mr-1 text-gray-500 dark:text-gray-400">
+                            {post.author.name}
+                          </span>
 
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 dark:text-white">
-                    Interesting Article Title {post}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                    laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                    irure dolor in reprehenderit in voluptate velit esse cillum
-                    dolore eu fugiat nulla pariatur.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      3 days ago • 8 min read
-                    </span>
-                    <Button
-                      variant="link"
-                      className="text-fuchsia-600 dark:text-fuchsia-400"
-                    >
-                      Continue Reading
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            • {ago(post.publishedAt)}
+                          </span>
+                        </div>
+                        <div className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1 text-gray-500 dark:text-gray-400" />
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {post.minRead} min read
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Link>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <LatestPostLoader />
+          )}
         </section>
 
-        <Card className="bg-muted/25">
-          <CardContent className="p-8">
-            <h2 className="text-3xl font-bold mb-4 dark:text-white">
-              Stay Updated
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Subscribe to our newsletter for the latest blog posts and updates.
-            </p>
-            <form className="flex flex-col md:flex-row gap-4">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="md:w-2/3"
-              />
-              <Button
-                type="submit"
-                className="md:w-1/3 bg-fuchsia-600 text-white hover:bg-fuchsia-700 dark:bg-fuchsia-500 dark:hover:bg-fuchsia-600"
-              >
-                Subscribe
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+        <div className="grid md:grid-cols-2 gap-8 mb-16">
+          <Card className="bg-white dark:bg-gray-800">
+            <CardContent className="p-8">
+              <h2 className="text-3xl font-bold mb-4 dark:text-white flex items-center">
+                <UserCircle className="mr-2" /> Featured Author
+              </h2>
+
+              <div className="flex items-center mb-4">
+                <Image
+                  src={author?.profile.avatar}
+                  alt="Featured Author"
+                  width={100}
+                  height={100}
+                  className="rounded-full mr-4"
+                />
+                <div>
+                  <h3 className="text-xl font-semibold dark:text-white">
+                    {author?.name}
+                  </h3>
+                </div>
+              </div>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                {author?.profile.bio}
+              </p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <BookOpen className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {author?._count.posts} Articles
+                  </span>
+                </div>
+                <Button asChild variant="default" size="sm">
+                  <Link href={`/profile/${author?.id}`}>View Profile</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white dark:bg-gray-800">
+            <CardContent className="p-8">
+              <h2 className="text-3xl font-bold mb-4 dark:text-white">
+                Popular Categories
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {category?.popularCategory?.map((cat: Category) => (
+                  <Link
+                    key={cat.id}
+                    href={`/filter?category=${cat.value}`}
+                    className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    {cat.label}
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </main>
 
       <Footer />
     </div>
   );
-}
+};
+
+export default Hero;

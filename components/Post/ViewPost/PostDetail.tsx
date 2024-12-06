@@ -161,10 +161,9 @@ export default function SingleBlogPost({ data }: Props) {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (ticking) return; // If we're already in the middle of an update, do nothing
-      ticking = true; // Set the flag to indicate we're in the process of updating
+      if (ticking) return;
+      ticking = true;
 
-      // Throttle the scroll position update
       requestAnimationFrame(() => {
         const scrollPosition = window.scrollY;
         const documentHeight = document.documentElement.scrollHeight;
@@ -172,8 +171,8 @@ export default function SingleBlogPost({ data }: Props) {
         const scrollPercentage =
           (scrollPosition / (documentHeight - windowHeight)) * 100;
 
-        setScrollProgress(scrollPercentage); // Update scroll progress state
-        ticking = false; // Reset the flag
+        setScrollProgress(scrollPercentage);
+        ticking = false;
       });
     };
 
@@ -453,40 +452,48 @@ export default function SingleBlogPost({ data }: Props) {
 
         <Separator className="my-8" />
 
-        <section className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Related Posts
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {relatedPosts?.post[0].posts.map((relatedPost: RelatedPost) => (
-              <Card key={relatedPost.post.id}>
-                <Link href={`/post/view/${relatedPost.post.slug}`}>
-                  <CardContent className="p-4">
-                    <Image
-                      src={relatedPost.post.featuredImage}
-                      alt={relatedPost.post.title}
-                      width={200}
-                      height={100}
-                      className="rounded-lg mb-2 w-full object-cover"
-                    />
-                    <h3 className="font-semibold text-gray-900 dark:text-white">
-                      {relatedPost.post.title}
-                    </h3>
-                    <div className="flex items-center mt-2 text-[14px]">
-                      <div className="flex font-bold items-center text-gray-600 dark:text-gray-400">
-                        {relatedPost.post.author.name}
+        {relatedPosts?.post[0].posts.length > 0 && (
+          <section className="max-w-4xl mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Related Posts
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedPosts?.post[0].posts.map((relatedPost: RelatedPost) => (
+                <Card key={relatedPost.post.id}>
+                  <Link href={`/post/view/${relatedPost.post.slug}`}>
+                    <CardContent className="p-4">
+                      <Image
+                        src={relatedPost.post.featuredImage}
+                        alt={relatedPost.post.title}
+                        width={200}
+                        height={100}
+                        className="rounded-lg mb-2 w-full object-cover"
+                      />
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        {relatedPost.post.title}
+                      </h3>
+                      <div className="flex items-center mt-2 text-[14px]">
+                        <div className="flex font-bold items-center text-gray-600 dark:text-gray-400">
+                          {relatedPost.post.author.name}
+                        </div>
+                        <Separator
+                          orientation="vertical"
+                          className="mx-2 h-4"
+                        />
+                        <div className="flex items-center text-gray-600 dark:text-gray-400">
+                          {format(
+                            relatedPost.post.publishedAt,
+                            "MMMM dd, yyyy"
+                          )}
+                        </div>
                       </div>
-                      <Separator orientation="vertical" className="mx-2 h-4" />
-                      <div className="flex items-center text-gray-600 dark:text-gray-400">
-                        {format(relatedPost.post.publishedAt, "MMMM dd, yyyy")}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Link>
-              </Card>
-            ))}
-          </div>
-        </section>
+                    </CardContent>
+                  </Link>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );
