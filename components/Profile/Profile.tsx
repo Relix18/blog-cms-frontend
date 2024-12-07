@@ -48,6 +48,8 @@ import Drafts from "./Drafts";
 import { useGetAuthorPostQuery } from "@/state/api/post/postApi";
 import PublishedPost from "./PublishedPost";
 import useUIStore from "@/app/hooks/useUIStore";
+import { formatLikes } from "@/utils/NumberFormat";
+import { IPost } from "@/types/types";
 
 const Profile = () => {
   const [logoutUser, setLogoutUser] = useState<boolean>(false);
@@ -86,6 +88,18 @@ const Profile = () => {
       console.log(error);
     }
   }, [isSuccess, error, toast]);
+
+  const getTotalLikes = (post: IPost[]) => {
+    return post
+      ?.map((post) => post.likes?.length || 0) // Get the count of likes for each post
+      .reduce((sum, likeCount) => sum + likeCount, 0); // Sum up all like counts
+  };
+
+  const getTotalComment = (post: IPost[]) => {
+    return post
+      ?.map((post) => post.comments?.length || 0) // Get the count of likes for each post
+      .reduce((sum, commentCount) => sum + commentCount, 0); // Sum up all like counts
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pt-10 dark:bg-background">
@@ -127,17 +141,19 @@ const Profile = () => {
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
                     {user?.profile?.bio}
                   </p>
-
-                  <div className="flex flex-wrap justify-center sm:justify-start gap-4">
-                    <span className="text-gray-500 dark:text-gray-400 flex items-center">
-                      <ThumbsUp className="h-5 w-5 mr-1" />
-                      1.2k Likes
-                    </span>
-                    <span className="text-gray-500 dark:text-gray-400 flex items-center">
-                      <MessageSquare className="h-5 w-5 mr-1" />
-                      305 Comments
-                    </span>
-                  </div>
+                  {user?.role !== "USER" && (
+                    <div className="flex flex-wrap justify-center sm:justify-start gap-4">
+                      <span className="text-gray-500 dark:text-gray-400 flex items-center">
+                        <ThumbsUp className="h-5 w-5 mr-1" />
+                        {formatLikes(getTotalLikes(authorPost?.post))} Likes
+                      </span>
+                      <span className="text-gray-500 dark:text-gray-400 flex items-center">
+                        <MessageSquare className="h-5 w-5 mr-1" />
+                        {formatLikes(getTotalComment(authorPost?.post))}{" "}
+                        Comments
+                      </span>
+                    </div>
+                  )}
 
                   <div className="flex justify-center sm:justify-start space-x-4 mt-4">
                     {user?.profile?.social?.mailLink && (

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Quill from "quill";
+import Quill, { Delta } from "quill";
 import "quill/dist/quill.snow.css";
 import axios from "axios";
 
@@ -9,25 +9,20 @@ type EditorProps = {
 };
 
 const formats = [
-  "background",
   "bold",
   "color",
   "font",
-  "code",
   "italic",
   "link",
   "size",
   "strike",
-  "script",
   "underline",
-  "blockquote",
   "header",
   "indent",
   "list",
   "align",
   "direction",
   "code-block",
-  "formula",
   "image",
 ];
 
@@ -58,35 +53,68 @@ export default function Editor({ value, onChange }: EditorProps) {
               ["clean"],
             ],
             handlers: {
-              image: () => handleImageUpload(quillInstance), // Custom handler for image upload
+              image: () => handleImageUpload(quillInstance),
             },
+          },
+          clipboard: {
+            matchers: [
+              [
+                Node.ELEMENT_NODE,
+                (node, delta) => {
+                  const newDelta = new Delta();
+
+                  delta.ops.forEach((op) => {
+                    if (typeof op.insert === "string") {
+                      const isBold = node.querySelector("strong, b") !== null;
+
+                      if (isBold) {
+                        newDelta.insert(op.insert, { bold: true });
+                      } else {
+                        newDelta.insert(op.insert);
+                      }
+                    } else {
+                      newDelta.insert(op.insert);
+                    }
+                  });
+
+                  return newDelta;
+                },
+              ],
+            ],
           },
         },
         formats,
       });
 
-      // Set initial content
+      // Set initial content in the editor
       quillInstance.clipboard.dangerouslyPasteHTML(value || "");
 
+      // Sync content changes with `onChange`
       quillInstance.on("text-change", () => {
         onChange(quillInstance.root.innerHTML);
       });
+
       setQuill(quillInstance);
     }
   }, [quill, value, onChange]);
 
   const handleImageUpload = async (quillInstance: Quill) => {
     const input = document.createElement("input");
-    input.setAttribute("type", "file");
-    input.setAttribute("accept", "image/*");
+    input.type = "file";
+    input.accept = "image/*";
     input.click();
 
     input.onchange = async () => {
       const file = input.files?.[0];
       if (!file) return;
 
+      if (!["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
+        alert("Only JPG, PNG, and GIF files are allowed.");
+        return;
+      }
+
       if (file.size > 5 * 1024 * 1024) {
-        alert("File size exceeds 5MB");
+        alert("File size exceeds 5MB.");
         return;
       }
 
@@ -104,9 +132,14 @@ export default function Editor({ value, onChange }: EditorProps) {
 
         // Insert the uploaded image into the editor
         const range = quillInstance.getSelection();
-        quillInstance.insertEmbed(range?.index || 0, "image", imageUrl);
+        if (range) {
+          quillInstance.insertEmbed(range.index, "image", imageUrl);
+        } else {
+          quillInstance.insertEmbed(0, "image", imageUrl); // Default insertion
+        }
       } catch (error) {
         console.error("Image upload failed:", error);
+        alert("Image upload failed. Please try again.");
       }
     };
   };

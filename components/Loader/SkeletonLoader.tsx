@@ -88,6 +88,58 @@ export function FeaturedPostLoader() {
     </div>
   );
 }
+export function FilterPostLoader() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="space-y-2">
+        <Skeleton className="h-48" />
+        <div className="py-2 space-y-2 px-4">
+          <Skeleton className="h-7" />
+          <div className="py-2 space-y-2">
+            <Skeleton className="h-5" />
+            <Skeleton className="h-5" />
+            <Skeleton className="h-5" />
+            <Skeleton className="h-5" />
+          </div>
+          <div className="flex justify-between">
+            <Skeleton className="h-5 w-20" />
+            <Skeleton className="h-5 w-20" />
+          </div>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-48" />
+        <div className="py-2 space-y-2 px-4">
+          <Skeleton className="h-7" />
+          <div className="py-2 space-y-2">
+            <Skeleton className="h-5" />
+            <Skeleton className="h-5" />
+            <Skeleton className="h-5" />
+          </div>
+          <div className="flex justify-between">
+            <Skeleton className="h-5 w-20" />
+            <Skeleton className="h-5 w-20" />
+          </div>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-48" />
+        <div className="py-2 space-y-2 px-4">
+          <Skeleton className="h-7" />
+          <div className="py-2 space-y-2">
+            <Skeleton className="h-5" />
+            <Skeleton className="h-5" />
+            <Skeleton className="h-5" />
+          </div>
+          <div className="flex justify-between">
+            <Skeleton className="h-5 w-20" />
+            <Skeleton className="h-5 w-20" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function LatestPostLoader() {
   return (

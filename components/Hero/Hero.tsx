@@ -22,6 +22,8 @@ import { IPost, Category, IAuthor } from "@/types/types";
 import { format as ago } from "timeago.js";
 import Link from "next/link";
 import { FeaturedPostLoader, LatestPostLoader } from "../Loader/SkeletonLoader";
+import useUIStore from "@/app/hooks/useUIStore";
+import { useEffect } from "react";
 
 const Hero = () => {
   const { data: featuredPost, isLoading: featureLoading } =
@@ -29,8 +31,12 @@ const Hero = () => {
   const { data: latestPost, isLoading } = useLatestPostQuery({});
   const { data: category } = usePopularCategoryQuery({});
   const { data: featuredAuthor } = useFeaturedAuthorQuery({});
+  const { setActiveTab } = useUIStore();
 
   const author: IAuthor = featuredAuthor?.featuredAuthor;
+  useEffect(() => {
+    setActiveTab("posts");
+  }, [setActiveTab]);
 
   return (
     <div className="min-h-screen pt-10 bg-gradient-to-b ">
@@ -52,7 +58,7 @@ const Hero = () => {
                   size="lg"
                   className="w-full sm:w-auto"
                 >
-                  Start Reading
+                  <Link href={"/filter"}>Start Reading</Link>
                   <ChevronRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>

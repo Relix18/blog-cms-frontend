@@ -28,6 +28,9 @@ export const user = createApi({
         }
       },
     }),
+    getAuthorProfile: builder.query({
+      query: (id) => `get-author-profile/${id}`,
+    }),
     updateProfile: builder.mutation({
       query: (data) => ({
         url: "update-profile",
@@ -59,6 +62,7 @@ export const user = createApi({
 
 export const {
   useGetUserQuery,
+  useGetAuthorProfileQuery,
   useUpdateProfileMutation,
   useUpdateAvatarMutation,
   useChangePasswordMutation,

@@ -47,6 +47,7 @@ import { useRouter } from "next/navigation";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { useGetCategoryQuery } from "@/state/api/post/postApi";
 import { Category } from "@/types/types";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   active?: number;
@@ -57,11 +58,20 @@ const Header = ({ active, isProfile }: Props) => {
   const { data } = useSession();
   const [logoutUser, setLogoutUser] = useState<boolean>(false);
   const [socialAuth] = useSocialAuthMutation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const isAuthenticated = useAuth();
   const {} = useLogoutQuery(undefined, { skip: !logoutUser ? true : false });
   const user = useSelector(getLoggedUser);
   const { data: categories } = useGetCategoryQuery({});
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const existingQuery = searchParams.get("search") || "";
+    setSearchQuery(existingQuery);
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user && !isAuthenticated) {
@@ -75,12 +85,22 @@ const Header = ({ active, isProfile }: Props) => {
     }
   }, [data, socialAuth, isAuthenticated, user]);
 
-  console.log(categories);
-
   const logoutHandler = async () => {
     setLogoutUser(true);
     await signOut();
     router.push("/");
+  };
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/filter?search=${searchQuery}`);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
   };
 
   return (
@@ -136,13 +156,16 @@ const Header = ({ active, isProfile }: Props) => {
               Contact
             </Link>
           </nav>
-          <form className={`md:hidden flex  w-full`}>
+          <div className="md:hidden flex w-full">
             <Input
               type="search"
-              placeholder="Search..."
-              className="outline-0"
+              placeholder="Search by Title, Author..."
+              className="outline-0 flex-1"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyPress}
             />
-          </form>
+          </div>
           <div className="flex items-center space-x-2">
             {isProfile && (
               <div className="hidden md:flex gap-4">
@@ -177,17 +200,20 @@ const Header = ({ active, isProfile }: Props) => {
                 <span>Become an Author</span>
               </Button>
             )}
-            <form
+            <div
               className={` ${
                 isProfile ? "md:hidden" : "md:flex"
               } hidden md:flex`}
             >
               <Input
                 type="search"
-                placeholder="Search..."
+                placeholder="Search by Title or Author..."
                 className="w-full md:w-64"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyPress}
               />
-            </form>
+            </div>
 
             <ThemeSwitcher />
             <Link
@@ -202,7 +228,7 @@ const Header = ({ active, isProfile }: Props) => {
                 <AvatarFallback>User</AvatarFallback>
               </Avatar>
             </Link>
-            <Sheet>
+            <Sheet open={isMainMenuOpen} onOpenChange={setIsMainMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
                   <Menu className="h-6 w-6" />
@@ -245,12 +271,40 @@ const Header = ({ active, isProfile }: Props) => {
                   >
                     <HomeIcon className="h-5 w-5 mr-2" /> Home
                   </Link>
-                  <Link
-                    href="/categories"
-                    className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
-                  >
-                    <Blocks className="h-5 w-5 mr-2" /> Categories
-                  </Link>
+
+                  <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                    <SheetTrigger asChild>
+                      <Button
+                        variant="link"
+                        className="justify-start text-[16px] p-0 text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-400"
+                      >
+                        <Blocks className="mr-2" /> Categories{" "}
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent side="bottom" className="h-[80vh]">
+                      <div className="grid grid-cols-2 gap-4 pt-4">
+                        {categories?.categories.map((category: Category) => (
+                          <Link
+                            href={`filter?category=${category.value}`}
+                            key={category.id}
+                            onClick={() => {
+                              setIsSheetOpen(false);
+                              setIsMainMenuOpen(false);
+                            }}
+                            className="w-full"
+                          >
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start truncate"
+                            >
+                              {category.label}
+                            </Button>
+                          </Link>
+                        ))}
+                      </div>
+                    </SheetContent>
+                  </Sheet>
                   <Link
                     href="/contact-us"
                     className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "

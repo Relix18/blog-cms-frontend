@@ -37,6 +37,7 @@ import { getLoggedUser } from "@/state/api/auth/authSlice";
 import Pusher from "pusher-js";
 import { useRelatedPostMutation } from "@/state/api/feature/featureApi";
 import ScrollProgressBar from "@/utils/ScrollProgressBar";
+import { formatLikes } from "@/utils/NumberFormat";
 
 interface Props {
   data: IPost;
@@ -243,10 +244,13 @@ export default function SingleBlogPost({ data }: Props) {
         <article className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold  mb-4">{data.title}</h1>
           <div className="flex items-center space-x-4 mb-6">
-            <div className="flex items-center text-gray-600 dark:text-gray-400">
+            <Link
+              href={`/profile/${data.author.id}`}
+              className="flex items-center text-gray-600 dark:text-gray-400"
+            >
               <User className="h-5 w-5 mr-2" />
-              <span>{data.author.name}</span>
-            </div>
+              <span className="font-bold">{data.author.name}</span>
+            </Link>
             <div className="flex items-center text-gray-600 dark:text-gray-400">
               <Calendar className="h-5 w-5 mr-2" />
               <span>{format(data.publishedAt, "MMMM dd, yyyy")}</span>
@@ -311,7 +315,7 @@ export default function SingleBlogPost({ data }: Props) {
               {isLiked ? "Liked" : "Like"}
             </Button>
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {likeCount || data.likes.length} likes
+              {formatLikes(likeCount) || formatLikes(data.likes.length)} likes
             </span>
           </div>
         </article>

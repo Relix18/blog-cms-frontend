@@ -8,7 +8,7 @@ import Link from "next/link";
 
 type Props = {
   posts: IPost[];
-  isLoading: boolean;
+  isLoading?: boolean;
 };
 
 const PublishedPost = ({ posts, isLoading }: Props) => {
