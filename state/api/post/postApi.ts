@@ -103,6 +103,14 @@ export const post = createApi({
       }),
       invalidatesTags: ["Post"],
     }),
+    getLikePost: builder.query({
+      query: () => ({
+        url: "liked-post",
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Post"],
+    }),
   }),
 });
 
@@ -119,4 +127,5 @@ export const {
   useCommentReplyMutation,
   useLikePostMutation,
   useViewUpdateMutation,
+  useGetLikePostQuery,
 } = post;

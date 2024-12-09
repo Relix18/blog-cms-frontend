@@ -50,6 +50,7 @@ import PublishedPost from "./PublishedPost";
 import useUIStore from "@/app/hooks/useUIStore";
 import { formatLikes } from "@/utils/NumberFormat";
 import { IPost } from "@/types/types";
+import LikedPost from "./LikedPost";
 
 const Profile = () => {
   const [logoutUser, setLogoutUser] = useState<boolean>(false);
@@ -318,41 +319,7 @@ const Profile = () => {
                     ))}
                   </div>
                 </TabsContent>
-                <TabsContent value="like">
-                  <div className="space-y-6">
-                    {[1, 2, 3].map((bookmark) => (
-                      <article
-                        key={bookmark}
-                        className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0 last:pb-0"
-                      >
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                          <Link
-                            href="#"
-                            className="hover:text-fuchsia-600 dark:hover:text-fuchsia-400"
-                          >
-                            Exciting Tech Trend {bookmark}
-                          </Link>
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 mb-4">
-                          A brief preview of the article content. This is where
-                          you'd see a summary or the first few lines of the
-                          bookmarked post.
-                        </p>
-                        <div className="flex flex-wrap justify-between items-center gap-2">
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            Bookmarked on May {bookmark + 10}, 2023
-                          </span>
-                          <Button
-                            variant="link"
-                            className="text-fuchsia-600 dark:text-fuchsia-400"
-                          >
-                            Read More
-                          </Button>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </TabsContent>
+                <LikedPost />
                 <Settings user={user} />
               </Tabs>
             </div>
