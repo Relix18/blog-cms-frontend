@@ -204,3 +204,59 @@ export function LatestPostLoader() {
     </div>
   );
 }
+
+export function LikedPostLoader() {
+  return (
+    <div className="space-y-8 mt-4">
+      <div className="py-2 space-y-2 px-4">
+        <Skeleton className="h-7" />
+        <div className="py-2 space-y-2">
+          <Skeleton className="h-5" />
+          <Skeleton className="h-5" />
+          <Skeleton className="h-5" />
+        </div>
+        <div className="flex justify-between">
+          <div className="flex ">
+            <Skeleton className="h-5 w-40" />
+          </div>
+          <Skeleton className="h-5 w-20" />
+        </div>
+      </div>
+      <div className="py-2 space-y-2 px-4">
+        <Skeleton className="h-7" />
+        <div className="py-2 space-y-2">
+          <Skeleton className="h-5" />
+          <Skeleton className="h-5" />
+          <Skeleton className="h-5" />
+        </div>
+        <div className="flex justify-between">
+          <div className="flex ">
+            <Skeleton className="h-5 w-40" />
+          </div>
+          <Skeleton className="h-5 w-20" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function RecentActivityLoader() {
+  return (
+    <div className="space-y-8 mt-4">
+      <div className="py-2 space-y-2 px-4">
+        <Skeleton className="h-7 w-[70%]" />
+        <Skeleton className="h-5 w-[60%]" />
+        <Skeleton className="h-5 w-32" />
+      </div>
+      <div className="py-2 space-y-2 px-4">
+        <Skeleton className="h-7 w-[80%]" />
+        <Skeleton className="h-5 w-32" />
+      </div>
+      <div className="py-2 space-y-2 px-4">
+        <Skeleton className="h-7 w-[75%]" />
+        <Skeleton className="h-5 w-[65%]" />
+        <Skeleton className="h-5 w-32" />
+      </div>
+    </div>
+  );
+}

@@ -15,7 +15,7 @@ const PublishedPost = ({ posts, isLoading }: Props) => {
   const published = posts?.filter((post) => post.published === true);
 
   return (
-    <TabsContent value="posts">
+    <TabsContent value="posts" className="mt-10">
       {isLoading && (
         <>
           <ProfilePostLoader />

@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "../ui/tabs";
 import { Button } from "../ui/button";
 
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -51,6 +51,7 @@ import useUIStore from "@/app/hooks/useUIStore";
 import { formatLikes } from "@/utils/NumberFormat";
 import { IPost } from "@/types/types";
 import LikedPost from "./LikedPost";
+import RecentActivity from "./RecentActivity";
 
 const Profile = () => {
   const [logoutUser, setLogoutUser] = useState<boolean>(false);
@@ -288,37 +289,7 @@ const Profile = () => {
                 </div>
                 <PublishedPost posts={authorPost?.post} isLoading={isLoading} />
                 <Drafts posts={authorPost?.post} isLoading={isLoading} />
-                <TabsContent value="activity">
-                  <div className="space-y-6">
-                    {[1, 2, 3].map((activity) => (
-                      <div
-                        key={activity}
-                        className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0 last:pb-0"
-                      >
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                          {activity === 1
-                            ? "Commented on"
-                            : activity === 2
-                            ? "Liked"
-                            : "Bookmarked"}{" "}
-                          <Link
-                            href="#"
-                            className="text-fuchsia-600 dark:text-fuchsia-400 hover:underline"
-                          >
-                            "The Future of AI in Everyday Life"
-                          </Link>
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 mb-2">
-                          {activity === 1 &&
-                            "Great article! I especially enjoyed the section on AI in healthcare."}
-                        </p>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          {activity} day{activity !== 1 ? "s" : ""} ago
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </TabsContent>
+                <RecentActivity />
                 <LikedPost />
                 <Settings user={user} />
               </Tabs>

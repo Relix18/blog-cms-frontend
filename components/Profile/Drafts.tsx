@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { TabsContent } from "../ui/tabs";
 import { Button } from "../ui/button";
-import { IPost } from "@/types/types";
+import { IPost, isApiResponse } from "@/types/types";
 import { format } from "date-fns";
 import { usePublishPostMutation } from "@/state/api/post/postApi";
 import { ProfilePostLoader } from "../Loader/SkeletonLoader";
@@ -28,13 +28,13 @@ const Drafts = ({ posts, isLoading }: Props) => {
     if (isSuccess) {
       toast({ title: "Post Published Successfully" });
     }
-    if (error) {
+    if (isApiResponse(error)) {
       toast({ title: error?.data.message });
     }
   }, [isSuccess, error, toast]);
 
   return (
-    <TabsContent value="drafts">
+    <TabsContent value="drafts" className="mt-10">
       {isLoading && <ProfilePostLoader />}
       {drafts?.length === 0 ? (
         <div className="flex justify-center items-center h-[200px] text-lg text-gray-400">

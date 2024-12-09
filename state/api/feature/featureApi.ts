@@ -25,6 +25,12 @@ export const feature = createApi({
     featuredAuthor: builder.query({
       query: () => "featured-author",
     }),
+    recentActivity: builder.query({
+      query: () => ({
+        url: "recent-activity",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -34,4 +40,5 @@ export const {
   useLatestPostQuery,
   usePopularCategoryQuery,
   useFeaturedAuthorQuery,
+  useRecentActivityQuery,
 } = feature;

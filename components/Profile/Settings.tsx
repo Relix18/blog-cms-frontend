@@ -23,7 +23,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import Loader from "../Loader/Loader";
 import { FormError } from "../form-error";
-import { IUser } from "@/types/types";
+import { isApiResponse, IUser } from "@/types/types";
 
 type Props = {
   user: IUser | null;
@@ -73,7 +73,7 @@ const Settings = ({ user }: Props) => {
       toast({ title: "Password Changed Successfully" });
       passwordForm.reset();
     }
-  }, [passwordSuccess, toast]);
+  }, [passwordSuccess, toast, passwordForm]);
 
   const onSubmit = async (values: z.infer<typeof ProfileSchema>) => {
     await profileUpdate(values);
@@ -86,7 +86,7 @@ const Settings = ({ user }: Props) => {
   };
 
   return (
-    <TabsContent value="settings">
+    <TabsContent value="settings" className="mt-10">
       <Form {...form}>
         <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-2">
@@ -347,7 +347,9 @@ const Settings = ({ user }: Props) => {
                   )}
                 />
               </div>
-              <FormError message={error ? error.data.message : ""} />
+              <FormError
+                message={isApiResponse(error) ? error.data.message : ""}
+              />
               <Button
                 type="submit"
                 className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
