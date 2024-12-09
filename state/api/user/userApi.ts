@@ -57,6 +57,13 @@ export const user = createApi({
         credentials: "include",
       }),
     }),
+    authorRequest: builder.mutation({
+      query: () => ({
+        url: "author-request",
+        credentials: "include",
+        method: "POST",
+      }),
+    }),
   }),
 });
 
@@ -66,4 +73,5 @@ export const {
   useUpdateProfileMutation,
   useUpdateAvatarMutation,
   useChangePasswordMutation,
+  useAuthorRequestMutation,
 } = user;

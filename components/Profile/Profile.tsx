@@ -87,7 +87,10 @@ const Profile = () => {
     if (error) {
       console.log(error);
     }
-  }, [isSuccess, error, toast]);
+    if (user?.role === "USER") {
+      setActiveTab("activity");
+    }
+  }, [isSuccess, error, toast, setActiveTab, user]);
 
   const getTotalLikes = (post: IPost[]) => {
     return post
@@ -256,11 +259,23 @@ const Profile = () => {
                       value={activeTab}
                     >
                       <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Published Posts" />
+                        <SelectValue
+                          placeholder={
+                            user?.role !== "USER"
+                              ? "Published Posts"
+                              : "Recent Activity"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="posts">Published Posts</SelectItem>
-                        <SelectItem value="drafts">Drafts</SelectItem>
+                        {user?.role !== "USER" && (
+                          <>
+                            <SelectItem value="posts">
+                              Published Posts
+                            </SelectItem>
+                            <SelectItem value="drafts">Drafts</SelectItem>
+                          </>
+                        )}
                         <SelectItem value="activity">
                           Recent Activity
                         </SelectItem>

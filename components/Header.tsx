@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import {
   Blocks,
   BookOpen,
-  ChevronDown,
   HomeIcon,
   LogIn,
   LogOutIcon,
@@ -44,10 +43,19 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import { useRouter } from "next/navigation";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { useGetCategoryQuery } from "@/state/api/post/postApi";
-import { Category } from "@/types/types";
+import { Category, isApiResponse } from "@/types/types";
 import { useSearchParams } from "next/navigation";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "./ui/navigation-menu";
+import { useAuthorRequestMutation } from "@/state/api/user/userApi";
+import { useToast } from "@/hooks/use-toast";
 
 type Props = {
   active?: number;
@@ -59,14 +67,16 @@ const Header = ({ active, isProfile }: Props) => {
   const [logoutUser, setLogoutUser] = useState<boolean>(false);
   const [socialAuth] = useSocialAuthMutation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const isAuthenticated = useAuth();
   const {} = useLogoutQuery(undefined, { skip: !logoutUser ? true : false });
+  const [authorRequest, { isSuccess, data: requestSuccess, error }] =
+    useAuthorRequestMutation();
   const user = useSelector(getLoggedUser);
   const { data: categories } = useGetCategoryQuery({});
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { toast } = useToast();
 
   useEffect(() => {
     const existingQuery = searchParams.get("search") || "";
@@ -85,6 +95,19 @@ const Header = ({ active, isProfile }: Props) => {
     }
   }, [data, socialAuth, isAuthenticated, user]);
 
+  useEffect(() => {
+    if (isSuccess) {
+      toast({ title: requestSuccess?.message });
+    }
+    if (isApiResponse(error)) {
+      toast({ title: error.data.message });
+    }
+  }, [isSuccess, error, requestSuccess, toast]);
+
+  const authorRequestHanlder = async () => {
+    await authorRequest();
+  };
+
   const logoutHandler = async () => {
     setLogoutUser(true);
     await signOut();
@@ -97,7 +120,7 @@ const Header = ({ active, isProfile }: Props) => {
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSearch();
     }
@@ -124,31 +147,29 @@ const Header = ({ active, isProfile }: Props) => {
             >
               Home
             </Link>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"link"}
-                  className="justify-start text-[16px] font-normal text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-400"
-                >
-                  Categories <ChevronDown className="ml-1 h-4 w-4" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 p-0">
-                <div className="max-h-80 overflow-y-auto">
-                  {categories?.categories.map((category: Category) => (
-                    <Link
-                      href={`filter?category=${category.value}`}
-                      key={category.id}
-                      className="w-full justify-start"
-                    >
-                      <Button variant="ghost" className="w-full justify-start">
-                        {category.label}
-                      </Button>
-                    </Link>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
+            <NavigationMenu>
+              <NavigationMenuList className="m-0 p-0 ">
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="p-0 text-md text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent dark:hover:text-fuchsia-400">
+                    Categories
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    {categories?.categories.map((category: Category) => (
+                      <NavigationMenuLink asChild key={category.id}>
+                        <Link
+                          href={`filter?category=${category.value}`}
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline min-w-40 outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        >
+                          <div className="text-sm font-medium leading-none">
+                            {category.label}
+                          </div>
+                        </Link>
+                      </NavigationMenuLink>
+                    ))}
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
             <Link
               href="#"
               className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
@@ -192,13 +213,40 @@ const Header = ({ active, isProfile }: Props) => {
               </div>
             )}
             {user?.role === "USER" && (
-              <Button
-                variant="outline"
-                className="hidden md:flex items-center space-x-2 mr-4 text-fuchsia-600"
-              >
-                <PenTool className="h-4 w-4" />
-                <span>Become an Author</span>
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="hidden md:flex items-center space-x-2 mr-4 text-fuchsia-600"
+                  >
+                    <PenTool className="h-4 w-4" />
+                    <span>Become an Author</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you passionate about sharing your knowledge and
+                      expertise with the Orbit Blog community? Becoming an
+                      author allows you to contribute articles, inspire readers,
+                      and establish yourself as a thought leader in your field.
+                      By submitting this request, you’ll notify our admin team,
+                      who will review your application. Once approved, you’ll
+                      gain access to our author dashboard to start crafting
+                      compelling content. Take the first step in making your
+                      voice heard and join a thriving community of writers
+                      today!
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={authorRequestHanlder}>
+                      Send Request
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
             <div
               className={` ${
@@ -272,39 +320,31 @@ const Header = ({ active, isProfile }: Props) => {
                     <HomeIcon className="h-5 w-5 mr-2" /> Home
                   </Link>
 
-                  <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-                    <SheetTrigger asChild>
-                      <Button
-                        variant="link"
-                        className="justify-start text-[16px] p-0 text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-400"
-                      >
-                        <Blocks className="mr-2" /> Categories{" "}
-                        <ChevronDown className="ml-1 h-4 w-4" />
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent side="bottom" className="h-[80vh]">
-                      <div className="grid grid-cols-2 gap-4 pt-4">
-                        {categories?.categories.map((category: Category) => (
-                          <Link
-                            href={`filter?category=${category.value}`}
-                            key={category.id}
-                            onClick={() => {
-                              setIsSheetOpen(false);
-                              setIsMainMenuOpen(false);
-                            }}
-                            className="w-full"
-                          >
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start truncate"
-                            >
-                              {category.label}
-                            </Button>
-                          </Link>
-                        ))}
-                      </div>
-                    </SheetContent>
-                  </Sheet>
+                  <NavigationMenu>
+                    <NavigationMenuList className="m-0 p-0 ">
+                      <NavigationMenuItem>
+                        <NavigationMenuTrigger className="p-0 text-md text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent dark:hover:text-fuchsia-400">
+                          <Blocks className="flex mr-2 h-5 w-5" />
+                          Categories
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          {categories?.categories.map((category: Category) => (
+                            <NavigationMenuLink asChild key={category.id}>
+                              <Link
+                                href={`filter?category=${category.value}`}
+                                onClick={() => setIsMainMenuOpen(false)}
+                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline min-w-40 outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                              >
+                                <div className="text-sm font-medium leading-none">
+                                  {category.label}
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          ))}
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    </NavigationMenuList>
+                  </NavigationMenu>
                   <Link
                     href="/contact-us"
                     className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
@@ -312,9 +352,37 @@ const Header = ({ active, isProfile }: Props) => {
                     <LucideContact className="mr-2 h-5 w-5" /> Contact
                   </Link>
                   {user?.role === "USER" && (
-                    <Button className="justify-start p-0 bg-transparent hover:bg-transparent text-fuchsia-600 ">
-                      <PenTool /> Become an Author
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button className="justify-start p-0 bg-transparent hover:bg-transparent text-fuchsia-600 ">
+                          <PenTool /> Become an Author
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you passionate about sharing your knowledge and
+                            expertise with the Orbit Blog community? Becoming an
+                            author allows you to contribute articles, inspire
+                            readers, and establish yourself as a thought leader
+                            in your field. By submitting this request, you’ll
+                            notify our admin team, who will review your
+                            application. Once approved, you’ll gain access to
+                            our author dashboard to start crafting compelling
+                            content. Take the first step in making your voice
+                            heard and join a thriving community of writers
+                            today!
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={authorRequestHanlder}>
+                            Send Request
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   )}
                 </nav>
 
