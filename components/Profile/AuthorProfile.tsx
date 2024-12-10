@@ -31,7 +31,7 @@ const AuthorProfile = ({ user }: Props) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (user.role === "USER") return router.back();
+    if (user?.role === "USER") return router.back();
   }, [user, router]);
 
   const getTotalLikes = (post: IPost[]) => {

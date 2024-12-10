@@ -93,6 +93,23 @@ export interface ApiErrorResponse {
   data: { message: string; errors: { [k: string]: string[] } };
 }
 
+interface Growth {
+  comments: { currentPeriod: number; lastPeriod: number; percentage: string };
+  likes: { currentPeriod: number; lastPeriod: number; percentage: string };
+  posts: { currentPeriod: number; lastPeriod: number; percentage: string };
+  views: { currentPeriod: number; lastPeriod: number; percentage: string };
+}
+
+export interface Analytics {
+  customTime: number;
+  growth: Growth;
+  post: IPost;
+  totalComments: number;
+  totalLikes: number;
+  totalPosts: number;
+  totalViews: number;
+}
+
 export function isApiResponse(error: unknown): error is ApiErrorResponse {
   return (
     typeof error === "object" &&

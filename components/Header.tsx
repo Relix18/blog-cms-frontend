@@ -205,7 +205,7 @@ const Header = ({ active, isProfile }: Props) => {
                   New Post
                 </Link>
                 <Link
-                  href="#"
+                  href="/author/analytics"
                   className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
                 >
                   Analytics
