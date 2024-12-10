@@ -103,7 +103,7 @@ interface Growth {
 export interface Analytics {
   customTime: number;
   growth: Growth;
-  post: IPost;
+  posts: IPost[];
   totalComments: number;
   totalLikes: number;
   totalPosts: number;

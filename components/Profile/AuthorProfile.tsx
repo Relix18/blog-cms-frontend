@@ -63,7 +63,7 @@ const AuthorProfile = ({ user }: Props) => {
                       }
                       alt="Author Avatar"
                     />
-                    <AvatarFallback>{user?.name.slice(1)}</AvatarFallback>
+                    <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
                   </Avatar>
 
                   <div className="text-center sm:text-left">

@@ -5,8 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Eye, ThumbsUp, MessageSquare, BookOpen } from "lucide-react";
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   PieChart,
@@ -23,7 +21,7 @@ import {
   ChartTooltipContent,
   ChartContainer,
 } from "@/components/ui/chart";
-import { Analytics, IUser } from "@/types/types";
+import { Analytics, IPost, IUser } from "@/types/types";
 import { useGetAnalyticsQuery } from "@/state/api/analytics/analyticsApi";
 import {
   Select,
@@ -33,39 +31,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { useState } from "react";
-
-const topPosts = [
-  {
-    id: 1,
-    title: "10 Tips for Better Writing",
-    views: 15230,
-    likes: 876,
-    comments: 234,
-  },
-  {
-    id: 2,
-    title: "The Future of AI in Content Creation",
-    views: 12450,
-    likes: 743,
-    comments: 189,
-  },
-  {
-    id: 3,
-    title: "How to Build a Successful Blog",
-    views: 10890,
-    likes: 652,
-    comments: 201,
-  },
-];
-
-const viewsData = [
-  { name: "Jan", total: 12000 },
-  { name: "Feb", total: 14000 },
-  { name: "Mar", total: 18000 },
-  { name: "Apr", total: 16000 },
-  { name: "May", total: 21000 },
-  { name: "Jun", total: 25000 },
-];
 
 const categoryData = [
   { name: "Technology", value: 40 },
@@ -111,7 +76,14 @@ export default function AuthorAnalytics({ user }: props) {
   const [timeRange, setTimeRange] = useState("1");
   const { data } = useGetAnalyticsQuery(timeRange);
 
+  console.log(data);
+
   const analytics: Analytics = data?.analytics;
+
+  const postData = analytics?.posts.slice(0, 5);
+
+  console.log(postData);
+
   return (
     <div className="container mx-auto my-10 rounded-lg px-4 py-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -147,9 +119,9 @@ export default function AuthorAnalytics({ user }: props) {
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalPosts}</div>
+            <div className="text-2xl font-bold">{analytics?.totalPosts}</div>
             <p className="text-xs text-muted-foreground">
-              {analytics.growth.posts.percentage}% from last month
+              {analytics?.growth.posts.percentage}% from last month
             </p>
           </CardContent>
         </Card>
@@ -159,9 +131,9 @@ export default function AuthorAnalytics({ user }: props) {
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalViews}</div>
+            <div className="text-2xl font-bold">{analytics?.totalViews}</div>
             <p className="text-xs text-muted-foreground">
-              {analytics.growth.views.percentage}% from last month
+              {analytics?.growth.views.percentage}% from last month
             </p>
           </CardContent>
         </Card>
@@ -171,9 +143,9 @@ export default function AuthorAnalytics({ user }: props) {
             <ThumbsUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalLikes}</div>
+            <div className="text-2xl font-bold">{analytics?.totalLikes}</div>
             <p className="text-xs text-muted-foreground">
-              {analytics.growth.likes.percentage}% from last month
+              {analytics?.growth.likes.percentage}% from last month
             </p>
           </CardContent>
         </Card>
@@ -185,9 +157,9 @@ export default function AuthorAnalytics({ user }: props) {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalComments}</div>
+            <div className="text-2xl font-bold">{analytics?.totalComments}</div>
             <p className="text-xs text-muted-foreground">
-              {analytics.growth.comments.percentage}% from last month
+              {analytics?.growth.comments.percentage}% from last month
             </p>
           </CardContent>
         </Card>
@@ -199,29 +171,6 @@ export default function AuthorAnalytics({ user }: props) {
           <TabsTrigger value="analytics">Detailed Analytics</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Views Over Time</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                <LineChart data={viewsData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="total"
-                    stroke="hsl(var(--chart-1))"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
@@ -301,13 +250,10 @@ export default function AuthorAnalytics({ user }: props) {
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
-                {topPosts.map((post) => (
+                {postData?.map((post: IPost) => (
                   <div key={post.id} className="flex items-center">
                     <Avatar className="h-9 w-9 mr-4">
-                      <AvatarImage
-                        src={`/placeholder.svg?height=36&width=36`}
-                        alt={post.title}
-                      />
+                      <AvatarImage src={post.featuredImage} alt={post.title} />
                       <AvatarFallback>{post.title.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="space-y-1 flex-1">
@@ -321,11 +267,11 @@ export default function AuthorAnalytics({ user }: props) {
                         </span>
                         <ThumbsUp className="mr-1 h-3 w-3 text-muted-foreground" />
                         <span className="text-xs text-muted-foreground mr-4">
-                          {post.likes}
+                          {post.likes.length}
                         </span>
                         <MessageSquare className="mr-1 h-3 w-3 text-muted-foreground" />
                         <span className="text-xs text-muted-foreground">
-                          {post.comments}
+                          {post.comments.length}
                         </span>
                       </div>
                     </div>
@@ -340,23 +286,23 @@ export default function AuthorAnalytics({ user }: props) {
             </CardHeader>
             <CardContent>
               <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                <BarChart
-                  data={[
-                    { name: "Post 1", views: 15230, likes: 876, comments: 234 },
-                    { name: "Post 2", views: 12450, likes: 743, comments: 189 },
-                    { name: "Post 3", views: 10890, likes: 652, comments: 201 },
-                    { name: "Post 4", views: 9870, likes: 587, comments: 176 },
-                    { name: "Post 5", views: 8760, likes: 521, comments: 158 },
-                  ]}
-                >
+                <BarChart data={postData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="title" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Legend />
                   <Bar dataKey="views" fill="hsl(var(--chart-1))" />
-                  <Bar dataKey="likes" fill="hsl(var(--chart-2))" />
-                  <Bar dataKey="comments" fill="hsl(var(--chart-3))" />
+                  <Bar
+                    name={"likes"}
+                    dataKey="likes.length"
+                    fill="hsl(var(--chart-2))"
+                  />
+                  <Bar
+                    name={"comment"}
+                    dataKey="comments.length"
+                    fill="hsl(var(--chart-3))"
+                  />
                 </BarChart>
               </ChartContainer>
             </CardContent>

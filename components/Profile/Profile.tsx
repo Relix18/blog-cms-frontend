@@ -123,7 +123,7 @@ const Profile = () => {
                       }
                       alt="Author Avatar"
                     />
-                    <AvatarFallback>JD</AvatarFallback>
+                    <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <Input
                     type="file"
