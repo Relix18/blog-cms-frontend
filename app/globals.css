@@ -154,7 +154,7 @@ ol {
   .my-react-select-container .my-react-select__input-container,
   .my-react-select-container .my-react-select__placeholder,
   .my-react-select-container .my-react-select__single-value {
-    @apply text-base;
+    @apply text-base dark:text-white;
   }
 
   /* Multi-value remove button and SVG */

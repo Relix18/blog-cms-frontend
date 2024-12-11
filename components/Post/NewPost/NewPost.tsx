@@ -24,6 +24,7 @@ import imageCompression from "browser-image-compression";
 import {
   useCreatePostMutation,
   useGetCategoryQuery,
+  useGetTagsQuery,
   usePublishPostMutation,
 } from "@/state/api/post/postApi";
 import { useToast } from "@/hooks/use-toast";
@@ -31,13 +32,13 @@ import Loader from "@/components/Loader/Loader";
 import { useRouter } from "next/navigation";
 import { isApiResponse } from "@/types/types";
 
-interface CategoryOption {
+interface Option {
   value: string;
   label: string;
 }
 
-interface CategoryResponse {
-  categories: CategoryOption[];
+interface TagResponse {
+  tags: Option[];
 }
 
 export default function CreateNewPost() {
@@ -45,11 +46,14 @@ export default function CreateNewPost() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { data: category } = useGetCategoryQuery(undefined, {
     skip: false,
-  }) as { data: CategoryResponse };
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<
-    CategoryOption[]
-  >([]);
+  });
+  const { data: tag } = useGetTagsQuery(undefined, {
+    skip: false,
+  }) as { data: TagResponse };
+  const [categories, setCategories] = useState<Option[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Option | null>(null);
+  const [tags, setTags] = useState<Option[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Option[]>([]);
   const [submitAction, setSubmitAction] = useState<"Draft" | "Publish">(
     "Draft"
   );
@@ -77,11 +81,13 @@ export default function CreateNewPost() {
       description: "",
       content: "",
       categories: [],
+      tags: [],
     },
   });
 
   useEffect(() => {
-    if (category) setCategories(category.categories);
+    if (category) setCategories(category.categories as Option[]);
+    if (tag) setTags(tag.tags);
 
     if (isSuccess) {
       toast({ title: "Post created and saved as draft." });
@@ -92,7 +98,7 @@ export default function CreateNewPost() {
     if (isApiResponse(error)) {
       toast({ title: error?.data?.message || "An error occurred." });
     }
-  }, [isSuccess, error, toast, category, router, postForm]);
+  }, [isSuccess, error, toast, category, router, postForm, tag]);
 
   const slug = (title: string) => {
     return title
@@ -123,20 +129,26 @@ export default function CreateNewPost() {
     }
   };
 
-  const handleCategoryChange = (
-    selectedOptions: MultiValue<CategoryOption>
-  ) => {
-    const selected = selectedOptions as CategoryOption[];
-    setSelectedCategories(selected);
-
+  const handleCategoryChange = (selectedOption: Option | null) => {
+    setSelectedCategory(selectedOption);
     postForm.setValue(
       "categories",
+      selectedOption ? [selectedOption.value] : []
+    );
+  };
+
+  const handleTagsChange = (selectedOptions: MultiValue<Option>) => {
+    const selected = selectedOptions as Option[];
+    setSelectedTags(selected);
+
+    postForm.setValue(
+      "tags",
       selected.map((option) => option.value)
     );
 
     selected.forEach((option) => {
-      if (!categories.some((cat) => cat.value === option.value)) {
-        setCategories((prevCategories) => [...prevCategories, option]);
+      if (!tags.some((tag) => tag.value === tag.value)) {
+        setTags((prevTags) => [...prevTags, option]);
       }
     });
   };
@@ -147,9 +159,10 @@ export default function CreateNewPost() {
       slug: slug(values.title),
       metaTitle: values.title,
       metaDescription: values.description,
-      metaKeyword: selectedCategories.map((cat) => cat.value).join(", "),
+      metaKeyword: selectedTags.map((tag) => tag.value).join(", "),
       featuredImage: imagePreview,
-      categories: selectedCategories.map((cat) => cat.value),
+      category: selectedCategory ? selectedCategory.value : "",
+      tags: selectedTags.map((tag) => tag.value),
     };
 
     console.log(formData);
@@ -309,11 +322,41 @@ export default function CreateNewPost() {
                             <CreatableSelect
                               {...field}
                               id="categories"
-                              isMulti
-                              value={selectedCategories}
+                              value={selectedCategory}
                               onChange={handleCategoryChange}
                               options={categories}
-                              placeholder="Select or create categories"
+                              placeholder="Select or create a category"
+                              getOptionLabel={(e) => e.label}
+                              getOptionValue={(e) => e.value}
+                              isClearable
+                              className="my-react-select-container"
+                              classNamePrefix="my-react-select"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <FormField
+                      control={postForm.control}
+                      name="tags"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Tags{" "}
+                            <span className="text-destructive text-lg">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <CreatableSelect
+                              {...field}
+                              id="tags"
+                              isMulti
+                              value={selectedTags}
+                              onChange={handleTagsChange}
+                              options={tags}
+                              placeholder="Select or create tags"
                               getOptionLabel={(e) => e.label}
                               getOptionValue={(e) => e.value}
                               isClearable

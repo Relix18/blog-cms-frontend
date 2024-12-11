@@ -16,9 +16,9 @@ import {
   useFeaturedAuthorQuery,
   useFeaturedPostQuery,
   useLatestPostQuery,
-  usePopularCategoryQuery,
+  usePopularTagQuery,
 } from "@/state/api/feature/featureApi";
-import { IPost, Category, IAuthor } from "@/types/types";
+import { IPost, Option, IAuthor } from "@/types/types";
 import { format as ago } from "timeago.js";
 import Link from "next/link";
 import { FeaturedPostLoader, LatestPostLoader } from "../Loader/SkeletonLoader";
@@ -29,7 +29,7 @@ const Hero = () => {
   const { data: featuredPost, isLoading: featureLoading } =
     useFeaturedPostQuery({});
   const { data: latestPost, isLoading } = useLatestPostQuery({});
-  const { data: category } = usePopularCategoryQuery({});
+  const { data: tag } = usePopularTagQuery({});
   const { data: featuredAuthor } = useFeaturedAuthorQuery({});
   const { setActiveTab } = useUIStore();
 
@@ -53,14 +53,16 @@ const Hero = () => {
                 trends.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-400">
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  className="w-full sm:w-auto"
-                >
-                  <Link href={"/filter"}>Start Reading</Link>
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
+                <Link href={"/filter"}>
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                  >
+                    Start Reading
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -222,16 +224,16 @@ const Hero = () => {
           <Card className="bg-white dark:bg-gray-800">
             <CardContent className="p-8">
               <h2 className="text-3xl font-bold mb-4 dark:text-white">
-                Popular Categories
+                Popular Tags
               </h2>
               <div className="flex flex-wrap gap-2">
-                {category?.popularCategory?.map((cat: Category) => (
+                {tag?.popularTags?.map((tag: Option) => (
                   <Link
-                    key={cat.id}
-                    href={`/filter?category=${cat.value}`}
+                    key={tag.id}
+                    href={`/filter?tags=${tag.label}`}
                     className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                   >
-                    {cat.label}
+                    {tag.label}
                   </Link>
                 ))}
               </div>

@@ -107,4 +107,15 @@ export const PostSchema = z.object({
       ])
     )
     .min(1, "At least one category is required"),
+  tags: z
+    .array(
+      z.union([
+        z.string(),
+        z.object({
+          value: z.string(),
+          label: z.string().optional(),
+        }),
+      ])
+    )
+    .min(1, "At least one category is required"),
 });

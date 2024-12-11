@@ -30,7 +30,9 @@ export interface IPost {
   title: string;
   slug: string;
   content: string;
-  categories: ICategory[];
+  tags: ITag[];
+  category: Option;
+  categoryId: number;
   description: string;
   featuredImage: string;
   published: boolean;
@@ -48,11 +50,11 @@ export interface IPost {
   updatedAt: Date;
 }
 
-export interface ICategory {
-  category: Category;
+export interface ITag {
+  tag: Option;
 }
 
-export interface Category {
+export interface Option {
   value: string;
   label: string;
   id: number;

@@ -19,8 +19,8 @@ export const feature = createApi({
     latestPost: builder.query({
       query: () => "latest-post",
     }),
-    popularCategory: builder.query({
-      query: () => "popular-categories",
+    popularTag: builder.query({
+      query: () => "popular-tags",
     }),
     featuredAuthor: builder.query({
       query: () => "featured-author",
@@ -38,7 +38,7 @@ export const {
   useRelatedPostMutation,
   useFeaturedPostQuery,
   useLatestPostQuery,
-  usePopularCategoryQuery,
+  usePopularTagQuery,
   useFeaturedAuthorQuery,
   useRecentActivityQuery,
 } = feature;

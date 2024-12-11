@@ -23,8 +23,9 @@ import {
 import {
   useGetCategoryQuery,
   useGetPostsQuery,
+  useGetTagsQuery,
 } from "@/state/api/post/postApi";
-import { Category, IPost } from "@/types/types";
+import { Option, IPost } from "@/types/types";
 import { format as ago } from "timeago.js";
 import Link from "next/link";
 import { FilterPostLoader } from "../Loader/SkeletonLoader";
@@ -33,26 +34,31 @@ export default function BlogFilterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("date");
   const [isGridView, setIsGridView] = useState(true);
   const [searchQuery, setSearchQuery] = useState<string | null>("");
 
-  // Fetch posts
   const { data: currentPosts, isLoading } = useGetPostsQuery({});
   const { data: categoriesList } = useGetCategoryQuery({});
+  const { data: tagsList } = useGetTagsQuery({});
 
   const categories =
-    categoriesList?.categories?.map((category: Category) => category.label) ||
-    [];
+    categoriesList?.categories?.map((category: Option) => category.label) || [];
 
-  // Sync state with URL params
+  const tags = tagsList?.tags?.map((tag: Option) => tag.label) || [];
+
   useEffect(() => {
     const categoriesFromParams = searchParams.get("categories");
+    const tagsFromParams = searchParams.get("tags");
     const sortByFromParams = searchParams.get("sortBy");
     const searchQueryFromParams = searchParams.get("search");
 
     if (categoriesFromParams) {
       setSelectedCategories(categoriesFromParams.split(","));
+    }
+    if (tagsFromParams) {
+      setSelectedTags(tagsFromParams.split(","));
     }
     if (sortByFromParams) {
       setSortBy(sortByFromParams);
@@ -67,6 +73,9 @@ export default function BlogFilterPage() {
     if (selectedCategories.length > 0) {
       params.set("categories", selectedCategories.join(","));
     }
+    if (selectedTags.length > 0) {
+      params.set("tags", selectedTags.join(","));
+    }
     if (sortBy) {
       params.set("sortBy", sortBy);
     }
@@ -78,13 +87,19 @@ export default function BlogFilterPage() {
 
   useEffect(() => {
     updateQueryParams();
-  }, [selectedCategories, sortBy, searchQuery]);
+  }, [selectedCategories, selectedTags, sortBy, searchQuery]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
       prev.includes(category)
         ? prev.filter((c) => c !== category)
         : [...prev, category]
+    );
+  };
+
+  const toggleTags = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
@@ -105,21 +120,24 @@ export default function BlogFilterPage() {
     }
   };
 
-  console.log(selectedCategories);
-
   const filteredPosts = currentPosts?.posts
     ?.filter((post: IPost) => {
       const matchesCategory =
         selectedCategories.length === 0 ||
         selectedCategories.some((category) =>
-          post.categories.map((cat) => cat.category.label).includes(category)
+          post.category.label.includes(category)
+        );
+      const matchesTag =
+        selectedTags.length === 0 ||
+        selectedTags.some((tag) =>
+          post.tags.map((tag) => tag.tag.label).includes(tag)
         );
       const matchesSearchQuery =
         !searchQuery ||
         post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         post.author.name?.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearchQuery;
+      return matchesCategory && matchesSearchQuery && matchesTag;
     })
     ?.sort((a, b) => (sortPosts([a, b])[0] === a ? -1 : 1));
 
@@ -127,8 +145,6 @@ export default function BlogFilterPage() {
     <div className="min-h-screen pt-10">
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Sidebar */}
-
           <aside className="w-full md:w-1/4 hidden md:block">
             <div className="md:sticky md:top-20 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
               <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
@@ -153,13 +169,34 @@ export default function BlogFilterPage() {
                 ))}
               </div>
             </div>
+            <div className="md:sticky md:top-20 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                Tags
+              </h2>
+
+              <div className="space-y-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
+                {tags.map((tag: string) => (
+                  <div key={tag} className="flex items-center">
+                    <Checkbox
+                      id={tag}
+                      checked={selectedTags.includes(tag)}
+                      onCheckedChange={() => toggleTags(tag)}
+                    />
+                    <label
+                      htmlFor={tag}
+                      className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 dark:text-gray-300"
+                    >
+                      {tag}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
           </aside>
 
-          {/* Main Content */}
           <div className="w-full md:w-3/4">
             <div className="flex flex-col gap-4 mb-6">
               <div className="flex flex-wrap items-center justify-between md:justify-end gap-2">
-                {/* Mobile Filter */}
                 <div className="md:hidden block w-full">
                   <Dialog>
                     <DialogTrigger asChild>
@@ -192,7 +229,6 @@ export default function BlogFilterPage() {
                   </Dialog>
                 </div>
 
-                {/* Sort and View Toggle */}
                 <div className="flex w-full gap-2 md:justify-end justify-between">
                   <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger className="w-[180px]">

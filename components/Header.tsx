@@ -44,7 +44,7 @@ import {
 } from "./ui/alert-dialog";
 import { useRouter } from "next/navigation";
 import { useGetCategoryQuery } from "@/state/api/post/postApi";
-import { Category, isApiResponse } from "@/types/types";
+import { Option, isApiResponse } from "@/types/types";
 import { useSearchParams } from "next/navigation";
 import {
   NavigationMenu,
@@ -154,10 +154,10 @@ const Header = ({ active, isProfile }: Props) => {
                     Categories
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    {categories?.categories.map((category: Category) => (
+                    {categories?.categories.map((category: Option) => (
                       <NavigationMenuLink asChild key={category.id}>
                         <Link
-                          href={`filter?category=${category.value}`}
+                          href={`filter?categories=${category.label}`}
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline min-w-40 outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">

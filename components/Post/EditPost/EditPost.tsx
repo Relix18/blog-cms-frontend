@@ -24,17 +24,19 @@ import {
   useGetPostBySlugQuery,
   useGetCategoryQuery,
   useUpdatePostMutation,
+  useGetTagsQuery,
 } from "@/state/api/post/postApi";
 import Loader from "@/components/Loader/Loader";
 import { useToast } from "@/hooks/use-toast";
 import { IPost, isApiResponse } from "@/types/types";
 import { useRouter } from "next/navigation";
+import { MultiValue } from "react-select";
 
 interface Props {
   slug: string;
 }
 
-interface CategoryOption {
+interface Option {
   value: string;
   label: string;
 }
@@ -42,12 +44,13 @@ interface CategoryOption {
 export default function EditPost({ slug }: Props) {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [categories, setCategories] = useState<CategoryOption[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<
-    CategoryOption[]
-  >([]);
+  const [categories, setCategories] = useState<Option[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Option | null>(null);
+  const [tags, setTags] = useState<Option[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Option[]>([]);
 
-  const { data: category } = useGetCategoryQuery({ skip: false });
+  const { data: categoryData } = useGetCategoryQuery({ skip: false });
+  const { data: tagData } = useGetTagsQuery({ skip: false });
   const { data: postData, isLoading } = useGetPostBySlugQuery(slug);
   const [updatePost, { isSuccess, isLoading: isUpdating, error }] =
     useUpdatePostMutation();
@@ -61,31 +64,56 @@ export default function EditPost({ slug }: Props) {
       description: "",
       content: "",
       categories: [],
+      tags: [],
     },
   });
 
   useEffect(() => {
-    setCategories(category?.categories || []);
+    if (categoryData) {
+      setCategories(
+        categoryData.categories.map((cat: Option) => ({
+          value: cat.value,
+          label: cat.label,
+        }))
+      );
+    }
+
+    if (tagData) {
+      setTags(
+        tagData.tags.map((tag: Option) => ({
+          value: tag.value,
+          label: tag.label,
+        }))
+      );
+    }
+  }, [categoryData, tagData]);
+
+  useEffect(() => {
     if (postData?.post) {
       const post: IPost = postData.post;
       postForm.reset({
         title: post.title,
         description: post.description,
         content: post.content,
-        categories: post.categories.map((cat) => ({
-          value: cat.category.value || "",
-          label: cat.category.label || "",
-        })),
+        categories: [post.category.value],
+        tags: post.tags.map((tag) => tag.tag.value),
       });
-      setSelectedCategories(
-        post.categories.map((cat) => ({
-          value: cat.category.value,
-          label: cat.category.label,
+
+      setSelectedCategory({
+        value: post.category.value,
+        label: post.category.label,
+      });
+
+      setSelectedTags(
+        post.tags.map((tag) => ({
+          value: tag.tag.value,
+          label: tag.tag.label,
         }))
       );
+
       setImagePreview(post.featuredImage);
     }
-  }, [postData, category, postForm]);
+  }, [postData, postForm]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -124,16 +152,24 @@ export default function EditPost({ slug }: Props) {
     }
   };
 
-  const handleCategoryChange = (selectedOptions: CategoryOption[]) => {
-    setSelectedCategories(selectedOptions);
+  const handleCategoryChange = (selectedOption: Option | null) => {
+    setSelectedCategory(selectedOption);
     postForm.setValue(
       "categories",
+      selectedOption ? [selectedOption.value] : []
+    );
+  };
+
+  const handleTagsChange = (selectedOptions: MultiValue<Option>) => {
+    setSelectedTags(selectedOptions as Option[]);
+    postForm.setValue(
+      "tags",
       selectedOptions.map((option) => option.value)
     );
 
     selectedOptions.forEach((option) => {
-      if (!categories.some((cat) => cat.value === option.value)) {
-        setCategories((prevCategories) => [...prevCategories, option]);
+      if (!tags.some((tag) => tag.value === option.value)) {
+        setTags((prevTags) => [...prevTags, option]);
       }
     });
   };
@@ -144,13 +180,15 @@ export default function EditPost({ slug }: Props) {
       slug: generateSlug(values.title),
       metaTitle: values.title,
       metaDescription: values.description,
-      metaKeyword: selectedCategories.map((cat) => cat.label).join(", "),
+      metaKeyword: selectedTags.map((tag) => tag.value).join(", "),
       featuredImage: imagePreview,
-      categories: selectedCategories.map((cat) => cat.value),
+      category: selectedCategory ? selectedCategory.value : "",
+      tags: selectedTags.map((tag) => tag.value),
     };
+
     const data = {
       post: formData,
-      id: postData.post.id,
+      id: postData?.post.id,
     };
 
     await updatePost(data);
@@ -175,14 +213,13 @@ export default function EditPost({ slug }: Props) {
                       className="space-y-6"
                       onSubmit={postForm.handleSubmit(onSubmit)}
                     >
-                      {/* Title Field */}
                       <FormField
                         control={postForm.control}
                         name="title"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Title{" "}
+                              Title
                               <span className="text-destructive text-lg">
                                 *
                               </span>
@@ -198,10 +235,9 @@ export default function EditPost({ slug }: Props) {
                         )}
                       />
 
-                      {/* Featured Image */}
                       <FormItem>
                         <FormLabel>
-                          Featured Image{" "}
+                          Featured Image
                           <span className="text-destructive text-lg">*</span>
                         </FormLabel>
                         <div className="flex items-center space-x-4">
@@ -238,14 +274,13 @@ export default function EditPost({ slug }: Props) {
                         )}
                       </FormItem>
 
-                      {/* Content */}
                       <FormField
                         control={postForm.control}
                         name="content"
                         render={() => (
                           <FormItem>
                             <FormLabel>
-                              Content{" "}
+                              Content
                               <span className="text-destructive text-lg">
                                 *
                               </span>
@@ -267,14 +302,13 @@ export default function EditPost({ slug }: Props) {
                         )}
                       />
 
-                      {/* Description */}
                       <FormField
                         control={postForm.control}
                         name="description"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Short Description{" "}
+                              Short Description
                               <span className="text-destructive text-lg">
                                 *
                               </span>
@@ -290,27 +324,53 @@ export default function EditPost({ slug }: Props) {
                         )}
                       />
 
-                      {/* Categories */}
                       <FormField
                         control={postForm.control}
                         name="categories"
-                        render={() => (
+                        render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              Categories{" "}
+                              Category
                               <span className="text-destructive text-lg">
                                 *
                               </span>
                             </FormLabel>
                             <FormControl>
                               <CreatableSelect
-                                isMulti
-                                value={selectedCategories}
+                                {...field}
+                                value={selectedCategory}
                                 onChange={handleCategoryChange}
                                 options={categories}
-                                placeholder="Select or create categories"
-                                getOptionLabel={(e) => e.label}
-                                getOptionValue={(e) => e.value}
+                                placeholder="Select or create a category"
+                                isClearable
+                                className="my-react-select-container"
+                                classNamePrefix="my-react-select"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={postForm.control}
+                        name="tags"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Tags
+                              <span className="text-destructive text-lg">
+                                *
+                              </span>
+                            </FormLabel>
+                            <FormControl>
+                              <CreatableSelect
+                                {...field}
+                                isMulti
+                                value={selectedTags}
+                                onChange={handleTagsChange}
+                                options={tags}
+                                placeholder="Select or create tags"
                                 isClearable
                                 className="my-react-select-container"
                                 classNamePrefix="my-react-select"
@@ -327,7 +387,7 @@ export default function EditPost({ slug }: Props) {
                           disabled={isUpdating}
                           className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
                         >
-                          Update Post {isUpdating && <Loader isButton={true} />}
+                          Update Post {isUpdating && <Loader isButton />}
                         </Button>
                       </div>
                     </form>

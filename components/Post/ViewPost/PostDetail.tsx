@@ -122,7 +122,7 @@ export default function SingleBlogPost({ data }: Props) {
   useEffect(() => {
     const relPost = {
       currentId: data.id,
-      value: data.categories[0].category.value,
+      value: data.category.value,
     };
     relatedPost(relPost);
     cleanUpExpiredViews();
@@ -273,11 +273,7 @@ export default function SingleBlogPost({ data }: Props) {
             />
           </div>
           <div className="flex flex-wrap gap-2 mb-6">
-            {data.categories.map((cat) => (
-              <Badge key={cat.category.id} variant="secondary">
-                {cat.category.label}
-              </Badge>
-            ))}
+            <Badge variant="secondary">{data.category.label}</Badge>
           </div>
           <div className="flex items-center space-x-4 mb-8">
             <span className="text-gray-600 dark:text-gray-400">Share:</span>

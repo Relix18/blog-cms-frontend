@@ -5,7 +5,7 @@ export const post = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:4000/api/v1/",
   }),
-  tagTypes: ["Post", "AuthorPost", "Category", "Comment"],
+  tagTypes: ["Post", "AuthorPost", "Category", "Tag", "Comment"],
   endpoints: (builder) => ({
     createPost: builder.mutation({
       query: (data) => ({
@@ -14,7 +14,7 @@ export const post = createApi({
         body: data,
         credentials: "include",
       }),
-      invalidatesTags: ["Post", "AuthorPost", "Category"],
+      invalidatesTags: ["Post", "AuthorPost", "Category", "Tag"],
     }),
     publishPost: builder.mutation({
       query: (id) => ({
@@ -60,6 +60,12 @@ export const post = createApi({
         url: "get-category",
       }),
       providesTags: ["Category"],
+    }),
+    getTags: builder.query({
+      query: () => ({
+        url: "get-tags",
+      }),
+      providesTags: ["Tag"],
     }),
     postComment: builder.mutation({
       query: (data) => ({
@@ -120,6 +126,7 @@ export const {
   useGetAuthorPostQuery,
   useGetPostsQuery,
   useGetCategoryQuery,
+  useGetTagsQuery,
   useGetPostBySlugQuery,
   useUpdatePostMutation,
   usePostCommentMutation,
