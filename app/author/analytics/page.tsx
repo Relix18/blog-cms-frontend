@@ -1,7 +1,9 @@
 "use client";
 
 import AuthorOrAdminProtected from "@/app/hooks/useAuthorProtected";
+import Protected from "@/app/hooks/useProtected";
 import Analytics from "@/components/Author/Analytics";
+import Header from "@/components/Header";
 import { getLoggedUser } from "@/state/api/auth/authSlice";
 import Heading from "@/utils/Heading";
 import React from "react";
@@ -11,14 +13,17 @@ const page = () => {
   const user = useSelector(getLoggedUser);
   return (
     <>
-      <AuthorOrAdminProtected>
-        <Heading
-          title={user?.name}
-          description="Author analytics section"
-          keywords="OrbitBlog, Blog, Orbit, author, analytics"
-        />
-        <Analytics user={user} />
-      </AuthorOrAdminProtected>
+      <Protected>
+        <AuthorOrAdminProtected>
+          <Heading
+            title={user?.name}
+            description="Author analytics section"
+            keywords="OrbitBlog, Blog, Orbit, author, analytics"
+          />
+          <Header />
+          <Analytics user={user} />
+        </AuthorOrAdminProtected>
+      </Protected>
     </>
   );
 };

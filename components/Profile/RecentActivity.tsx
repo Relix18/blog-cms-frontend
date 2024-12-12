@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { TabsContent } from "../ui/tabs";
-import { useRecentActivityQuery } from "@/state/api/feature/featureApi";
+import { useRecentActivityQuery } from "@/state/api/post/postApi";
 import { IPost } from "@/types/types";
 import { format } from "date-fns";
 import { format as ago } from "timeago.js";

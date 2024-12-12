@@ -117,6 +117,13 @@ export const post = createApi({
       }),
       providesTags: ["Post"],
     }),
+    recentActivity: builder.query({
+      query: () => ({
+        url: "recent-activity",
+        credentials: "include",
+      }),
+      providesTags: ["Post"],
+    }),
   }),
 });
 
@@ -135,4 +142,5 @@ export const {
   useLikePostMutation,
   useViewUpdateMutation,
   useGetLikePostQuery,
+  useRecentActivityQuery,
 } = post;

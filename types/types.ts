@@ -110,6 +110,21 @@ export interface Analytics {
   totalLikes: number;
   totalPosts: number;
   totalViews: number;
+  categoryMetrics: CategoryMetrics[];
+  categoryPercentages: CategoryPercentages[];
+}
+
+interface CategoryMetrics {
+  category: string;
+  comment: number;
+  views: number;
+  likes: number;
+}
+
+interface CategoryPercentages {
+  name: string;
+  value: number;
+  count: number;
 }
 
 export function isApiResponse(error: unknown): error is ApiErrorResponse {

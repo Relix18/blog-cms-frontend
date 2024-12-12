@@ -129,6 +129,7 @@ export default function SingleBlogPost({ data }: Props) {
   }, [relatedPost, data]);
 
   useEffect(() => {
+    setLikeCount(data?.likes.length);
     const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
     });
@@ -143,10 +144,6 @@ export default function SingleBlogPost({ data }: Props) {
         }
       }
     );
-
-    return () => {
-      pusher.unsubscribe("post-channel");
-    };
   }, [data]);
 
   useEffect(() => {
@@ -311,7 +308,7 @@ export default function SingleBlogPost({ data }: Props) {
               {isLiked ? "Liked" : "Like"}
             </Button>
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              {formatLikes(likeCount) || formatLikes(data.likes.length)} likes
+              {formatLikes(likeCount)} likes
             </span>
           </div>
         </article>
@@ -452,7 +449,7 @@ export default function SingleBlogPost({ data }: Props) {
 
         <Separator className="my-8" />
 
-        {relatedPosts?.post[0].posts.length > 0 && (
+        {relatedPosts?.post[0].post.length > 0 && (
           <section className="max-w-4xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
               Related Posts
