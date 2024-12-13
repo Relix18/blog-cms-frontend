@@ -191,7 +191,7 @@ const Header = ({ active, isProfile }: Props) => {
             {isProfile && (
               <div className="hidden md:flex gap-4">
                 <Link
-                  href="#"
+                  href="/admin/dashboard/overview"
                   className={`${
                     user?.role !== "ADMIN" && "hidden"
                   } text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500`}
