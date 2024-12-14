@@ -1,9 +1,7 @@
 import Overview from "@/components/Admin/Overview";
 import React from "react";
 
-type Props = {};
-
-const page = (props: Props) => {
+const page = () => {
   return <Overview />;
 };
 

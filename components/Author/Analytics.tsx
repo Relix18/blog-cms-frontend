@@ -71,7 +71,7 @@ export default function AuthorAnalytics({ user }: props) {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <div className="flex items-center mb-4 md:mb-0">
               <Avatar className="h-16 w-16 mr-4">
-                <AvatarImage src={user?.profile.avatar} alt={user?.name} />
+                <AvatarImage src={user?.profile?.avatar} alt={user?.name} />
                 <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div>

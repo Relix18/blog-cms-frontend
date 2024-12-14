@@ -12,7 +12,13 @@ export const analytics = createApi({
         credentials: "include",
       }),
     }),
+    getOverview: builder.query({
+      query: (days) => ({
+        url: `admin-overview/${days}`,
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
-export const { useGetAnalyticsQuery } = analytics;
+export const { useGetAnalyticsQuery, useGetOverviewQuery } = analytics;

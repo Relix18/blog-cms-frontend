@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import React from "react";
 import { cookies } from "next/headers";
 import AdminHeader from "@/components/Admin/AdminHeader";
+import AdminProtected from "../hooks/useAdminProtected";
 
 export default async function Layout({
   children,
@@ -13,12 +14,14 @@ export default async function Layout({
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
-      <Sidebar />
-      <main className="w-full">
-        <AdminHeader />
-        {children}
-      </main>
-    </SidebarProvider>
+    <AdminProtected>
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <Sidebar />
+        <main className="w-full bg-gray-50 dark:bg-background">
+          <AdminHeader />
+          {children}
+        </main>
+      </SidebarProvider>
+    </AdminProtected>
   );
 }

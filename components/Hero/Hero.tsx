@@ -101,7 +101,7 @@ const Hero = () => {
                             width={32}
                             height={32}
                             alt={post.author.name}
-                            className="rounded-full mr-2"
+                            className="rounded-full  aspect-square mr-2 "
                           />
                           <span className="text-sm text-gray-500 dark:text-gray-400">
                             {post.author.name}
@@ -157,7 +157,7 @@ const Hero = () => {
                             width={32}
                             height={32}
                             alt={post.author.name}
-                            className="rounded-full mr-2"
+                            className="rounded-full aspect-square mr-2"
                           />
                           <span className="text-sm mr-1 text-gray-500 dark:text-gray-400">
                             {post.author.name}

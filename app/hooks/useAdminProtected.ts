@@ -1,3 +1,4 @@
+"use client";
 import { redirect } from "next/navigation";
 import React from "react";
 import { getLoggedUser } from "@/state/api/auth/authSlice";
@@ -8,7 +9,7 @@ interface props {
 }
 
 const useAdminProtected = ({ children }: props) => {
-  const { user } = useSelector(getLoggedUser);
+  const user = useSelector(getLoggedUser);
 
   return user?.role === "ADMIN" ? children : redirect("/");
 };
