@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { IComment, IPost } from "@/types/types";
-import { format } from "date-fns";
+import { format, formatDistanceStrict } from "date-fns";
 import Link from "next/link";
 import { MdWhatsapp } from "react-icons/md";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,7 +31,6 @@ import {
 } from "@/state/api/post/postApi";
 import Loader from "@/components/Loader/Loader";
 import { useToast } from "@/hooks/use-toast";
-import { format as ago } from "timeago.js";
 import { useSelector } from "react-redux";
 import { getLoggedUser } from "@/state/api/auth/authSlice";
 import Pusher from "pusher-js";
@@ -55,7 +54,7 @@ export default function SingleBlogPost({ data }: Props) {
   );
   const [isLiked, setIsLiked] = useState(false);
   const [comment, setComment] = useState("");
-  const [likeCount, setLikeCount] = useState<number | null>(null);
+  const [likeCount, setLikeCount] = useState<number>(0);
   const { data: getComment } = useGetCommentQuery(data.slug);
   const [postComment, { isLoading, isSuccess }] = usePostCommentMutation();
   const [commentReply] = useCommentReplyMutation();
@@ -362,7 +361,9 @@ export default function SingleBlogPost({ data }: Props) {
                     </p>
                     <div className="flex text-sm items-center mt-2 space-x-4">
                       <h3 className="text-gray-600 dark:text-gray-400">
-                        {ago(comment.createdAt, "en_US")}
+                        {formatDistanceStrict(comment.createdAt, new Date(), {
+                          addSuffix: true,
+                        })}
                       </h3>
                       <Button
                         variant="link"
@@ -435,7 +436,13 @@ export default function SingleBlogPost({ data }: Props) {
                               {reply.content}
                             </p>
                             <h3 className="text-gray-600 text-sm pt-2 dark:text-gray-400">
-                              {ago(reply.createdAt, "en_US")}
+                              {formatDistanceStrict(
+                                reply.createdAt,
+                                new Date(),
+                                {
+                                  addSuffix: true,
+                                }
+                              )}
                             </h3>
                           </div>
                         </div>

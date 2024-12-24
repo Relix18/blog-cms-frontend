@@ -3,8 +3,7 @@ import React from "react";
 import { TabsContent } from "../ui/tabs";
 import { useRecentActivityQuery } from "@/state/api/post/postApi";
 import { IPost } from "@/types/types";
-import { format } from "date-fns";
-import { format as ago } from "timeago.js";
+import { format, formatDistanceStrict } from "date-fns";
 import { RecentActivityLoader } from "../Loader/SkeletonLoader";
 
 interface Activity {
@@ -49,7 +48,9 @@ const RecentActivity = () => {
                 {activity.type !== "LIKE" && activity.content}
               </p>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {ago(activity.createdAt)}
+                {formatDistanceStrict(activity.createdAt, new Date(), {
+                  addSuffix: true,
+                })}
               </span>
             </div>
           ))}

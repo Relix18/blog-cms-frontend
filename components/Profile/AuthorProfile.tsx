@@ -144,7 +144,7 @@ const AuthorProfile = ({ user }: Props) => {
                       Author Posts
                     </h1>
                   </Button>
-                  <PublishedPost posts={user?.posts} />
+                  <PublishedPost isAuthorProfile={true} posts={user?.posts} />
                 </Tabs>
               </div>
             </div>

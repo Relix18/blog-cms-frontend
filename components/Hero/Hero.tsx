@@ -19,11 +19,11 @@ import {
   usePopularTagQuery,
 } from "@/state/api/feature/featureApi";
 import { IPost, Option, IAuthor } from "@/types/types";
-import { format as ago } from "timeago.js";
 import Link from "next/link";
 import { FeaturedPostLoader, LatestPostLoader } from "../Loader/SkeletonLoader";
 import useUIStore from "@/app/hooks/useUIStore";
 import { useEffect } from "react";
+import { formatDistanceStrict } from "date-fns";
 
 const Hero = () => {
   const { data: featuredPost, isLoading: featureLoading } =
@@ -164,7 +164,14 @@ const Hero = () => {
                           </span>
 
                           <span className="text-sm text-gray-500 dark:text-gray-400">
-                            • {ago(post.publishedAt)}
+                            •{" "}
+                            {formatDistanceStrict(
+                              post.publishedAt,
+                              new Date(),
+                              {
+                                addSuffix: true,
+                              }
+                            )}
                           </span>
                         </div>
                         <div className="flex items-center">

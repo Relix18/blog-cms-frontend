@@ -110,6 +110,7 @@ export interface Analytics {
   totalLikes: number;
   totalPosts: number;
   totalViews: number;
+  viewsChart?: [{ month: string; views: number }];
   categoryMetrics: CategoryMetrics[];
   categoryPercentages: CategoryPercentages[];
 }

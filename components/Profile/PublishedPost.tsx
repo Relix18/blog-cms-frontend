@@ -5,13 +5,15 @@ import { IPost } from "@/types/types";
 import { format } from "date-fns";
 import { ProfilePostLoader } from "../Loader/SkeletonLoader";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 type Props = {
   posts: IPost[];
   isLoading?: boolean;
+  isAuthorProfile?: boolean;
 };
 
-const PublishedPost = ({ posts, isLoading }: Props) => {
+const PublishedPost = ({ posts, isLoading, isAuthorProfile }: Props) => {
   const published = posts?.filter((post) => post.published === true);
 
   return (
@@ -48,7 +50,10 @@ const PublishedPost = ({ posts, isLoading }: Props) => {
                     asChild
                     variant="outline"
                     size="sm"
-                    className="text-fuchsia-600  border-fuchsia-600 "
+                    className={cn(
+                      isAuthorProfile ? "hidden" : "inline-flex",
+                      "text-fuchsia-600  border-fuchsia-600"
+                    )}
                   >
                     <Link href={`post/edit-post/${post.slug}`}>Edit</Link>
                   </Button>

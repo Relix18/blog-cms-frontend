@@ -43,79 +43,6 @@ const chartData = [
   { month: "June", desktop: 214 },
 ];
 
-const topPosts = [
-  {
-    id: 1,
-    title: "10 Tips for Better Writing",
-    views: 15230,
-    likes: 876,
-    comments: 234,
-  },
-  {
-    id: 2,
-    title: "The Future of AI in Content Creation",
-    views: 12450,
-    likes: 743,
-    comments: 189,
-  },
-  {
-    id: 3,
-    title: "How to Build a Successful Blog",
-    views: 10890,
-    likes: 652,
-    comments: 201,
-  },
-  {
-    id: 4,
-    title: "How to Build a Successful Blog",
-    views: 10890,
-    likes: 652,
-    comments: 201,
-  },
-  {
-    id: 5,
-    title: "How to Build a Successful Blog",
-    views: 10890,
-    likes: 652,
-    comments: 201,
-  },
-  {
-    id: 6,
-    title: "How to Build a Successful Blog",
-    views: 10890,
-    likes: 652,
-    comments: 201,
-  },
-  {
-    id: 7,
-    title: "How to Build a Successful Blog",
-    views: 10890,
-    likes: 652,
-    comments: 201,
-  },
-  {
-    id: 8,
-    title: "How to Build a Successful Blog",
-    views: 10890,
-    likes: 652,
-    comments: 201,
-  },
-  {
-    id: 9,
-    title: "How to Build a Successful Blog",
-    views: 10890,
-    likes: 652,
-    comments: 201,
-  },
-  {
-    id: 10,
-    title: "How to Build a Successful Blog",
-    views: 10890,
-    likes: 652,
-    comments: 201,
-  },
-];
-
 const chartConfig: ChartConfig = {
   desktop: {
     label: "Desktop",
@@ -206,7 +133,7 @@ const Overview = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue="views" className="space-y-4">
         <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
           <TabsTrigger value="views">Views</TabsTrigger>
           <TabsTrigger value="posts">Top Posts</TabsTrigger>
@@ -222,12 +149,12 @@ const Overview = () => {
               </CardHeader>
               <CardContent>
                 <ChartContainer
-                  className="h-[300px] w-full"
+                  className="max-h-[300px] w-full"
                   config={chartConfig}
                 >
                   <AreaChart
                     accessibilityLayer
-                    data={chartData}
+                    data={overview?.viewsChart}
                     margin={{
                       left: 12,
                       right: 12,
@@ -246,7 +173,7 @@ const Overview = () => {
                       content={<ChartTooltipContent indicator="line" />}
                     />
                     <Area
-                      dataKey="desktop"
+                      dataKey="views"
                       type="natural"
                       fill="var(--color-desktop)"
                       fillOpacity={0.4}
@@ -259,11 +186,14 @@ const Overview = () => {
                 <div className="flex w-full items-start gap-2 text-sm">
                   <div className="grid gap-2">
                     <div className="flex items-center gap-2 font-medium leading-none">
-                      Trending up by 5.2% this month{" "}
-                      <TrendingUp className="h-4 w-4" />
+                      Trending up by {overview?.growth.views.percentage}% this
+                      month <TrendingUp className="h-4 w-4" />
                     </div>
                     <div className="flex items-center gap-2 leading-none text-muted-foreground">
-                      January - June 2024
+                      {`${overview?.viewsChart[0].month} - ${
+                        overview?.viewsChart[overview?.viewsChart?.length - 1]
+                          .month
+                      }`}
                     </div>
                   </div>
                 </div>
@@ -278,12 +208,18 @@ const Overview = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
-                {topPosts?.map((post) => (
+                {overview?.posts?.map((post, index) => (
                   <div key={post.id} className="flex items-center">
-                    <Avatar className="h-9 w-9 mr-4">
-                      <AvatarImage src={post.title} alt={post.title} />
-                      <AvatarFallback>{post.title.charAt(0)}</AvatarFallback>
-                    </Avatar>
+                    <div className="flex gap-4 items-center">
+                      <div className="mx-auto w-4 text-lg">{index + 1}.</div>
+                      <Avatar className="h-9 w-9 mr-4">
+                        <AvatarImage
+                          src={post?.featuredImage}
+                          alt={post.title}
+                        />
+                        <AvatarFallback>{post.title.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    </div>
                     <div className="space-y-1 flex-1">
                       <p className="text-sm font-medium leading-none">
                         {post.title}
@@ -295,11 +231,11 @@ const Overview = () => {
                         </span>
                         <ThumbsUp className="mr-1 h-3 w-3 text-muted-foreground" />
                         <span className="text-xs text-muted-foreground mr-4">
-                          {post.likes}
+                          {post.likes.length}
                         </span>
                         <MessageSquare className="mr-1 h-3 w-3 text-muted-foreground" />
                         <span className="text-xs text-muted-foreground">
-                          {post.comments}
+                          {post.comments.length}
                         </span>
                       </div>
                     </div>

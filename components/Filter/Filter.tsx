@@ -26,9 +26,9 @@ import {
   useGetTagsQuery,
 } from "@/state/api/post/postApi";
 import { Option, IPost } from "@/types/types";
-import { format as ago } from "timeago.js";
 import Link from "next/link";
 import { FilterPostLoader } from "../Loader/SkeletonLoader";
+import { formatDistanceStrict } from "date-fns";
 
 export default function BlogFilterPage() {
   const router = useRouter();
@@ -295,7 +295,15 @@ export default function BlogFilterPage() {
                         </p>
                         <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
                           <span className="font-bold">{post.author.name}</span>
-                          <span>{ago(post.publishedAt)}</span>
+                          <span>
+                            {formatDistanceStrict(
+                              post.publishedAt,
+                              new Date(),
+                              {
+                                addSuffix: true,
+                              }
+                            )}
+                          </span>
                         </div>
                       </div>
                     </Link>
