@@ -7,7 +7,7 @@ import {
   ThumbsUp,
   TrendingUp,
 } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
   CardContent,
@@ -32,31 +32,53 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useGetOverviewQuery } from "@/state/api/analytics/analyticsApi";
-import { Analytics } from "@/types/types";
-
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
+import { AdminAnalytics } from "@/types/types";
+import { format } from "date-fns";
+import Loader from "../Loader/Loader";
 
 const chartConfig: ChartConfig = {
-  desktop: {
-    label: "Desktop",
+  views: {
+    label: "Views",
     color: "hsl(var(--chart-1))",
   },
 };
 
 const Overview = () => {
   const [timeRange, setTimeRange] = useState("1");
-  const { data } = useGetOverviewQuery(timeRange);
+  const [chartRange, setChartRange] = useState("90");
+  const { data, isLoading } = useGetOverviewQuery(timeRange);
 
-  const overview: Analytics = data?.overview;
+  const overview: AdminAnalytics = data?.overview;
 
   console.log(overview);
+
+  const filteredData = overview?.viewsChart.filter((item) => {
+    const date = new Date(item.month);
+    const startDate = new Date();
+    let daysToSubtract = 90;
+    if (chartRange === "30") {
+      daysToSubtract = 30;
+    } else if (chartRange === "180") {
+      daysToSubtract = 180;
+    }
+    startDate.setDate(startDate.getDate() - daysToSubtract);
+    return date >= startDate;
+  });
+
+  const filteredDataUsers = overview?.usersChart.filter((item) => {
+    const date = new Date(item.month);
+    const startDate = new Date();
+    let daysToSubtract = 90;
+    if (chartRange === "30") {
+      daysToSubtract = 30;
+    } else if (chartRange === "180") {
+      daysToSubtract = 180;
+    }
+    startDate.setDate(startDate.getDate() - daysToSubtract);
+    return date >= startDate;
+  });
+
+  if (isLoading) return <Loader />;
 
   return (
     <div className="container m-auto rounded-lg px-4 py-8 min-h-screen">
@@ -119,15 +141,13 @@ const Overview = () => {
         </Card>
         <Card className=" dark:bg-gray-900 ">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Comments
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{overview?.totalComments}</div>
+            <div className="text-2xl font-bold">{overview?.totalUsers}</div>
             <p className="text-xs text-muted-foreground">
-              {overview?.growth.comments.percentage}% from last month
+              {overview?.growth.users.percentage}% from last month
             </p>
           </CardContent>
         </Card>
@@ -138,46 +158,70 @@ const Overview = () => {
           <TabsTrigger value="views">Views</TabsTrigger>
           <TabsTrigger value="posts">Top Posts</TabsTrigger>
         </TabsList>
+
         <TabsContent value="views" className="space-y-4">
-          <div>
+          <Select value={chartRange} onValueChange={setChartRange}>
+            <SelectTrigger
+              className="w-[180px] rounded-lg sm:ml-auto"
+              aria-label="Select a value"
+            >
+              <SelectValue placeholder="Last 3 months" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="30" className="rounded-lg">
+                Last 30 days
+              </SelectItem>
+              <SelectItem value="90" className="rounded-lg">
+                Last 3 months
+              </SelectItem>
+              <SelectItem value="180" className="rounded-lg">
+                Last 6 months
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="grid gap-4 md:grid-cols-2">
             <Card className="dark:bg-gray-900">
               <CardHeader>
                 <CardTitle>Total Views</CardTitle>
                 <CardDescription>
-                  Showing total views for the last 6 months
+                  Showing total views for the last {chartRange} days
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer
-                  className="max-h-[300px] w-full"
-                  config={chartConfig}
-                >
-                  <AreaChart
-                    accessibilityLayer
-                    data={overview?.viewsChart}
-                    margin={{
-                      left: 12,
-                      right: 12,
-                    }}
-                  >
+                <ChartContainer config={chartConfig}>
+                  <AreaChart accessibilityLayer data={filteredData}>
                     <CartesianGrid vertical={false} />
                     <XAxis
                       dataKey="month"
                       tickLine={false}
                       axisLine={false}
                       tickMargin={8}
-                      tickFormatter={(value) => value.slice(0, 3)}
+                      minTickGap={32}
+                      tickFormatter={(value) => {
+                        const date = new Date(value);
+                        return date.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        });
+                      }}
                     />
                     <ChartTooltip
                       cursor={false}
                       content={<ChartTooltipContent indicator="line" />}
+                      labelFormatter={(value) => {
+                        const date = new Date(value);
+                        return date.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        });
+                      }}
                     />
                     <Area
                       dataKey="views"
                       type="natural"
-                      fill="var(--color-desktop)"
+                      fill="var(--color-views)"
                       fillOpacity={0.4}
-                      stroke="var(--color-desktop)"
+                      stroke="var(--color-views)"
                     />
                   </AreaChart>
                 </ChartContainer>
@@ -190,10 +234,79 @@ const Overview = () => {
                       month <TrendingUp className="h-4 w-4" />
                     </div>
                     <div className="flex items-center gap-2 leading-none text-muted-foreground">
-                      {`${overview?.viewsChart[0].month} - ${
-                        overview?.viewsChart[overview?.viewsChart?.length - 1]
-                          .month
-                      }`}
+                      {`${format(filteredData[0].month, "MMMM")} - ${format(
+                        filteredData[filteredData.length - 1].month,
+                        "MMMM yy"
+                      )}`}
+                    </div>
+                  </div>
+                </div>
+              </CardFooter>
+            </Card>
+            <Card className="dark:bg-gray-900">
+              <CardHeader>
+                <CardTitle>Total Users</CardTitle>
+                <CardDescription>
+                  Showing total users for the last {chartRange} days
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig}>
+                  <BarChart accessibilityLayer data={filteredDataUsers}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
+                      tickFormatter={(value) => {
+                        const date = new Date(value);
+                        return date.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        });
+                      }}
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={
+                        <ChartTooltipContent
+                          indicator="line"
+                          labelFormatter={(value) => {
+                            const date = new Date(value);
+                            return date.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            });
+                          }}
+                        />
+                      }
+                    />
+                    <Bar
+                      dataKey="users"
+                      type="natural"
+                      fill="var(--color-views)"
+                      fillOpacity={0.4}
+                      stroke="var(--color-views)"
+                    />
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+              <CardFooter>
+                <div className="flex w-full items-start gap-2 text-sm">
+                  <div className="grid gap-2">
+                    <div className="flex items-center gap-2 font-medium leading-none">
+                      Trending up by {overview?.growth.users.percentage}% this
+                      month <TrendingUp className="h-4 w-4" />
+                    </div>
+                    <div className="flex items-center gap-2 leading-none text-muted-foreground">
+                      {`${format(
+                        filteredDataUsers[0].month,
+                        "MMMM"
+                      )} - ${format(
+                        filteredDataUsers[filteredDataUsers.length - 1].month,
+                        "MMMM yy"
+                      )}`}
                     </div>
                   </div>
                 </div>

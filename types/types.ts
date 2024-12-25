@@ -97,6 +97,7 @@ export interface ApiErrorResponse {
 
 interface Growth {
   comments: { currentPeriod: number; lastPeriod: number; percentage: string };
+  users: { currentPeriod: number; lastPeriod: number; percentage: string };
   likes: { currentPeriod: number; lastPeriod: number; percentage: string };
   posts: { currentPeriod: number; lastPeriod: number; percentage: string };
   views: { currentPeriod: number; lastPeriod: number; percentage: string };
@@ -110,7 +111,20 @@ export interface Analytics {
   totalLikes: number;
   totalPosts: number;
   totalViews: number;
-  viewsChart?: [{ month: string; views: number }];
+  categoryMetrics: CategoryMetrics[];
+  categoryPercentages: CategoryPercentages[];
+}
+
+export interface AdminAnalytics {
+  customTime: number;
+  growth: Growth;
+  posts: IPost[];
+  totalUsers: number;
+  totalLikes: number;
+  totalPosts: number;
+  totalViews: number;
+  viewsChart: { month: Date; views: number }[];
+  usersChart: { month: Date; users: number }[];
   categoryMetrics: CategoryMetrics[];
   categoryPercentages: CategoryPercentages[];
 }

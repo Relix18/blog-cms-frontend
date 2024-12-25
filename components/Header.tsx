@@ -138,7 +138,7 @@ const Header = ({ active, isProfile }: Props) => {
           </Link>
           <nav className="hidden items-center md:flex space-x-4">
             <Link
-              href="#"
+              href="/"
               className={
                 active === 1
                   ? "text-fuchsia-600 dark:text-fuchsia-500"
@@ -150,7 +150,7 @@ const Header = ({ active, isProfile }: Props) => {
             <NavigationMenu>
               <NavigationMenuList className="m-0 p-0 ">
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="p-0 text-md text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent dark:hover:text-fuchsia-400">
+                  <NavigationMenuTrigger className="p-0 text-md text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent hover:text-fuchsia-400 dark:hover:text-fuchsia-600">
                     Categories
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
