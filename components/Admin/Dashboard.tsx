@@ -43,7 +43,7 @@ const chartConfig: ChartConfig = {
   },
 };
 
-const Overview = () => {
+const Dashboard = () => {
   const [timeRange, setTimeRange] = useState("1");
   const [chartRange, setChartRange] = useState("90");
   const { data, isLoading } = useGetOverviewQuery(timeRange);
@@ -85,7 +85,7 @@ const Overview = () => {
       <div className="flex flex-col gap-4 md:flex-row justify-between items-start md:items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Welcome, Relix</h1>
-          <p className="text-muted-foreground">Overview</p>
+          <p className="text-muted-foreground">Dashboard</p>
         </div>
         <div className="flex items-center space-x-4">
           <Select value={timeRange} onValueChange={setTimeRange}>
@@ -363,4 +363,4 @@ const Overview = () => {
   );
 };
 
-export default Overview;
+export default Dashboard;

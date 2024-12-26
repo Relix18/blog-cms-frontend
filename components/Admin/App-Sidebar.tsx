@@ -27,18 +27,16 @@ import {
   ChartNetwork,
   ChartNoAxesCombined,
   ChevronRight,
-  ClipboardPlus,
   LayoutDashboard,
   MessageSquare,
   ScrollText,
   Settings,
   Settings2,
   Tags,
-  Target,
   UserCheck,
   UserCog,
 } from "lucide-react";
-import { MdDrafts, MdNotes, MdOutlineAnalytics } from "react-icons/md";
+import { MdNotes, MdOutlineAnalytics } from "react-icons/md";
 
 interface MenuItem {
   title: string;
@@ -52,33 +50,16 @@ const items: MenuItem[] = [
   {
     title: "Dashboard",
     icon: LayoutDashboard,
-    isActive: true,
+    url: "/admin/dashboard",
+  },
+  {
+    title: "Post Management",
+    icon: MdNotes,
     items: [
       {
-        title: "Overview",
-        url: "/admin/dashboard/overview",
-        icon: Target,
-      },
-      {
-        title: "Post Manage",
-        icon: MdNotes,
-        items: [
-          {
-            title: "All Posts",
-            url: "/admin/dashboard/posts",
-            icon: ScrollText,
-          },
-          {
-            title: "Add New Post",
-            url: "/admin/dashboard/new-post",
-            icon: ClipboardPlus,
-          },
-          {
-            title: "Drafts",
-            url: "/admin/dashboard/drafts",
-            icon: MdDrafts,
-          },
-        ],
+        title: "All Posts",
+        url: "/admin/dashboard/posts",
+        icon: ScrollText,
       },
       {
         title: "Categories & Tags",
@@ -160,7 +141,7 @@ const renderMenuItems = (menuItems: MenuItem[]) => {
           {item.url ? (
             <Link href={item.url} passHref>
               <SidebarMenuButton tooltip={item.title}>
-                {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                {item.icon && <item.icon className="h-4 w-4" />}
                 <span>{item.title}</span>
                 {item.items && (
                   <ChevronRight className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />

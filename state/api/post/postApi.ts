@@ -55,6 +55,14 @@ export const post = createApi({
       }),
       providesTags: ["Post"],
     }),
+    getAllPosts: builder.query({
+      query: () => ({
+        url: "get-all-post-admin",
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Post"],
+    }),
     getCategory: builder.query({
       query: () => ({
         url: "get-category",
@@ -132,6 +140,7 @@ export const {
   usePublishPostMutation,
   useGetAuthorPostQuery,
   useGetPostsQuery,
+  useGetAllPostsQuery,
   useGetCategoryQuery,
   useGetTagsQuery,
   useGetPostBySlugQuery,

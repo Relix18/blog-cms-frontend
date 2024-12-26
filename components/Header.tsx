@@ -191,7 +191,7 @@ const Header = ({ active, isProfile }: Props) => {
             {isProfile && (
               <div className="hidden md:flex gap-4">
                 <Link
-                  href="/admin/dashboard/overview"
+                  href="/admin/dashboard"
                   className={`${
                     user?.role !== "ADMIN" && "hidden"
                   } text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500`}
@@ -323,12 +323,12 @@ const Header = ({ active, isProfile }: Props) => {
                   <NavigationMenu>
                     <NavigationMenuList className="m-0 p-0 ">
                       <NavigationMenuItem>
-                        <NavigationMenuTrigger className="p-0 text-md text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent dark:hover:text-fuchsia-400">
+                        <NavigationMenuTrigger className="p-0 text-md text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent hover:text-fuchsia-400 dark:hover:text-fuchsia-600">
                           <Blocks className="flex mr-2 h-5 w-5" />
                           Categories
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
-                          {categories?.categories.map((category: Category) => (
+                          {categories?.categories.map((category: Option) => (
                             <NavigationMenuLink asChild key={category.id}>
                               <Link
                                 href={`filter?category=${category.value}`}
