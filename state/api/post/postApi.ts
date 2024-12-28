@@ -24,6 +24,15 @@ export const post = createApi({
       }),
       invalidatesTags: ["Post", "AuthorPost"],
     }),
+    unpublishPost: builder.mutation({
+      query: (data) => ({
+        url: "unpublish-post",
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Post"],
+    }),
     getAuthorPost: builder.query({
       query: () => ({
         url: "get-author-post",
@@ -132,12 +141,22 @@ export const post = createApi({
       }),
       providesTags: ["Post"],
     }),
+    deletePostAdmin: builder.mutation({
+      query: (postId) => ({
+        url: "delete-post-admin",
+        method: "DELETE",
+        body: { postId },
+        credentials: "include",
+      }),
+      invalidatesTags: ["Post"],
+    }),
   }),
 });
 
 export const {
   useCreatePostMutation,
   usePublishPostMutation,
+  useUnpublishPostMutation,
   useGetAuthorPostQuery,
   useGetPostsQuery,
   useGetAllPostsQuery,
@@ -152,4 +171,5 @@ export const {
   useViewUpdateMutation,
   useGetLikePostQuery,
   useRecentActivityQuery,
+  useDeletePostAdminMutation,
 } = post;

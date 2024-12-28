@@ -1,9 +1,10 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
+  PaginationState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -35,54 +36,163 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetAllPostsQuery } from "@/state/api/post/postApi";
+import {
+  useDeletePostAdminMutation,
+  useGetAllPostsQuery,
+  useUnpublishPostMutation,
+} from "@/state/api/post/postApi";
 import Loader from "../Loader/Loader";
-import { IPost } from "@/types/types";
+import { IPost, isApiResponse } from "@/types/types";
 import { Badge } from "../ui/badge";
 import { format } from "date-fns";
+import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 
-// const data: Post[] = [
-//   {
-//     id: "1",
-//     title: "The Future of AI in Web Development",
-//     category: "Technology",
-//     status: "Published",
-//     author: "John Doe",
-//     date: "2023-06-20",
-//   },
-//   {
-//     id: "2",
-//     title: "10 Tips for Better SEO",
-//     category: "Marketing",
-//     status: "Draft",
-//     author: "Jane Smith",
-//     date: "2023-06-19",
-//   },
-//   {
-//     id: "3",
-//     title: "Getting Started with React Hooks",
-//     category: "Programming",
-//     status: "Published",
-//     author: "Bob Johnson",
-//     date: "2023-06-18",
-//   },
-//   {
-//     id: "4",
-//     title: "The Importance of Responsive Design",
-//     category: "Design",
-//     status: "Published",
-//     author: "Alice Williams",
-//     date: "2023-06-17",
-//   },
-//   {
-//     id: "5",
-//     title: "Mastering CSS Grid Layout",
-//     category: "Programming",
-//     status: "Draft",
-//     author: "Charlie Brown",
-//     date: "2023-06-16",
-//   },
-// ];
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
+import { SelectValue } from "@radix-ui/react-select";
+
+const ActionCell = ({ post }: { post: IPost }) => {
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [Unpublish, { isSuccess, data, error, isLoading }] =
+    useUnpublishPostMutation();
+  const [
+    deletePost,
+    { isSuccess: deleteSuccess, error: deleteError, isLoading: deleteLoading },
+  ] = useDeletePostAdminMutation();
+  const [message, setMessage] = useState("");
+  const { toast } = useToast();
+
+  const handleDelete = async () => {
+    await deletePost(post.id);
+    setIsAlertOpen(false);
+  };
+
+  const handleUnpublish = async () => {
+    const data = {
+      postId: post.id,
+      message,
+    };
+    await Unpublish(data);
+    setIsDialogOpen(false);
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({ title: data.message });
+    }
+    if (isApiResponse(error)) {
+      toast({ variant: "destructive", title: error?.data.message });
+    }
+  }, [isSuccess, error, toast, data]);
+
+  useEffect(() => {
+    if (deleteSuccess) {
+      toast({ title: "Post deleted successfully" });
+    }
+    if (isApiResponse(deleteError)) {
+      toast({ variant: "destructive", title: deleteError?.data.message });
+    }
+  }, [deleteError, deleteSuccess, toast]);
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem
+            onClick={() => navigator.clipboard.writeText(post.id.toString())}
+          >
+            Copy post ID
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <Link href={`/post/view/${post.slug}`}>
+            <DropdownMenuItem>View post</DropdownMenuItem>
+          </Link>
+          {post.published && (
+            <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+              Unpublish post
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem
+            className="text-red-600"
+            onClick={() => setIsAlertOpen(true)}
+          >
+            Delete post
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You want to unpublish this post. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex flex-col">
+            <Label htmlFor="reason" className="mb-2">
+              Reason
+            </Label>
+            <Textarea
+              id="reason"
+              placeholder="reason..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleUnpublish}
+              disabled={message.length < 20}
+            >
+              Unpublish {isLoading && <Loader isButton={true} />}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You want to delete this post. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/80"
+              onClick={handleDelete}
+            >
+              Delete Post {deleteLoading && <Loader isButton={true} />}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+};
 
 export const columns: ColumnDef<IPost>[] = [
   {
@@ -192,53 +302,23 @@ export const columns: ColumnDef<IPost>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
-      const post = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(post.id.toString())}
-            >
-              Copy post ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View post</DropdownMenuItem>
-            <DropdownMenuItem>Edit post</DropdownMenuItem>
-            {post.published ? (
-              <DropdownMenuItem>Unpublish post</DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem>Publish post</DropdownMenuItem>
-            )}
-            <DropdownMenuItem className="text-red-600">
-              Delete post
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <ActionCell post={row.original} />,
   },
 ];
 
 export default function Posts() {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [rowSelection, setRowSelection] = useState({});
   const { data: posts, isLoading } = useGetAllPostsQuery({});
 
-  const data = React.useMemo(() => posts?.posts, [posts]);
+  const data = useMemo(() => posts?.posts, [posts]);
 
   console.log(posts);
 
@@ -249,6 +329,7 @@ export default function Posts() {
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -258,6 +339,7 @@ export default function Posts() {
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
 
@@ -351,12 +433,16 @@ export default function Posts() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="flex text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center  space-x-2">
+          <span className="flex w-[180px] text-sm items-center text-muted-foreground">
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount().toLocaleString()}
+          </span>
           <Button
             variant="outline"
             size="sm"
@@ -373,6 +459,21 @@ export default function Posts() {
           >
             Next
           </Button>
+          <Select
+            value={`${table.getState().pagination.pageSize}`}
+            onValueChange={(value) => table.setPageSize(Number(value))}
+          >
+            <SelectTrigger>
+              <SelectValue>{table.getState().pagination.pageSize}</SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {[10, 20, 30, 40, 50].map((pageSize) => (
+                <SelectItem key={pageSize} value={`${pageSize}`}>
+                  Show {pageSize}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>

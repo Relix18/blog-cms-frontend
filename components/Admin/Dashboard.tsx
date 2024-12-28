@@ -34,7 +34,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useGetOverviewQuery } from "@/state/api/analytics/analyticsApi";
 import { AdminAnalytics } from "@/types/types";
 import { format } from "date-fns";
-import Loader from "../Loader/Loader";
+import { DashboardLoader } from "../Loader/SkeletonLoader";
 
 const chartConfig: ChartConfig = {
   views: {
@@ -78,7 +78,7 @@ const Dashboard = () => {
     return date >= startDate;
   });
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <DashboardLoader />;
 
   return (
     <div className="container m-auto rounded-lg px-4 py-8 min-h-screen">

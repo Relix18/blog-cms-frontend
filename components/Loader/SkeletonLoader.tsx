@@ -260,3 +260,33 @@ export function RecentActivityLoader() {
     </div>
   );
 }
+
+export function DashboardLoader() {
+  return (
+    <div className="container m-auto rounded-lg px-4 py-8 min-h-screen">
+      <div className=" space-y-2 w-full flex-col md:flex-row flex md:items-center justify-between">
+        <div className="py-2 space-y-2 w-[60%]">
+          <Skeleton className="h-10 w-[100%] md:w-[70%]" />
+          <Skeleton className="h-6 w-[50%] md:w-[30%]" />
+        </div>
+        <Skeleton className="h-8 w-[40%] md:w-[20%]" />
+      </div>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 my-8">
+        <Skeleton className="h-32 w-[100%]" />
+        <Skeleton className="h-32 w-[100%]" />
+        <Skeleton className="h-32 w-[100%]" />
+        <Skeleton className="h-32 w-[100%]" />
+      </div>
+      <div className="w-full md:w-[400px]">
+        <Skeleton className="h-10 w-[100%]" />
+      </div>
+      <div className="my-4 w-[200px] flex float-right">
+        <Skeleton className="h-8 w-[100%]" />
+      </div>
+      <div className="grid mt-16 gap-4 md:grid-cols-2">
+        <Skeleton className="h-[300px] w-[100%]" />
+        <Skeleton className="h-[300px] w-[100%]" />
+      </div>
+    </div>
+  );
+}
