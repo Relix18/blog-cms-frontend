@@ -60,31 +60,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import {
-  useEditCategoryMutation,
-  useGetCategoryQuery,
-} from "@/state/api/post/postApi";
+import { useEditTagMutation, useGetTagsQuery } from "@/state/api/post/postApi";
 
-interface Category {
+interface Tag {
   id: number;
   label: string;
   value: string;
-  _count: { post: number };
+  _count: { posts: number };
   createdAt: Date;
   updatedAt: Date;
 }
 
 const ActionCell = ({
-  category,
+  tag,
   onEdit,
 }: {
-  category: Category;
+  tag: Tag;
   onEdit: (id: number) => void;
 }) => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const handleDelete = () => {
-    console.log("Deleting category:", category.id);
+    console.log("Deleting tag:", tag.id);
     setIsAlertOpen(false);
   };
 
@@ -100,21 +97,19 @@ const ActionCell = ({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
-            onClick={() =>
-              navigator.clipboard.writeText(category.id.toString())
-            }
+            onClick={() => navigator.clipboard.writeText(tag.id.toString())}
           >
-            Copy category ID
+            Copy tag ID
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => onEdit(category.id)}>
-            Edit category
+          <DropdownMenuItem onClick={() => onEdit(tag.id)}>
+            Edit tag
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-red-600"
             onClick={() => setIsAlertOpen(true)}
           >
-            Delete category
+            Delete tag
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -124,8 +119,8 @@ const ActionCell = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              category and remove it from our servers.
+              This action cannot be undone. This will permanently delete the tag
+              and remove it from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -143,8 +138,8 @@ const ActionCell = ({
   );
 };
 
-export default function Category() {
-  const [data, setData] = useState<Category[]>([]);
+export default function Tag() {
+  const [data, setData] = useState<Tag[]>([]);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -155,9 +150,9 @@ export default function Category() {
   });
   const [rowSelection, setRowSelection] = useState({});
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editCategory] = useEditCategoryMutation();
+  const [editTag] = useEditTagMutation();
 
-  const columns: ColumnDef<Category>[] = [
+  const columns: ColumnDef<Tag>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -213,7 +208,7 @@ export default function Category() {
             value,
             label,
           };
-          await editCategory(data);
+          await editTag(data);
           setEditingId(null);
         };
 
@@ -268,7 +263,7 @@ export default function Category() {
             value,
             label,
           };
-          await editCategory(data);
+          await editTag(data);
           setEditingId(null);
         };
 
@@ -332,21 +327,21 @@ export default function Category() {
       enableHiding: false,
       cell: ({ row }) => (
         <ActionCell
-          category={row.original}
+          tag={row.original}
           onEdit={() => setEditingId(row.original.id)}
         />
       ),
     },
   ];
 
-  const { data: categories } = useGetCategoryQuery({});
+  const { data: tags } = useGetTagsQuery({});
 
-  const allData = useMemo(() => categories?.categories, [categories]);
+  const allData = useMemo(() => tags?.tags, [tags]);
 
   useEffect(() => {
     const flattenedData = allData?.map((item: Tag) => ({
       ...item,
-      postCount: item._count?.post || 0,
+      postCount: item._count?.posts || 0,
     }));
     setData(flattenedData);
   }, [setData, allData]);
@@ -376,7 +371,7 @@ export default function Category() {
     <div className="w-full px-2 mx-auto">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter categories..."
+          placeholder="Filter tags..."
           value={(table.getColumn("label")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("label")?.setFilterValue(event.target.value)
