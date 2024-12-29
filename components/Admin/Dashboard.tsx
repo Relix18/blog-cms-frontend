@@ -135,7 +135,7 @@ const Dashboard = () => {
           <CardContent>
             <div className="text-2xl font-bold">{overview?.totalLikes}</div>
             <p className="text-xs text-muted-foreground">
-              {overview?.growth.views.percentage}% from last month
+              {overview?.growth.likes.percentage}% from last month
             </p>
           </CardContent>
         </Card>

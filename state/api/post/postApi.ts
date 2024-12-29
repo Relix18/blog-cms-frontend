@@ -150,6 +150,15 @@ export const post = createApi({
       }),
       invalidatesTags: ["Post"],
     }),
+    editCategory: builder.mutation({
+      query: (data) => ({
+        url: "edit-category",
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Category"],
+    }),
   }),
 });
 
@@ -171,5 +180,6 @@ export const {
   useViewUpdateMutation,
   useGetLikePostQuery,
   useRecentActivityQuery,
+  useEditCategoryMutation,
   useDeletePostAdminMutation,
 } = post;

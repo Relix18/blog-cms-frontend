@@ -36,7 +36,7 @@ import {
   UserCheck,
   UserCog,
 } from "lucide-react";
-import { MdNotes, MdOutlineAnalytics } from "react-icons/md";
+import { MdNotes, MdOutlineAnalytics, MdOutlineCategory } from "react-icons/md";
 
 interface MenuItem {
   title: string;
@@ -62,8 +62,13 @@ const items: MenuItem[] = [
         icon: ScrollText,
       },
       {
-        title: "Categories & Tags",
-        url: "/admin/dashboard/category-tag",
+        title: "Categories",
+        url: "/admin/dashboard/category",
+        icon: MdOutlineCategory,
+      },
+      {
+        title: "Tags",
+        url: "/admin/dashboard/tag",
         icon: Tags,
       },
     ],
