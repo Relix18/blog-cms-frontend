@@ -5,7 +5,6 @@ import { format } from "date-fns";
 import {
   ColumnDef,
   ColumnFiltersState,
-  PaginationState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -19,8 +18,8 @@ import {
   ArrowUpDown,
   ChevronDown,
   MoreHorizontal,
-  X,
   Check,
+  X,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -59,31 +58,52 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { useEditTagMutation, useGetTagsQuery } from "@/state/api/post/postApi";
+} from "@/components/ui/select";
+import {
+  useDeleteUserMutation,
+  useGetAllUserQuery,
+  user,
+  useUpdateRoleMutation,
+} from "@/state/api/user/userApi";
+import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
-interface Tag {
-  id: number;
-  label: string;
-  value: string;
-  _count: { posts: number };
+const roles = ["ADMIN", "AUTHOR", "USER"] as const;
+
+type User = {
   createdAt: Date;
+  email: string;
+  id: string;
+  isSocial: boolean;
+  name: string;
+  resetPasswordExpire: Date | null;
+  resetPasswordToken: Date | null;
+  role: "ADMIN" | "AUTHOR" | "USER";
   updatedAt: Date;
-}
+};
 
 const ActionCell = ({
-  tag,
+  user,
   onEdit,
 }: {
-  tag: Tag;
-  onEdit: (id: number) => void;
+  user: User;
+  onEdit: (id: string) => void;
 }) => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [deleteUser, { isSuccess }] = useDeleteUserMutation({});
+  const { toast } = useToast();
 
-  const handleDelete = () => {
-    console.log("Deleting tag:", tag.id);
+  const handleDelete = async () => {
+    await deleteUser(user.id);
+    console.log("Deleting user:", user.id);
     setIsAlertOpen(false);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({ title: "User deleted successfully" });
+    }
+  }, [isSuccess, toast]);
 
   return (
     <>
@@ -97,19 +117,22 @@ const ActionCell = ({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(tag.id.toString())}
+            onClick={() => navigator.clipboard.writeText(user.id.toString())}
           >
-            Copy tag ID
+            Copy user ID
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => onEdit(tag.id)}>
-            Edit tag
+          <Link href={`users/${user.id}`}>
+            <DropdownMenuItem>View details</DropdownMenuItem>
+          </Link>
+          <DropdownMenuItem onClick={() => onEdit(user.id)}>
+            Edit role
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-red-600"
             onClick={() => setIsAlertOpen(true)}
           >
-            Delete tag
+            Delete user
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -119,8 +142,8 @@ const ActionCell = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the tag
-              and remove it from our servers.
+              This action cannot be undone. This will permanently delete the
+              user and remove their data from our servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -138,21 +161,23 @@ const ActionCell = ({
   );
 };
 
-export default function Tag() {
-  const [data, setData] = useState<Tag[]>([]);
-
+export default function Users() {
+  const [data, setData] = useState<User[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
   const [rowSelection, setRowSelection] = useState({});
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editTag] = useEditTagMutation();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [updateRole, { isSuccess }] = useUpdateRoleMutation();
+  const { toast } = useToast();
 
-  const columns: ColumnDef<Tag>[] = [
+  useEffect(() => {
+    if (isSuccess) {
+      toast({ title: "Role updated successfully" });
+    }
+  }, [isSuccess, toast]);
+
+  const columns: ColumnDef<User>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -173,7 +198,7 @@ export default function Tag() {
       enableHiding: false,
     },
     {
-      accessorKey: "label",
+      accessorKey: "name",
       header: ({ column }) => {
         return (
           <Button
@@ -185,41 +210,58 @@ export default function Tag() {
           </Button>
         );
       },
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <div className="font-medium">{row.getValue("name")}</div>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: "Email",
+      cell: ({ row }) => <div>{row.getValue("email")}</div>,
+    },
+    {
+      accessorKey: "role",
+      header: "Role",
       cell: ({ row }) => {
-        const isEditing = editingId === row.original.id;
-        const [value, setValue] = useState(row.getValue("value"));
-        const [label, setLabel] = useState(row.getValue("label"));
+        const user = row.original;
+        const isEditing = editingId === user.id;
+        const [value, setValue] = useState(user.role);
 
         useEffect(() => {
-          setValue(row.getValue("value"));
-          setLabel(row.getValue("label"));
-        }, [row]);
+          setValue(user.role);
+        }, [user]);
 
         const onSave = async () => {
           setData((prev) =>
             prev.map((item) =>
-              item.id === row.original.id
-                ? { ...item, label: label as string }
-                : item
+              item.id === user.id ? { ...item, role: value } : item
             )
           );
           const data = {
-            id: row.original.id,
-            value,
-            label,
+            id: user.id,
+            role: value,
           };
-          await editTag(data);
+          await updateRole(data);
           setEditingId(null);
         };
 
         if (isEditing) {
           return (
             <div className="flex items-center gap-2">
-              <Input
-                value={label as string}
-                onChange={(e) => setLabel(e.target.value)}
-                className="h-8 w-[180px]"
-              />
+              <Select value={value} onValueChange={setValue}>
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue>{value}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {role}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Button size="icon" variant="ghost" onClick={onSave}>
                 <Check className="h-4 w-4" />
               </Button>
@@ -234,79 +276,23 @@ export default function Tag() {
           );
         }
 
-        return <div className="font-medium">{row.getValue("label")}</div>;
+        return <div>{user.role}</div>;
       },
     },
     {
-      accessorKey: "value",
-      header: "Slug",
-      cell: ({ row }) => {
-        const isEditing = editingId === row.original.id;
-        const [value, setValue] = useState(row.getValue("value"));
-        const [label, setLabel] = useState(row.getValue("label"));
-
-        useEffect(() => {
-          setValue(row.getValue("value"));
-          setLabel(row.getValue("label"));
-        }, [row]);
-
-        const onSave = async () => {
-          setData((prev) =>
-            prev.map((item) =>
-              item.id === row.original.id
-                ? { ...item, value: value as string }
-                : item
-            )
-          );
-          const data = {
-            id: row.original.id,
-            value,
-            label,
-          };
-          await editTag(data);
-          setEditingId(null);
-        };
-
-        if (isEditing) {
-          return (
-            <div className="flex items-center gap-2">
-              <Input
-                value={value as string}
-                onChange={(e) => setValue(e.target.value)}
-                className="h-8 w-[180px]"
-              />
-              <Button size="icon" variant="ghost" onClick={onSave}>
-                <Check className="h-4 w-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setEditingId(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          );
-        }
-
-        return <div>{row.getValue("value")}</div>;
-      },
-    },
-
-    {
-      accessorKey: "postCount",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Post Count
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => <div>{row.getValue("postCount")}</div>,
+      accessorKey: "isSocial",
+      header: "Method",
+      cell: ({ row }) => (
+        <div
+          className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+            row.getValue("isSocial") === true
+              ? "bg-green-100 text-green-800"
+              : "bg-blue-100 text-blue-800"
+          }`}
+        >
+          {row.getValue("isSocial") === true ? "Social" : "Email"}
+        </div>
+      ),
     },
     {
       accessorKey: "createdAt",
@@ -317,7 +303,7 @@ export default function Tag() {
     },
     {
       accessorKey: "updatedAt",
-      header: "Updated At",
+      header: "Created At",
       cell: ({ row }) => (
         <div>{format(row.getValue("updatedAt"), "yyyy-MM-dd")}</div>
       ),
@@ -327,23 +313,19 @@ export default function Tag() {
       enableHiding: false,
       cell: ({ row }) => (
         <ActionCell
-          tag={row.original}
+          user={row.original}
           onEdit={() => setEditingId(row.original.id)}
         />
       ),
     },
   ];
 
-  const { data: tags } = useGetTagsQuery({});
+  const { data: users } = useGetAllUserQuery({});
 
-  const allData = useMemo(() => tags?.tags, [tags]);
+  const allData = useMemo(() => users?.users, [users]);
 
   useEffect(() => {
-    const flattenedData = allData?.map((item: Tag) => ({
-      ...item,
-      postCount: item._count?.posts || 0,
-    }));
-    setData(flattenedData);
+    setData(allData);
   }, [allData]);
 
   const table = useReactTable({
@@ -357,24 +339,22 @@ export default function Tag() {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      pagination,
     },
   });
 
   return (
-    <div className="w-full px-2 mx-auto">
+    <div className="w-full px-2">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter tags..."
-          value={(table.getColumn("label")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter users..."
+          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("label")?.setFilterValue(event.target.value)
+            table.getColumn("email")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

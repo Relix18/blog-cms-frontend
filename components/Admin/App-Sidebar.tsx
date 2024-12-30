@@ -58,17 +58,17 @@ const items: MenuItem[] = [
     items: [
       {
         title: "All Posts",
-        url: "/admin/dashboard/posts",
+        url: "/admin/post-management/posts",
         icon: ScrollText,
       },
       {
         title: "Categories",
-        url: "/admin/dashboard/category",
+        url: "/admin/post-management/category",
         icon: MdOutlineCategory,
       },
       {
         title: "Tags",
-        url: "/admin/dashboard/tag",
+        url: "/admin/post-management/tag",
         icon: Tags,
       },
     ],
@@ -78,8 +78,8 @@ const items: MenuItem[] = [
     icon: UserCog,
     items: [
       {
-        title: "Authors",
-        url: "/admin/user-management/authors",
+        title: "Users",
+        url: "/admin/user-management/users",
         icon: UserCheck,
       },
       {

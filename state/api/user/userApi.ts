@@ -6,7 +6,7 @@ export const user = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `http://localhost:4000/api/v1/`,
   }),
-  tagTypes: ["User"],
+  tagTypes: ["User", "Users"],
   endpoints: (builder) => ({
     getUser: builder.query({
       query: () => ({
@@ -64,6 +64,31 @@ export const user = createApi({
         method: "POST",
       }),
     }),
+    getAllUser: builder.query({
+      query: () => ({
+        url: "get-all-users",
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: ["Users"],
+    }),
+    updateRole: builder.mutation({
+      query: (data) => ({
+        url: `/update-role/${data.id}`,
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Users"],
+    }),
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `/delete-user/${id}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Users"],
+    }),
   }),
 });
 
@@ -74,4 +99,7 @@ export const {
   useUpdateAvatarMutation,
   useChangePasswordMutation,
   useAuthorRequestMutation,
+  useGetAllUserQuery,
+  useUpdateRoleMutation,
+  useDeleteUserMutation,
 } = user;

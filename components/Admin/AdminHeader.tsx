@@ -9,7 +9,7 @@ import { Separator } from "../ui/separator";
 
 const AdminHeader = () => {
   return (
-    <header className="sticky px-2 py-1 top-0 flex justify-between shrink-0 dark:border-b-2 backdrop-blur shadow-sm dark:bg-gray-900/70 bg-slate-50/60 items-center">
+    <header className="sticky px-2 py-1 top-0 flex justify-between shrink-0 dark:border-b-2 backdrop-blur shadow-sm dark:bg-gray-900/70 bg-slate-50/60 items-center z-50">
       <SidebarTrigger className="h-10 w-10" />
       <div className="flex gap-2">
         <Popover>
