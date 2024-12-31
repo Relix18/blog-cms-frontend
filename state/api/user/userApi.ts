@@ -72,6 +72,20 @@ export const user = createApi({
       }),
       providesTags: ["Users"],
     }),
+    getUserDetails: builder.query({
+      query: (id) => ({
+        url: `user-details/${id}`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
+    getAllComments: builder.query({
+      query: () => ({
+        url: "get-all-comments",
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
     updateRole: builder.mutation({
       query: (data) => ({
         url: `/update-role/${data.id}`,
@@ -100,6 +114,8 @@ export const {
   useChangePasswordMutation,
   useAuthorRequestMutation,
   useGetAllUserQuery,
+  useGetAllCommentsQuery,
+  useGetUserDetailsQuery,
   useUpdateRoleMutation,
   useDeleteUserMutation,
 } = user;
