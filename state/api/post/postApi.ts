@@ -168,6 +168,22 @@ export const post = createApi({
       }),
       invalidatesTags: ["Tag"],
     }),
+    deleteComment: builder.mutation({
+      query: (id) => ({
+        url: "delete-comment",
+        method: "DELETE",
+        body: { id },
+        credentials: "include",
+      }),
+    }),
+    deleteReply: builder.mutation({
+      query: (id) => ({
+        url: "delete-reply",
+        method: "DELETE",
+        body: { id },
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -192,4 +208,6 @@ export const {
   useEditCategoryMutation,
   useEditTagMutation,
   useDeletePostAdminMutation,
+  useDeleteCommentMutation,
+  useDeleteReplyMutation,
 } = post;

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import {
   ColumnDef,
@@ -132,7 +132,7 @@ const ActionCell = ({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-red-600 focus:ring-red-600"
+              className="bg-destructive hover:bg-destructive/80"
             >
               Delete
             </AlertDialogAction>
@@ -341,15 +341,13 @@ export default function Category() {
 
   const { data: categories } = useGetCategoryQuery({});
 
-  const allData = useMemo(() => categories?.categories, [categories]);
-
   useEffect(() => {
-    const flattenedData = allData?.map((item: Tag) => ({
+    const flattenedData = categories?.categories?.map((item: Tag) => ({
       ...item,
       postCount: item._count?.post || 0,
     }));
     setData(flattenedData);
-  }, [setData, allData]);
+  }, [categories]);
 
   const table = useReactTable({
     data,

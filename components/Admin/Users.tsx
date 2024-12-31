@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import {
   ColumnDef,
   ColumnFiltersState,
+  PaginationState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -62,7 +63,6 @@ import {
 import {
   useDeleteUserMutation,
   useGetAllUserQuery,
-  user,
   useUpdateRoleMutation,
 } from "@/state/api/user/userApi";
 import { useToast } from "@/hooks/use-toast";
@@ -150,7 +150,7 @@ const ActionCell = ({
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-red-600 focus:ring-red-600"
+              className="bg-destructive hover:bg-destructive/80"
             >
               Delete
             </AlertDialogAction>
@@ -166,9 +166,14 @@ export default function Users() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const [rowSelection, setRowSelection] = useState({});
   const [editingId, setEditingId] = useState<string | null>(null);
   const [updateRole, { isSuccess }] = useUpdateRoleMutation();
+  const [globalFilter, setGlobalFilter] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -322,11 +327,9 @@ export default function Users() {
 
   const { data: users } = useGetAllUserQuery({});
 
-  const allData = useMemo(() => users?.users, [users]);
-
   useEffect(() => {
-    setData(allData);
-  }, [allData]);
+    setData(users?.users);
+  }, [users]);
 
   const table = useReactTable({
     data,
@@ -335,16 +338,24 @@ export default function Users() {
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const value = row.getValue(columnId) as string;
+      return value.toLowerCase().includes(filterValue.toLowerCase());
+    },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
+      globalFilter,
     },
+    onGlobalFilterChange: setGlobalFilter,
   });
 
   return (
@@ -352,10 +363,8 @@ export default function Users() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter users..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>

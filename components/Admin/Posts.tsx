@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -232,14 +232,14 @@ export const columns: ColumnDef<IPost>[] = [
     ),
   },
   {
-    accessorKey: "category",
+    accessorKey: "category.label",
     header: "Category",
-    cell: ({ row }) => <div>{row.original.category.label}</div>,
+    cell: ({ row }) => <div>{row.getValue("category_label")}</div>,
   },
   {
-    accessorKey: "author",
+    accessorKey: "author.name",
     header: "Author",
-    cell: ({ row }) => <div>{row.original.author.name}</div>,
+    cell: ({ row }) => <div>{row.getValue("author_name")}</div>,
   },
   {
     accessorKey: "publishedAt",
@@ -255,7 +255,7 @@ export const columns: ColumnDef<IPost>[] = [
       );
     },
     cell: ({ row }) => (
-      <div>{format(row.original.publishedAt, "yyyy/MM/dd")}</div>
+      <div>{format(row.getValue("publishedAt"), "yyyy/MM/dd")}</div>
     ),
   },
   {
@@ -272,7 +272,7 @@ export const columns: ColumnDef<IPost>[] = [
       );
     },
     cell: ({ row }) => (
-      <div>{format(row.original.createdAt, "yyyy/MM/dd")}</div>
+      <div>{format(row.getValue("createdAt"), "yyyy/MM/dd")}</div>
     ),
   },
   {
@@ -295,7 +295,7 @@ export const columns: ColumnDef<IPost>[] = [
     header: "Status",
     cell: ({ row }) => (
       <Badge variant={row.original.published ? "default" : "secondary"}>
-        {row.original.published ? "Published" : "Draft"}
+        {row.getValue("published") ? "Published" : "Draft"}
       </Badge>
     ),
   },
@@ -307,20 +307,21 @@ export const columns: ColumnDef<IPost>[] = [
 ];
 
 export default function Posts() {
+  const [data, setData] = useState<IPost[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
-  const { data: posts, isLoading } = useGetAllPostsQuery({});
+  const { data: posts } = useGetAllPostsQuery({});
 
-  const data = useMemo(() => posts?.posts, [posts]);
-
-  console.log(posts);
+  useEffect(() => {
+    setData(posts?.posts);
+  }, [posts]);
 
   const table = useReactTable({
     data,
@@ -334,26 +335,32 @@ export default function Posts() {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const value = row.getValue(columnId);
+      return (
+        value !== null &&
+        value !== undefined &&
+        String(value).toLowerCase().includes(String(filterValue).toLowerCase())
+      );
+    },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
       pagination,
+      globalFilter,
     },
+    onGlobalFilterChange: setGlobalFilter,
   });
-
-  if (isLoading) return <Loader />;
 
   return (
     <div className="container px-2 mx-auto">
       <div className="flex items-center py-4 gap-2">
         <Input
           placeholder="Filter posts..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>
