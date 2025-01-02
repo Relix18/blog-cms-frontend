@@ -1,9 +1,8 @@
+import PostAnalytics from "@/components/Admin/PostAnalytics";
 import React from "react";
 
-type Props = {};
-
-const page = (props: Props) => {
-  return <div>page</div>;
+const page = () => {
+  return <PostAnalytics />;
 };
 
 export default page;

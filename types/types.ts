@@ -142,6 +142,36 @@ interface CategoryPercentages {
   count: number;
 }
 
+export interface MonthlyMetrics {
+  month: string;
+  views: number;
+  likes: number;
+  comments: number;
+  replies: number;
+  posts: number;
+  totalEngagement: number;
+  viewsGrowth?: number;
+  likesGrowth?: number;
+  commentsGrowth?: number;
+  repliesGrowth?: number;
+}
+
+export interface SinglePostAnalytics {
+  postId: number;
+  title: string;
+  views: number;
+  likes: number;
+  comments: number;
+  replies: number;
+  totalEngagement: number;
+  createdAt: Date;
+}
+
+export interface MonthlyPostAnalytics {
+  monthlyAnalytics: MonthlyMetrics[];
+  postAnalytics: SinglePostAnalytics[];
+}
+
 export function isApiResponse(error: unknown): error is ApiErrorResponse {
   return (
     typeof error === "object" &&
