@@ -25,6 +25,13 @@ export const analytics = createApi({
         credentials: "include",
       }),
     }),
+    getUserAnalytics: builder.query({
+      query: () => ({
+        url: "admin-user-analytics",
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -32,4 +39,5 @@ export const {
   useGetAnalyticsQuery,
   useGetOverviewQuery,
   useGetPostAnalyticsQuery,
+  useGetUserAnalyticsQuery,
 } = analytics;

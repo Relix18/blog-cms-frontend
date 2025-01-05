@@ -178,7 +178,7 @@ export default function SinglePost({ posts }: Posts) {
 
   return (
     <div className="container px-2 mx-auto">
-      <div className="text-xl font-bold my-4">Single Post Management</div>
+      <div className="text-xl font-bold my-4">Single Post Engagement</div>
       <div className="grid rounded-md border">
         <Table>
           <TableHeader>

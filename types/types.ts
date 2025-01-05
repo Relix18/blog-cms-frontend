@@ -172,6 +172,27 @@ export interface MonthlyPostAnalytics {
   postAnalytics: SinglePostAnalytics[];
 }
 
+export interface MonthlyUserActivity {
+  month: string;
+  newUsers: number;
+  activeUsers: number;
+  interactions: {
+    views: number;
+    likes: number;
+    comments: number;
+    replies: number;
+  };
+  newAuthors: number;
+}
+
+export interface DetailedPlatformUserAnalytics {
+  totalUsers: number;
+  newUsers: number;
+  activeUsers: number;
+  authors: number;
+  monthlyActivity: MonthlyUserActivity[];
+}
+
 export function isApiResponse(error: unknown): error is ApiErrorResponse {
   return (
     typeof error === "object" &&
