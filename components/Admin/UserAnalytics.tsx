@@ -3,6 +3,7 @@ import { useGetUserAnalyticsQuery } from "@/state/api/analytics/analyticsApi";
 import React from "react";
 import UserChart from "./UserChart";
 import Loader from "../Loader/Loader";
+import UserActivity from "./UserActivity";
 
 const UserAnalytics = () => {
   const { data, isLoading } = useGetUserAnalyticsQuery({});
@@ -13,6 +14,7 @@ const UserAnalytics = () => {
   return (
     <div className="container m-auto rounded-lg px-4 py-8 min-h-screen">
       <UserChart users={data?.UserAnalytics} />
+      <UserActivity users={data?.UserAnalytics} />
     </div>
   );
 };

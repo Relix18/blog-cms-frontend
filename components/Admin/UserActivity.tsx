@@ -12,9 +12,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-
 import {
   Table,
   TableBody,
@@ -23,18 +21,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-import { MonthlyMetrics, MonthlyPostAnalytics } from "@/types/types";
-
+import {
+  DetailedPlatformUserAnalytics,
+  MonthlyUserActivity,
+} from "@/types/types";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { format } from "date-fns";
 
 type Posts = {
-  posts: MonthlyPostAnalytics;
+  users: DetailedPlatformUserAnalytics;
 };
 
-export const columns: ColumnDef<MonthlyMetrics>[] = [
+export const columns: ColumnDef<MonthlyUserActivity>[] = [
   {
     accessorKey: "month",
     header: ({ column }) => {
@@ -51,115 +50,115 @@ export const columns: ColumnDef<MonthlyMetrics>[] = [
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <div className="font-medium">
-          {format(row.getValue("month"), "MMMM yyyy")}
+          {format(row.getValue("month"), "MMMM yy")}
         </div>
       </div>
     ),
   },
   {
-    accessorKey: "posts",
+    accessorKey: "newUsers",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Total Posts
+          New Users
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("posts")}</div>
+        <div className="font-medium">{row.getValue("newUsers")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "views",
+    accessorKey: "activeUsers",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Total Views
+          Active Users
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("views")}</div>
+        <div className="font-medium">{row.getValue("activeUsers")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "likes",
+    accessorKey: "newAuthors",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Total Likes
+          New Authors
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("likes")}</div>
+        <div className="font-medium">{row.getValue("activeUsers")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "comments",
+    accessorKey: "interactions.views",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Total Comments
+          Views
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("comments")}</div>
+        <div className="font-medium">{row.getValue("interactions_views")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "replies",
+    accessorKey: "interactions.likes",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Total Comments
+          Likes
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("replies")}</div>
+        <div className="font-medium">{row.getValue("interactions_likes")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "viewsGrowth",
+    accessorKey: "interactions.comments",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Views Growth
+          Comments
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -167,20 +166,20 @@ export const columns: ColumnDef<MonthlyMetrics>[] = [
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <div className="font-medium">
-          {Math.floor(row.original.viewsGrowth || 0)}%
+          {row.getValue("interactions_comments")}
         </div>
       </div>
     ),
   },
   {
-    accessorKey: "likesGrowth",
+    accessorKey: "interactions.replies",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Likes Growth
+          Replies
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -188,85 +187,26 @@ export const columns: ColumnDef<MonthlyMetrics>[] = [
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <div className="font-medium">
-          {Math.floor(row.original.likesGrowth || 0)}%
+          {row.getValue("interactions_replies")}
         </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "commentsGrowth",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Comments Growth
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <div className="font-medium">
-          {Math.floor(row.original.commentsGrowth || 0)}%
-        </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "repliesGrowth",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Replies Growth
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <div className="font-medium">
-          {Math.floor(row.original.repliesGrowth || 0)}%
-        </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "totalEngagement",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Total Engagement
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("totalEngagement")}</div>
       </div>
     ),
   },
 ];
 
-export default function MultiplePost({ posts }: Posts) {
-  const [data, setData] = useState<MonthlyMetrics[]>([]);
+export default function UserActivity({ users }: Posts) {
+  const [data, setData] = useState<MonthlyUserActivity[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
+  console.log(users);
+
   useEffect(() => {
-    setData(posts?.monthlyAnalytics);
-  }, [posts]);
+    setData(users?.allMonthlyActivity);
+  }, [users]);
 
   const table = useReactTable({
     data,
@@ -283,8 +223,8 @@ export default function MultiplePost({ posts }: Posts) {
   });
 
   return (
-    <div className="container px-2 mx-auto">
-      <div className="text-xl font-bold my-4">Monthly Post Engagement</div>
+    <div className="container px-2  mx-auto">
+      <div className="text-xl font-bold my-4">Monthly Breakdown Table</div>
       <div className="grid rounded-md border">
         <Table>
           <TableHeader>

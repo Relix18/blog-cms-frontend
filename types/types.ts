@@ -191,6 +191,7 @@ export interface DetailedPlatformUserAnalytics {
   activeUsers: number;
   authors: number;
   monthlyActivity: MonthlyUserActivity[];
+  allMonthlyActivity: MonthlyUserActivity[];
 }
 
 export function isApiResponse(error: unknown): error is ApiErrorResponse {

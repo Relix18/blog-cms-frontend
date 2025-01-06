@@ -7,7 +7,6 @@ import {
   SortingState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
@@ -169,7 +168,6 @@ export default function SinglePost({ posts }: Posts) {
     getPaginationRowModel: getPaginationRowModel(),
     onPaginationChange: setPagination,
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
       pagination,
@@ -229,11 +227,7 @@ export default function SinglePost({ posts }: Posts) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="flex text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex items-center  space-x-2">
           <span className="flex w-[180px] text-sm items-center text-muted-foreground">
             Page {table.getState().pagination.pageIndex + 1} of{" "}
