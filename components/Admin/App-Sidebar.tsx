@@ -116,17 +116,17 @@ const items: MenuItem[] = [
     items: [
       {
         title: "Site Settings",
-        url: "/admin/setting/site",
+        url: "/admin/settings/site",
         icon: Settings2,
       },
       {
         title: "Seo Settings",
-        url: "/admin/setting/seo",
+        url: "/admin/settings/seo",
         icon: CalendarCog,
       },
       {
         title: "Notifications",
-        url: "/admin/setting/notification",
+        url: "/admin/settings/notification",
         icon: Bell,
       },
     ],

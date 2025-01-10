@@ -35,6 +35,8 @@ import { useGetOverviewQuery } from "@/state/api/analytics/analyticsApi";
 import { AdminAnalytics } from "@/types/types";
 import { format } from "date-fns";
 import { DashboardLoader } from "../Loader/SkeletonLoader";
+import { useSelector } from "react-redux";
+import { selectSettings } from "@/state/api/site/siteSlice";
 
 const chartConfig: ChartConfig = {
   views: {
@@ -50,7 +52,9 @@ const Dashboard = () => {
 
   const overview: AdminAnalytics = data?.overview;
 
-  console.log(overview);
+  const settings = useSelector(selectSettings);
+
+  console.log(settings);
 
   const filteredData = overview?.viewsChart.filter((item) => {
     const date = new Date(item.month);

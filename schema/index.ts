@@ -119,3 +119,14 @@ export const PostSchema = z.object({
     )
     .min(1, "At least one category is required"),
 });
+
+export const SiteSettingSchema = z.object({
+  accentColor: z.string().min(4, "Accent Color must be provided"),
+  gradientStart: z.string().min(4, "Gradient Start Color must be provided"),
+  gradientEnd: z.string().min(4, "Gradient End Color must be provided"),
+  heroDescription: z
+    .string()
+    .min(30, "Description must be atleast 30 characters"),
+  heroTitle: z.string().min(20, "Title must be atleast 20 characters"),
+  siteName: z.string().min(3, "Site name is required"),
+});

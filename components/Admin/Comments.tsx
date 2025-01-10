@@ -348,7 +348,7 @@ export default function Comments() {
 
   return (
     <div className="w-full px-2">
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 gap-2">
         <Input
           placeholder="Filter..."
           value={globalFilter}

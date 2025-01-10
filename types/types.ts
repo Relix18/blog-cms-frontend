@@ -194,6 +194,22 @@ export interface DetailedPlatformUserAnalytics {
   allMonthlyActivity: MonthlyUserActivity[];
 }
 
+export interface ISiteSettings {
+  id: string;
+  logoUrl: string;
+  logoUrlId: string;
+  siteName: string;
+  heroTitle: string;
+  heroDescription: string;
+  heroImageUrl: string | null;
+  heroImageUrlId: string | null;
+  accentColor: string;
+  gradientStart: string;
+  gradientEnd: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export function isApiResponse(error: unknown): error is ApiErrorResponse {
   return (
     typeof error === "object" &&

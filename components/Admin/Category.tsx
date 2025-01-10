@@ -372,7 +372,7 @@ export default function Category() {
 
   return (
     <div className="w-full px-2 mx-auto">
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 gap-2">
         <Input
           placeholder="Filter categories..."
           value={(table.getColumn("label")?.getFilterValue() as string) ?? ""}

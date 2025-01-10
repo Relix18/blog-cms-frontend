@@ -1,5 +1,6 @@
 "use client";
 
+import type { AppProps } from "next/app";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "../utils/ThemeProvider";
@@ -9,6 +10,7 @@ import { Provider } from "react-redux";
 import { store } from "@/state/store";
 import { useGetUserQuery } from "@/state/api/user/userApi";
 import { Toaster } from "@/components/ui/toaster";
+import { useGetSiteSettingsQuery } from "@/state/api/site/siteApi";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,8 +25,10 @@ const geistMono = localFont({
 
 export default function RootLayout({
   children,
+  pageProps,
 }: Readonly<{
   children: React.ReactNode;
+  pageProps: AppProps;
 }>) {
   return (
     <html lang="en">
@@ -39,7 +43,7 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <Custom>{children}</Custom>
+              <Custom {...pageProps}>{children}</Custom>
               <Toaster />
             </ThemeProvider>
           </SessionProvider>
@@ -51,6 +55,7 @@ export default function RootLayout({
 
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading } = useGetUserQuery({});
+  const {} = useGetSiteSettingsQuery({});
 
   return <>{isLoading ? <Loader /> : <>{children}</>}</>;
 };
