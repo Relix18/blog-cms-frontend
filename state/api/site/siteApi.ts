@@ -11,7 +11,16 @@ export const site = createApi({
       query: () => "get-site-settings",
       providesTags: ["Site"],
     }),
+    updateSiteSettings: builder.mutation({
+      query: (data) => ({
+        url: "update-site-settings",
+        method: "PUT",
+        credentials: "include",
+        body: data,
+      }),
+      invalidatesTags: ["Site"],
+    }),
   }),
 });
 
-export const { useGetSiteSettingsQuery } = site;
+export const { useGetSiteSettingsQuery, useUpdateSiteSettingsMutation } = site;

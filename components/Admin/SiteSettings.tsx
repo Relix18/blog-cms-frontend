@@ -15,13 +15,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { SiteSettingSchema } from "@/schema";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useGetSiteSettingsQuery } from "@/state/api/site/siteApi";
-import { ISiteSettings } from "@/types/types";
+import {
+  useGetSiteSettingsQuery,
+  useUpdateSiteSettingsMutation,
+} from "@/state/api/site/siteApi";
+import { isApiResponse, ISiteSettings } from "@/types/types";
 import {
   Form,
   FormControl,
@@ -30,19 +32,24 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
+import { useToast } from "@/hooks/use-toast";
+import Loader from "../Loader/Loader";
 
 export default function SiteSettings() {
   const [siteName, setSiteName] = useState("My Awesome Site");
   const [logo, setLogo] = useState<string | null>(null);
-  const [accentColor, setAccentColor] = useState("#3b82f6");
+  const [accentColor, setAccentColor] = useState("#d946ef");
   const [heroImage, setHeroImage] = useState<string | null>(null);
-  const [gradientStart, setGradientStart] = useState("#4f46e5");
-  const [gradientEnd, setGradientEnd] = useState("#7c3aed");
+  const [gradientStart, setGradientStart] = useState("#d946ef");
+  const [gradientEnd, setGradientEnd] = useState("#ec4899");
   const [heroTitle, setHeroTitle] = useState("Welcome to Our Site");
   const [heroDescription, setHeroDescription] = useState(
     "Discover amazing content and features"
   );
   const { data } = useGetSiteSettingsQuery({});
+  const [updateSettings, { data: updated, isLoading, isSuccess, error }] =
+    useUpdateSiteSettingsMutation();
+  const { toast } = useToast();
 
   const siteForm = useForm<z.infer<typeof SiteSettingSchema>>({
     resolver: zodResolver(SiteSettingSchema),
@@ -74,7 +81,7 @@ export default function SiteSettings() {
       setAccentColor(settings.accentColor);
       setGradientStart(settings.gradientStart);
       setGradientEnd(settings.gradientEnd);
-      setLogo(settings.logoUrl);
+      setHeroDescription(settings.heroDescription);
       setHeroImage(settings.heroImageUrl);
       setHeroTitle(settings.heroTitle);
     }
@@ -104,13 +111,24 @@ export default function SiteSettings() {
     }
   };
 
+  useEffect(() => {
+    if (isSuccess) {
+      toast({ title: updated.message });
+    }
+    if (isApiResponse(error)) {
+      toast({ title: error?.data.message, variant: "destructive" });
+    }
+  }, [isSuccess, updated, error, toast]);
+
   const onSubmit = async (values: z.infer<typeof SiteSettingSchema>) => {
-    // Here you would typically send this data to your backend
-    console.log({
+    const allData = {
       ...values,
+      id: data.siteSettings.id,
       logo,
       heroImage,
-    });
+    };
+    await updateSettings(allData);
+    console.log(allData);
   };
 
   return (
@@ -354,8 +372,12 @@ export default function SiteSettings() {
                 )}
               />
 
-              <Button type="submit" style={{ backgroundColor: accentColor }}>
-                Save Changes
+              <Button
+                disabled={isLoading}
+                type="submit"
+                style={{ backgroundColor: accentColor }}
+              >
+                Save Changes {isLoading && <Loader isButton={true} />}
               </Button>
             </form>
           </Form>
