@@ -403,7 +403,7 @@ export default function SiteSettings() {
                   <img
                     src={logo}
                     alt="Site Logo"
-                    className="w-10 h-10 object-contain"
+                    className="w-6 h-6 object-contain"
                   />
                 )}
                 <h1 className="text-xl text-black font-bold">{siteName}</h1>

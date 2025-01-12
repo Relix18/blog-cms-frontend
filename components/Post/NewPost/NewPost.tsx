@@ -202,7 +202,7 @@ export default function CreateNewPost() {
                               {...field}
                               placeholder="Enter post title"
                               disabled={isLoading}
-                              className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                              className="focus:border-accentColor focus:ring-accentColor"
                             />
                           </FormControl>
                           <FormMessage />
@@ -299,7 +299,7 @@ export default function CreateNewPost() {
                               id="description"
                               disabled={isLoading}
                               placeholder="Enter a short description of your post"
-                              className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                              className="focus:border-accentColor focus:ring-accentColor"
                             />
                           </FormControl>
                           <FormMessage />
@@ -389,7 +389,7 @@ export default function CreateNewPost() {
                         postForm.handleSubmit(onSubmit)();
                       }}
                       name="action"
-                      className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
+                      className="bg-accentColor text-white hover:bg-accentColor/90"
                     >
                       Publish Post{" "}
                       {isLoading ||

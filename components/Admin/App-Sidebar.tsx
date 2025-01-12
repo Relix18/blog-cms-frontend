@@ -37,6 +37,8 @@ import {
   UserCog,
 } from "lucide-react";
 import { MdNotes, MdOutlineAnalytics, MdOutlineCategory } from "react-icons/md";
+import { selectSettings } from "@/state/api/site/siteSlice";
+import { useSelector } from "react-redux";
 
 interface MenuItem {
   title: string;
@@ -178,17 +180,20 @@ const AppSidebar: React.FC = ({
   ...props
 }: React.ComponentProps<typeof Sidebar>) => {
   const { setOpen } = useSidebar();
+  const settings = useSelector(selectSettings);
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <Link href={"/"}>
           <SidebarMenuButton size="lg">
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-fuchsia-600 text-sidebar-primary-foreground">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-accentColor text-sidebar-primary-foreground">
               <BookOpen className="size-5" />
             </div>
             <div className="grid flex-1 text-left text-lg leading-tight">
-              <span className="truncate font-semibold">OrbitBlog</span>
+              <span className="truncate font-semibold">
+                {settings.siteName}
+              </span>
             </div>
           </SidebarMenuButton>
         </Link>

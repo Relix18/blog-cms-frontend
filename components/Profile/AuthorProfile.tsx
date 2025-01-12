@@ -36,14 +36,14 @@ const AuthorProfile = ({ user }: Props) => {
 
   const getTotalLikes = (post: IPost[]) => {
     return post
-      ?.map((post) => post.likes?.length || 0) // Get the count of likes for each post
-      .reduce((sum, likeCount) => sum + likeCount, 0); // Sum up all like counts
+      ?.map((post) => post.likes?.length || 0)
+      .reduce((sum, likeCount) => sum + likeCount, 0);
   };
 
   const getTotalComment = (post: IPost[]) => {
     return post
-      ?.map((post) => post.comments?.length || 0) // Get the count of likes for each post
-      .reduce((sum, commentCount) => sum + commentCount, 0); // Sum up all like counts
+      ?.map((post) => post.comments?.length || 0)
+      .reduce((sum, commentCount) => sum + commentCount, 0);
   };
 
   return (
@@ -54,7 +54,7 @@ const AuthorProfile = ({ user }: Props) => {
             <div className="bg-white dark:bg-muted/50 shadow rounded-lg overflow-hidden">
               <div className="p-6 sm:p-8 md:p-10">
                 <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
-                  <Avatar className="w-24 h-24 border-4  border-fuchsia-600 ">
+                  <Avatar className="w-24 h-24 border-4  border-accentColor ">
                     <AvatarImage
                       src={
                         user?.profile?.avatar
@@ -89,7 +89,7 @@ const AuthorProfile = ({ user }: Props) => {
                       {user?.profile?.social?.mailLink && (
                         <Link
                           href={`mailto:${user.profile?.social.mailLink}`}
-                          className="text-fuchsia-600 hover:text-fuchsia-700"
+                          className="text-accentColor hover:text-accentColor/90"
                         >
                           <Mail className="h-5 w-5" />
                         </Link>
@@ -97,7 +97,7 @@ const AuthorProfile = ({ user }: Props) => {
                       {user?.profile?.social?.instaLink && (
                         <Link
                           href={user.profile?.social.instaLink}
-                          className="text-fuchsia-600 hover:text-fuchsia-700"
+                          className="text-accentColor hover:text-accentColor/90"
                         >
                           <Instagram className="h-5 w-5" />
                         </Link>
@@ -105,7 +105,7 @@ const AuthorProfile = ({ user }: Props) => {
                       {user?.profile?.social?.githubLink && (
                         <Link
                           href={user.profile?.social.githubLink}
-                          className="text-fuchsia-600 hover:text-fuchsia-700"
+                          className="text-accentColor hover:text-accentColor/90"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -115,7 +115,7 @@ const AuthorProfile = ({ user }: Props) => {
                       {user?.profile?.social?.facebookLink && (
                         <Link
                           href={user.profile?.social.facebookLink}
-                          className="text-fuchsia-600 hover:text-fuchsia-700"
+                          className="text-accentColor hover:text-accentColor/90"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -125,7 +125,7 @@ const AuthorProfile = ({ user }: Props) => {
                       {user?.profile?.social?.linkedinLink && (
                         <Link
                           href={user.profile?.social.linkedinLink}
-                          className="text-fuchsia-600 hover:text-fuchsia-700"
+                          className="text-accentColor hover:text-accentColor/90"
                           target="_blank"
                           rel="noopener noreferrer"
                         >

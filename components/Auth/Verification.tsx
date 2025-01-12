@@ -36,6 +36,7 @@ import {
   useActivateUserMutation,
   useResendOtpMutation,
 } from "@/state/api/auth/authApi";
+import { isApiResponse } from "@/types/types";
 
 const Verificaiton = () => {
   const [error, setError] = useState<string | undefined>(undefined);
@@ -57,9 +58,8 @@ const Verificaiton = () => {
   });
 
   useEffect(() => {
-    if (err) {
-      const { data } = err;
-      setError(data?.message);
+    if (isApiResponse(err)) {
+      setError(err?.data.message);
     }
     if (isSuccess) {
       router.push("/");
@@ -67,14 +67,13 @@ const Verificaiton = () => {
   }, [err, isSuccess, router]);
 
   useEffect(() => {
-    if (resendError) {
-      const { data } = resendError;
-      setError(data?.message);
+    if (isApiResponse(resendError)) {
+      setError(resendError?.data.message);
     }
     if (resendSuccess) {
       setSuccess(successMessage?.message);
     }
-  }, [resendSuccess, resendError]);
+  }, [resendSuccess, resendError, successMessage]);
 
   const onSubmit = async (values: z.infer<typeof VerificationSchema>) => {
     setError("");
@@ -90,7 +89,7 @@ const Verificaiton = () => {
   return (
     <Card className="w-full max-w-md backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center text-fuchsia-600">
+        <CardTitle className="text-2xl font-bold text-center text-accentColor">
           Verify OTP
         </CardTitle>
         <CardDescription className="text-center">
@@ -131,7 +130,7 @@ const Verificaiton = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-fuchsia-600 hover:bg-fuchsia-700 text-white"
+                className="w-full bg-accentColor hover:bg-accentColor/90 text-white"
               >
                 Verify OTP {isLoading && <Loader isButton={true} />}
               </Button>
@@ -140,12 +139,12 @@ const Verificaiton = () => {
         </Form>
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">
-        <div className="text-center text-sm text-fuchsia-900">
+        <div className="text-center text-sm text-accentColor/80">
           Didn't receive the code?{" "}
           <Button
             variant="link"
             onClick={resendOtpHandler}
-            className="text-fuchsia-600 hover:underline p-0"
+            className="text-accentColor hover:underline p-0"
           >
             Resend OTP
           </Button>

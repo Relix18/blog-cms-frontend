@@ -385,7 +385,7 @@ export default function EditPost({ slug }: Props) {
                         <Button
                           type="submit"
                           disabled={isUpdating}
-                          className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
+                          className="bg-accentColor text-white hover:bg-accentColor/90"
                         >
                           Update Post {isUpdating && <Loader isButton />}
                         </Button>

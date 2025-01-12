@@ -1,7 +1,10 @@
+import { selectSettings } from "@/state/api/site/siteSlice";
 import Link from "next/link";
 import React from "react";
+import { useSelector } from "react-redux";
 
 const Footer = () => {
+  const settings = useSelector(selectSettings);
   return (
     <footer className="bg-gray-800 dark:bg-gray-900 text-white py-8">
       <div className="container mx-auto px-4">
@@ -9,9 +12,9 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">About Us</h3>
             <p className="text-gray-400">
-              OrbitBlog is your go-to source for insightful articles, expert
-              opinions, and the latest trends in technology, lifestyle, and
-              more.
+              {settings.siteName} is your go-to source for insightful articles,
+              expert opinions, and the latest trends in technology, lifestyle,
+              and more.
             </p>
           </div>
           <div>
@@ -95,7 +98,10 @@ const Footer = () => {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
-          <p>&copy; 2024 OrbitBlog. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()} {settings.siteName}. All rights
+            reserved.
+          </p>
         </div>
       </div>
     </footer>

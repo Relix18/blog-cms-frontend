@@ -7,19 +7,46 @@ const GlobalStyles = () => {
 
   const settings: ISiteSettings = data?.siteSettings;
 
+  function hexToHSL(hex: string) {
+    hex = hex.replace(/^#/, "");
+
+    const r = parseInt(hex.slice(0, 2), 16) / 255;
+    const g = parseInt(hex.slice(2, 4), 16) / 255;
+    const b = parseInt(hex.slice(4, 6), 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+
+    let hue = 0;
+    if (delta !== 0) {
+      if (max === r) hue = ((g - b) / delta) % 6;
+      else if (max === g) hue = (b - r) / delta + 2;
+      else hue = (r - g) / delta + 4;
+      hue *= 60;
+      if (hue < 0) hue += 360;
+    }
+
+    const lightness = (max + min) / 2;
+
+    const saturation =
+      delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1));
+
+    return `${Math.round(hue)} ${+(saturation * 100).toFixed(1)}% ${+(
+      lightness * 100
+    ).toFixed(1)}%`;
+  }
+
   useEffect(() => {
     if (settings && !isLoading) {
       document.documentElement.style.setProperty(
         "--accent-color",
-        settings.accentColor || "#3498db"
+        hexToHSL(settings.accentColor) || "292 84.1% 60.6%"
       );
-      document.documentElement.style.setProperty(
-        "--background-image",
-        settings.heroImageUrl
-          ? `url(${settings.heroImageUrl})`
-          : `linear-gradient(to right, ${settings.gradientStart}, ${settings.gradientEnd})` ||
-              "linear-gradient(to right, #ff7e5f, #feb47b)"
-      );
+      // document.documentElement.style.setProperty(
+      //   "--bg-gradient",
+      //   `linear-gradient(to right, ${settings.gradientStart}, ${settings.gradientEnd})`
+      // );
     }
   }, [settings, isLoading]);
 

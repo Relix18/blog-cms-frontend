@@ -52,7 +52,7 @@ const PublishedPost = ({ posts, isLoading, isAuthorProfile }: Props) => {
                     size="sm"
                     className={cn(
                       isAuthorProfile ? "hidden" : "inline-flex",
-                      "text-fuchsia-600  border-fuchsia-600"
+                      "text-accentColor  border-accentColor"
                     )}
                   >
                     <Link href={`post/edit-post/${post.slug}`}>Edit</Link>
@@ -61,7 +61,7 @@ const PublishedPost = ({ posts, isLoading, isAuthorProfile }: Props) => {
                     asChild
                     variant={"default"}
                     size={"sm"}
-                    className="bg-fuchsia-600 text-white hover:bg-fuchsia-700 "
+                    className="bg-accentColor text-white hover:bg-accentColor/90 "
                   >
                     <Link href={`post/view/${post.slug}`}>View</Link>
                   </Button>

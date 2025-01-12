@@ -3,7 +3,7 @@ import React from "react";
 import { TabsContent } from "../ui/tabs";
 import { useRecentActivityQuery } from "@/state/api/post/postApi";
 import { IPost } from "@/types/types";
-import { format, formatDistanceStrict } from "date-fns";
+import { formatDistanceStrict } from "date-fns";
 import { RecentActivityLoader } from "../Loader/SkeletonLoader";
 
 interface Activity {
@@ -28,7 +28,7 @@ const RecentActivity = () => {
         <div className="space-y-6">
           {activities?.map((activity: Activity) => (
             <div
-              key={format(activity.createdAt, "MMMM dd, yyyy")}
+              key={`${activity.type}${activity.createdAt}`}
               className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0 last:pb-0"
             >
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -39,7 +39,7 @@ const RecentActivity = () => {
                   : "Replied on"}{" "}
                 <Link
                   href={`/post/view/${activity.post.slug}`}
-                  className="text-fuchsia-600 dark:text-fuchsia-400 hover:underline"
+                  className="text-accentColor  hover:underline"
                 >
                   {activity.post.title}
                 </Link>

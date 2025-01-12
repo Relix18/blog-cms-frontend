@@ -102,7 +102,7 @@ const Settings = ({ user }: Props) => {
                     <Input
                       {...field}
                       disabled={isLoading}
-                      className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                      className="focus:border-accentColor focus:ring-accentColor"
                     />
                   </FormControl>
                   <FormMessage />
@@ -145,7 +145,7 @@ const Settings = ({ user }: Props) => {
                     <Textarea
                       {...field}
                       disabled={isLoading}
-                      className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                      className="focus:border-accentColor focus:ring-accentColor"
                     />
                   </FormControl>
                   <FormMessage />
@@ -165,7 +165,7 @@ const Settings = ({ user }: Props) => {
                       {...field}
                       type="text"
                       disabled={isLoading}
-                      className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                      className="focus:border-accentColor focus:ring-accentColor"
                     />
                   </FormControl>
                   <FormMessage />
@@ -187,7 +187,7 @@ const Settings = ({ user }: Props) => {
                       type="url"
                       pattern="https://.*"
                       disabled={isLoading}
-                      className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                      className="focus:border-accentColor focus:ring-accentColor"
                     />
                   </FormControl>
                   <FormMessage />
@@ -208,7 +208,7 @@ const Settings = ({ user }: Props) => {
                       type="url"
                       pattern="https://.*"
                       disabled={isLoading}
-                      className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                      className="focus:border-accentColor focus:ring-accentColor"
                     />
                   </FormControl>
                   <FormMessage />
@@ -229,7 +229,7 @@ const Settings = ({ user }: Props) => {
                       type="url"
                       pattern="https://.*"
                       disabled={isLoading}
-                      className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                      className="focus:border-accentColor focus:ring-accentColor"
                     />
                   </FormControl>
                   <FormMessage />
@@ -250,7 +250,7 @@ const Settings = ({ user }: Props) => {
                       type="url"
                       pattern="https://.*"
                       disabled={isLoading}
-                      className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                      className="focus:border-accentColor focus:ring-accentColor"
                     />
                   </FormControl>
                   <FormMessage />
@@ -261,7 +261,7 @@ const Settings = ({ user }: Props) => {
 
           <Button
             type="submit"
-            className="w-full sm:w-auto bg-fuchsia-600 text-white hover:bg-fuchsia-700"
+            className="w-full sm:w-auto bg-accentColor text-white hover:bg-accentColor/90"
           >
             Save Changes {isLoading && <Loader isButton={true} />}
           </Button>
@@ -290,7 +290,7 @@ const Settings = ({ user }: Props) => {
                             {...field}
                             disabled={isLoading}
                             type={showCurrentPassword ? "text" : "password"}
-                            className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                            className="focus:border-accentColor focus:ring-accentColor"
                           />
                           {showCurrentPassword ? (
                             <EyeOff
@@ -325,7 +325,7 @@ const Settings = ({ user }: Props) => {
                             {...field}
                             disabled={isLoading}
                             type={showNewPassword ? "text" : "password"}
-                            className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                            className="focus:border-accentColor focus:ring-accentColor"
                           />
                           {showNewPassword ? (
                             <EyeOff
@@ -352,7 +352,7 @@ const Settings = ({ user }: Props) => {
               />
               <Button
                 type="submit"
-                className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
+                className="bg-accentColor text-white hover:bg-accentColor/90"
               >
                 Change Password {passwordLoading && <Loader isButton={true} />}
               </Button>

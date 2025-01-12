@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +33,7 @@ import {
   useRegisterMutation,
   useSocialAuthMutation,
 } from "@/state/api/auth/authApi";
+import { isApiResponse } from "@/types/types";
 
 export default function SignUpPage() {
   const [error, setError] = useState<string | undefined>(undefined);
@@ -60,15 +61,15 @@ export default function SignUpPage() {
       });
     }
 
-    if (socialErr) {
-      setError(socialErr?.data?.message);
+    if (isApiResponse(socialErr)) {
+      setError(socialErr?.data.message);
     }
   }, [data, socialAuth, socialErr]);
 
   useEffect(() => {
     setError("");
-    if (err) {
-      setError(err?.data?.message);
+    if (isApiResponse(err)) {
+      setError(err?.data.message);
     }
   }, [err]);
 
@@ -77,11 +78,11 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-fuchsia-400 via-fuchsia-600 to-purple-800">
+    <div className="flex items-center justify-center min-h-screen bgGradient">
       {!isSuccess ? (
         <Card className="w-full max-w-md backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold  text-center text-fuchsia-600">
+            <CardTitle className="text-2xl font-bold  text-center text-accentColor">
               Sign Up for OrbitBlog
             </CardTitle>
             <CardDescription className="text-center">
@@ -102,7 +103,7 @@ export default function SignUpPage() {
                           <Input
                             {...field}
                             disabled={isLoading}
-                            className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                            className="focus:border-accentColor focus:ring-accentColor"
                           />
                         </FormControl>
                         <FormMessage />
@@ -120,7 +121,7 @@ export default function SignUpPage() {
                             {...field}
                             disabled={isLoading}
                             type="email"
-                            className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                            className="focus:border-accentColor focus:ring-accentColor"
                           />
                         </FormControl>
                         <FormMessage />
@@ -139,7 +140,7 @@ export default function SignUpPage() {
                               {...field}
                               disabled={isLoading}
                               type={hidden ? "password" : "text"}
-                              className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                              className="focus:border-accentColor focus:ring-accentColor"
                             />
                             {hidden ? (
                               <Eye
@@ -164,7 +165,7 @@ export default function SignUpPage() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-fuchsia-600 hover:bg-fuchsia-700 text-white"
+                    className="w-full bg-accentColor hover:bg-accentColor/90 text-white"
                   >
                     Sign Up {isLoading && <Loader isButton={true} />}
                   </Button>
@@ -187,7 +188,7 @@ export default function SignUpPage() {
               <Button
                 variant="outline"
                 onClick={() => signIn("github")}
-                className="border-fuchsia-600 text-fuchsia-600 hover:bg-fuchsia-50 dark:hover:bg-background dark:hover:text-primary"
+                className="border-accentColor text-accentColor hover:bg-slate-50 dark:hover:bg-background hover:text-accentColor/80"
               >
                 <Github className="mr-2 h-4 w-4" />
                 GitHub
@@ -195,17 +196,17 @@ export default function SignUpPage() {
               <Button
                 variant="outline"
                 onClick={() => signIn("google")}
-                className="border-fuchsia-600 text-fuchsia-600 hover:bg-fuchsia-50 dark:hover:bg-background dark:hover:text-primary"
+                className="border-accentColor text-accentColor hover:bg-slate-50 dark:hover:bg-background hover:text-accentColor/80"
               >
                 <Mail className="mr-2 h-4 w-4" />
                 Google
               </Button>
             </div>
-            <div className="text-center text-sm text-fuchsia-900 dark:text-fuchsia-600">
+            <div className="text-center text-sm text-accentColor/80 dark:text-accentColor">
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="font-semibold text-fuchsia-600 hover:underline"
+                className="font-semibold text-accentColor hover:underline"
               >
                 Log in
               </Link>

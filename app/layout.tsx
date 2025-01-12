@@ -6,11 +6,12 @@ import "./globals.css";
 import { ThemeProvider } from "../utils/ThemeProvider";
 import Loader from "@/components/Loader/Loader";
 import { SessionProvider } from "next-auth/react";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { store } from "@/state/store";
 import { useGetUserQuery } from "@/state/api/user/userApi";
 import { Toaster } from "@/components/ui/toaster";
-import { useGetSiteSettingsQuery } from "@/state/api/site/siteApi";
+import GlobalStyles from "@/utils/GlobalStyles";
+import { selectSettings } from "@/state/api/site/siteSlice";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -43,6 +44,7 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
+              <GlobalStyles />
               <Custom {...pageProps}>{children}</Custom>
               <Toaster />
             </ThemeProvider>
@@ -55,7 +57,7 @@ export default function RootLayout({
 
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading } = useGetUserQuery({});
-  const {} = useGetSiteSettingsQuery({});
+  const settings = useSelector(selectSettings);
 
-  return <>{isLoading ? <Loader /> : <>{children}</>}</>;
+  return <>{!settings || isLoading ? <Loader /> : <>{children}</>}</>;
 };

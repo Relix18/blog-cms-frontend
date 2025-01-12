@@ -114,7 +114,7 @@ const Profile = () => {
             <div className="p-6 sm:p-8 md:p-10">
               <div className="flex flex-col sm:flex-row items-center gap-6 mb-8">
                 <div className="relative">
-                  <Avatar className="w-24 h-24 border-4  border-fuchsia-600 ">
+                  <Avatar className="w-24 h-24 border-4  border-accentColor ">
                     <AvatarImage
                       src={
                         user?.profile?.avatar
@@ -164,7 +164,7 @@ const Profile = () => {
                     {user?.profile?.social?.mailLink && (
                       <Link
                         href={`mailto:${user.profile?.social.mailLink}`}
-                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                        className="text-accentColor hover:text-accentColor/90"
                       >
                         <Mail className="h-5 w-5" />
                       </Link>
@@ -172,7 +172,7 @@ const Profile = () => {
                     {user?.profile?.social?.instaLink && (
                       <Link
                         href={user.profile?.social.instaLink}
-                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                        className="text-accentColor hover:text-accentColor/90"
                       >
                         <Instagram className="h-5 w-5" />
                       </Link>
@@ -180,7 +180,7 @@ const Profile = () => {
                     {user?.profile?.social?.githubLink && (
                       <Link
                         href={user.profile?.social.githubLink}
-                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                        className="text-accentColor hover:text-accentColor/90"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -190,7 +190,7 @@ const Profile = () => {
                     {user?.profile?.social?.facebookLink && (
                       <Link
                         href={user.profile?.social.facebookLink}
-                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                        className="text-accentColor hover:text-accentColor/90"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -200,7 +200,7 @@ const Profile = () => {
                     {user?.profile?.social?.linkedinLink && (
                       <Link
                         href={user.profile?.social.linkedinLink}
-                        className="text-fuchsia-600 hover:text-fuchsia-700"
+                        className="text-accentColor hover:text-accentColor/90"
                         target="_blank"
                         rel="noopener noreferrer"
                       >

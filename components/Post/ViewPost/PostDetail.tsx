@@ -235,7 +235,7 @@ export default function SingleBlogPost({ data }: Props) {
 
   return (
     <div className="min-h-screen pt-10 ">
-      <ScrollProgressBar progress={scrollProgress} color="#ef46ef" />
+      <ScrollProgressBar progress={scrollProgress} />
       <div ref={contentRef} className="container  mx-auto px-4 py-8">
         <article className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold  mb-4">{data.title}</h1>
@@ -299,7 +299,9 @@ export default function SingleBlogPost({ data }: Props) {
               variant={isLiked ? "default" : "outline"}
               size="sm"
               onClick={() => handleLike(data.id)}
-              className={isLiked ? "bg-fuchsia-600 hover:bg-fuchsia-700" : ""}
+              className={
+                isLiked ? "bg-accentColor hover:bg-accentColor/90" : ""
+              }
             >
               <Heart
                 className={`h-4 w-4 mr-2 ${isLiked ? "fill-current" : ""}`}
@@ -328,7 +330,7 @@ export default function SingleBlogPost({ data }: Props) {
               />
               <Button
                 onClick={() => handleAddComment(data.slug)}
-                className="w-full"
+                className="bg-accentColor hover:bg-accentColor/90 w-full"
                 disabled={!comment}
               >
                 <Send className="h-4 w-4 mr-2" />
@@ -367,7 +369,7 @@ export default function SingleBlogPost({ data }: Props) {
                       </h3>
                       <Button
                         variant="link"
-                        className="p-0 h-auto text-fuchsia-600 dark:text-fuchsia-400"
+                        className="p-0 h-auto text-accentColor "
                         onClick={() => handleReply(comment.id)}
                       >
                         Reply
@@ -401,6 +403,7 @@ export default function SingleBlogPost({ data }: Props) {
                           className="mb-2"
                         />
                         <Button
+                          className="bg-accentColor hover:bg-accentColor/90"
                           disabled={!replyContent}
                           onClick={() => submitReply(comment.id)}
                         >

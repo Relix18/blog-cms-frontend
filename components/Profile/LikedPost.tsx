@@ -36,7 +36,7 @@ const LikedPost = () => {
                 <h3 className="text-xl line-clamp-2 font-semibold text-gray-900 dark:text-white mb-2">
                   <Link
                     href={`/post/view/${like.post.slug}`}
-                    className="hover:text-fuchsia-600 dark:hover:text-fuchsia-400"
+                    className="hover:text-accentColor "
                   >
                     {like.post.title}
                   </Link>
@@ -50,7 +50,7 @@ const LikedPost = () => {
                   </span>
                   <Link
                     href={`/post/view/${like.post.slug}`}
-                    className="text-fuchsia-600 dark:text-fuchsia-400"
+                    className="text-accentColor "
                   >
                     Read More
                   </Link>

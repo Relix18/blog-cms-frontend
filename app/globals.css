@@ -8,6 +8,8 @@
 :root {
   --font-geist-sans: "GeistSans", sans-serif;
   --font-geist-mono: "GeistMono", monospace;
+  --accent-color: 292 84.1% 60.6%;
+  --bg-gradient: linear-gradient(to right, #c026d3, #6b21a8);
 }
 
 ::-webkit-scrollbar {
@@ -31,6 +33,10 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.bgGradient {
+  background: var(--bg-gradient);
 }
 
 .ql-toolbar {
@@ -158,15 +164,15 @@ input::-webkit-inner-spin-button {
 
 @layer components {
   .my-react-select-container .my-react-select__control {
-    @apply border-input bg-background border hover:border-fuchsia-600;
+    @apply border-input bg-background border hover:border-accentColor;
   }
 
   .my-react-select-container .my-react-select__control--is-focused {
-    @apply border-fuchsia-600 hover:border-fuchsia-600 shadow-none;
+    @apply border-accentColor hover:border-accentColor shadow-none;
   }
 
   .my-react-select-container .my-react-select__menu {
-    @apply border-fuchsia-600 hover:border-fuchsia-600 shadow-none bg-background border-input border hover:border-input;
+    @apply border-accentColor hover:border-accentColor shadow-none bg-background;
   }
 
   .my-react-select-container .my-react-select__option {
@@ -205,7 +211,7 @@ input::-webkit-inner-spin-button {
 
   .my-react-select-container .my-react-select__clear-indicator:hover,
   .my-react-select-container .my-react-select__dropdown-indicator:hover {
-    @apply text-fuchsia-600;
+    @apply text-accentColor;
   }
 
   .my-react-select-container .my-react-select__clear-indicator .css-tj5bde-Svg,

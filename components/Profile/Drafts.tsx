@@ -61,7 +61,7 @@ const Drafts = ({ posts, isLoading }: Props) => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-fuchsia-600 border-fuchsia-600"
+                    className="text-accentColor border-accentColor"
                   >
                     <Link href={`post/edit-post/${post.slug}`}>Edit</Link>
                   </Button>
@@ -69,7 +69,7 @@ const Drafts = ({ posts, isLoading }: Props) => {
                     variant="default"
                     size="sm"
                     onClick={() => publishHanlder(post.id)}
-                    className="bg-fuchsia-600 text-white hover:bg-fuchsia-700"
+                    className="bg-accentColor text-white hover:bg-accentColor/90"
                   >
                     Publish {publishLoading && <Loader isButton={true} />}
                   </Button>

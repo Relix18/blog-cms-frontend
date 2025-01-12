@@ -56,6 +56,8 @@ import {
 } from "./ui/navigation-menu";
 import { useAuthorRequestMutation } from "@/state/api/user/userApi";
 import { useToast } from "@/hooks/use-toast";
+import { selectSettings } from "@/state/api/site/siteSlice";
+import Image from "next/image";
 
 type Props = {
   active?: number;
@@ -77,6 +79,7 @@ const Header = ({ active, isProfile }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const settings = useSelector(selectSettings);
 
   useEffect(() => {
     const existingQuery = searchParams.get("search") || "";
@@ -131,9 +134,20 @@ const Header = ({ active, isProfile }: Props) => {
       <header className=" backdrop-blur w-full fixed top-0 left-0 shadow-sm dark:bg-gray-900/70 bg-slate-50/60  z-50 dark:border-b-2">
         <div className="mx-2 px-2 py-2 flex items-center justify-between">
           <Link href="/" className="flex items-center ">
-            <BookOpen className="mr-4 h-6 w-6 text-fuchsia-600 dark:text-fuchsia-500" />
+            {settings.logoUrl ? (
+              <Image
+                className="mr-4 h-6 w-6"
+                src={settings.logoUrl}
+                alt=""
+                height="25"
+                width="25"
+              />
+            ) : (
+              <BookOpen className="mr-4 h-6 w-6 text-accentColor" />
+            )}
+
             <span className="text-xl font-bold font-Poppins md:flex hidden">
-              OrbitBlog
+              {settings.siteName || "OrbitBlog"}
             </span>
           </Link>
           <nav className="hidden items-center md:flex space-x-4">
@@ -141,8 +155,8 @@ const Header = ({ active, isProfile }: Props) => {
               href="/"
               className={
                 active === 1
-                  ? "text-fuchsia-600 dark:text-fuchsia-500"
-                  : "text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500"
+                  ? "text-accentColor "
+                  : "text-gray-600 dark:text-gray-300 hover:text-accentColor/80 dark:hover:text-accentColor"
               }
             >
               Home
@@ -150,7 +164,7 @@ const Header = ({ active, isProfile }: Props) => {
             <NavigationMenu>
               <NavigationMenuList className="m-0 p-0 ">
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="p-0 text-md text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent hover:text-fuchsia-400 dark:hover:text-fuchsia-600">
+                  <NavigationMenuTrigger className="p-0 text-md font-normal text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent hover:text-accentColor/80 dark:hover:text-accentColor">
                     Categories
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -172,7 +186,7 @@ const Header = ({ active, isProfile }: Props) => {
             </NavigationMenu>
             <Link
               href="#"
-              className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+              className="text-gray-600 dark:text-gray-300 hover:text-accentColor/80 dark:hover:text-accentColor"
             >
               Contact
             </Link>
@@ -194,19 +208,19 @@ const Header = ({ active, isProfile }: Props) => {
                   href="/admin/dashboard"
                   className={`${
                     user?.role !== "ADMIN" && "hidden"
-                  } text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500`}
+                  } text-gray-600 dark:text-gray-300 hover:text-accentColor dark:hover:text-accentColor/80`}
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/post/new-post"
-                  className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+                  className="text-gray-600 dark:text-gray-300 hover:text-accentColor dark:hover:text-accentColor/80   "
                 >
                   New Post
                 </Link>
                 <Link
                   href="/author/analytics"
-                  className="text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+                  className="text-gray-600 dark:text-gray-300 hover:text-accentColor dark:hover:text-accentColor/80   "
                 >
                   Analytics
                 </Link>
@@ -217,7 +231,7 @@ const Header = ({ active, isProfile }: Props) => {
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="outline"
-                    className="hidden md:flex items-center space-x-2 mr-4 text-fuchsia-600"
+                    className="hidden md:flex items-center space-x-2 mr-4 text-accentColor"
                   >
                     <PenTool className="h-4 w-4" />
                     <span>Become an Author</span>
@@ -300,7 +314,7 @@ const Header = ({ active, isProfile }: Props) => {
 
                       <Link
                         href="/profile"
-                        className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+                        className="flex items-center text-gray-600 dark:text-gray-300 hover:text-accentColor dark:hover:text-accentColor/80   "
                       >
                         <UserCircle className="mr-2 h-5 w-5 " /> Profile
                       </Link>
@@ -308,14 +322,14 @@ const Header = ({ active, isProfile }: Props) => {
                   ) : (
                     <Link
                       href={"/login"}
-                      className="flex items-center text-md text-fuchsia-600 font-bold"
+                      className="flex items-center text-md text-accentColor font-bold"
                     >
                       <LogIn className="mr-2" /> Login
                     </Link>
                   )}
                   <Link
                     href="/"
-                    className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+                    className="flex items-center text-gray-600 dark:text-gray-300 hover:text-accentColor dark:hover:text-accentColor/80   "
                   >
                     <HomeIcon className="h-5 w-5 mr-2" /> Home
                   </Link>
@@ -323,7 +337,7 @@ const Header = ({ active, isProfile }: Props) => {
                   <NavigationMenu>
                     <NavigationMenuList className="m-0 p-0 ">
                       <NavigationMenuItem>
-                        <NavigationMenuTrigger className="p-0 text-md text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent hover:text-fuchsia-400 dark:hover:text-fuchsia-600">
+                        <NavigationMenuTrigger className="p-0 text-md text-gray-600 dark:text-gray-300 bg-transparent dark:bg-transparent hover:bg-transparent hover:dark:bg-transparent hover:text-accentColor/80 dark:hover:text-accentColor/80">
                           <Blocks className="flex mr-2 h-5 w-5" />
                           Categories
                         </NavigationMenuTrigger>
@@ -347,14 +361,14 @@ const Header = ({ active, isProfile }: Props) => {
                   </NavigationMenu>
                   <Link
                     href="/contact-us"
-                    className="flex items-center text-gray-600 dark:text-gray-300 hover:text-fuchsia-600 dark:hover:text-fuchsia-500   "
+                    className="flex items-center text-gray-600 dark:text-gray-300 hover:text-accentColor/80 dark:hover:text-accentColor/80   "
                   >
                     <LucideContact className="mr-2 h-5 w-5" /> Contact
                   </Link>
                   {user?.role === "USER" && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button className="justify-start p-0 bg-transparent hover:bg-transparent text-fuchsia-600 ">
+                        <Button className="justify-start p-0 bg-transparent hover:bg-transparent text-accentColor ">
                           <PenTool /> Become an Author
                         </Button>
                       </AlertDialogTrigger>

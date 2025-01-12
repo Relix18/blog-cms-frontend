@@ -24,6 +24,8 @@ import { FeaturedPostLoader, LatestPostLoader } from "../Loader/SkeletonLoader";
 import useUIStore from "@/app/hooks/useUIStore";
 import { useEffect } from "react";
 import { formatDistanceStrict } from "date-fns";
+import { useSelector } from "react-redux";
+import { selectSettings } from "@/state/api/site/siteSlice";
 
 const Hero = () => {
   const { data: featuredPost, isLoading: featureLoading } =
@@ -32,6 +34,7 @@ const Hero = () => {
   const { data: tag } = usePopularTagQuery({});
   const { data: featuredAuthor } = useFeaturedAuthorQuery({});
   const { setActiveTab } = useUIStore();
+  const settings = useSelector(selectSettings);
 
   const author: IAuthor = featuredAuthor?.featuredAuthor;
   useEffect(() => {
@@ -42,7 +45,14 @@ const Hero = () => {
     <div className="min-h-screen pt-10 bg-gradient-to-b ">
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
-          <div className="bg-gradient-to-r from-fuchsia-500 to-pink-500 dark:from-fuchsia-600 dark:to-pink-600 rounded-lg shadow-xl p-8 md:p-12 text-white relative overflow-hidden">
+          <div
+            style={{
+              background: settings.heroImageUrl
+                ? `linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.1)), url(${settings.heroImageUrl}) center/cover no-repeat`
+                : `linear-gradient(to right, ${settings.gradientStart}, ${settings.gradientEnd})`,
+            }}
+            className=" rounded-lg shadow-xl p-8 md:p-12 text-white relative overflow-hidden"
+          >
             <div className="absolute inset-0 bg-black opacity-20"></div>
             <div className="relative z-10">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in-up">
@@ -222,7 +232,11 @@ const Hero = () => {
                     {author?._count.posts} Articles
                   </span>
                 </div>
-                <Button asChild variant="default" size="sm">
+                <Button
+                  asChild
+                  className="bg-accentColor hover:bg-accentColor/90"
+                  size="sm"
+                >
                   <Link href={`/profile/${author?.id}`}>View Profile</Link>
                 </Button>
               </div>

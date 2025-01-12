@@ -10,7 +10,6 @@ import settingsSlice from "./api/site/siteSlice";
 
 export const store = configureStore({
   reducer: {
-    settings: settingsSlice,
     [auth.reducerPath]: auth.reducer,
     [user.reducerPath]: user.reducer,
     [post.reducerPath]: post.reducer,
@@ -18,6 +17,7 @@ export const store = configureStore({
     [analytics.reducerPath]: analytics.reducer,
     [site.reducerPath]: site.reducer,
     authSlice: authSlice,
+    settings: settingsSlice,
   },
   middleware: (mid) =>
     mid()

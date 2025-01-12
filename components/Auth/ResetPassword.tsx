@@ -26,9 +26,9 @@ import { useForm } from "react-hook-form";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import Loader from "../Loader/Loader";
-import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useResetPasswordMutation } from "@/state/api/auth/authApi";
+import { isApiResponse } from "@/types/types";
 
 interface props {
   token: string;
@@ -49,8 +49,8 @@ export default function ResetPassword({ token }: props) {
   });
 
   useEffect(() => {
-    if (isError) {
-      setError(isError?.data?.message);
+    if (isApiResponse(isError)) {
+      setError(isError?.data.message);
     }
     if (isSuccess) {
       setSuccess(data.message);
@@ -71,10 +71,10 @@ export default function ResetPassword({ token }: props) {
   };
 
   return (
-    <div className="flex items-center  justify-center min-h-screen bg-gradient-to-br from-fuchsia-400 via-fuchsia-600 to-purple-800">
+    <div className="flex items-center  justify-center min-h-screen bgGradient">
       <Card className="w-full max-w-md backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center text-fuchsia-600">
+          <CardTitle className="text-2xl font-bold text-center text-accentColor">
             Reset Password
           </CardTitle>
           <CardDescription className="text-center ">
@@ -96,7 +96,7 @@ export default function ResetPassword({ token }: props) {
                           {...field}
                           disabled={isLoading}
                           type={"password"}
-                          className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                          className="focus:border-accentColor focus:ring-accentColor"
                         />
                       </FormControl>
                       <FormMessage />
@@ -114,7 +114,7 @@ export default function ResetPassword({ token }: props) {
                           {...field}
                           disabled={isLoading}
                           type={"password"}
-                          className="focus:border-fuchsia-600 focus:ring-fuchsia-600"
+                          className="focus:border-accentColor focus:ring-accentColor"
                         />
                       </FormControl>
                       <FormMessage />
@@ -127,7 +127,7 @@ export default function ResetPassword({ token }: props) {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-fuchsia-600 hover:bg-fuchsia-700 text-white"
+                  className="w-full bg-accentColor hover:bg-accentColor/90 text-white"
                 >
                   Reset Password {isLoading && <Loader isButton={true} />}
                 </Button>
@@ -138,7 +138,7 @@ export default function ResetPassword({ token }: props) {
         <CardFooter className="flex justify-center">
           <Link
             href="/login"
-            className="text-sm text-fuchsia-600 hover:underline"
+            className="text-sm text-accentColor hover:underline"
           >
             Back to Login
           </Link>
