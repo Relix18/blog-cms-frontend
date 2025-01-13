@@ -58,6 +58,9 @@ import { useAuthorRequestMutation } from "@/state/api/user/userApi";
 import { useToast } from "@/hooks/use-toast";
 import { selectSettings } from "@/state/api/site/siteSlice";
 import Image from "next/image";
+import socketIO from "socket.io-client";
+const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
+const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 type Props = {
   active?: number;
@@ -100,12 +103,17 @@ const Header = ({ active, isProfile }: Props) => {
 
   useEffect(() => {
     if (isSuccess) {
+      socketId.emit("notification", {
+        title: "New Author Request",
+        message: `You have a new author request by ${user?.name}`,
+        userId: user?.id,
+      });
       toast({ title: requestSuccess?.message });
     }
     if (isApiResponse(error)) {
       toast({ title: error.data.message });
     }
-  }, [isSuccess, error, requestSuccess, toast]);
+  }, [isSuccess, error, requestSuccess, toast, user]);
 
   const authorRequestHanlder = async () => {
     await authorRequest();
@@ -231,10 +239,10 @@ const Header = ({ active, isProfile }: Props) => {
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="outline"
-                    className="hidden md:flex items-center space-x-2 mr-4 text-accentColor"
+                    className="hidden md:flex items-center space-x-2  text-accentColor"
                   >
                     <PenTool className="h-4 w-4" />
-                    <span>Become an Author</span>
+                    <span className="hidden lg:flex">Become an Author</span>
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -255,7 +263,10 @@ const Header = ({ active, isProfile }: Props) => {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={authorRequestHanlder}>
+                    <AlertDialogAction
+                      className="bg-accentColor hover:bg-accentColor/90"
+                      onClick={authorRequestHanlder}
+                    >
                       Send Request
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -391,7 +402,10 @@ const Header = ({ active, isProfile }: Props) => {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={authorRequestHanlder}>
+                          <AlertDialogAction
+                            className="bg-accentColor hover:bg-accentColor/90"
+                            onClick={authorRequestHanlder}
+                          >
                             Send Request
                           </AlertDialogAction>
                         </AlertDialogFooter>

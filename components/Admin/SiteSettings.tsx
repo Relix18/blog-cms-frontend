@@ -128,7 +128,6 @@ export default function SiteSettings() {
       heroImage,
     };
     await updateSettings(allData);
-    console.log(allData);
   };
 
   return (

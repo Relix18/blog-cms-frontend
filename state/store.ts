@@ -6,6 +6,7 @@ import { post } from "./api/post/postApi";
 import { feature } from "./api/feature/featureApi";
 import { analytics } from "./api/analytics/analyticsApi";
 import { site } from "./api/site/siteApi";
+import { notification } from "./api/notification/notificationApi";
 import settingsSlice from "./api/site/siteSlice";
 
 export const store = configureStore({
@@ -16,6 +17,7 @@ export const store = configureStore({
     [feature.reducerPath]: feature.reducer,
     [analytics.reducerPath]: analytics.reducer,
     [site.reducerPath]: site.reducer,
+    [notification.reducerPath]: notification.reducer,
     authSlice: authSlice,
     settings: settingsSlice,
   },
@@ -26,5 +28,6 @@ export const store = configureStore({
       .concat(post.middleware)
       .concat(feature.middleware)
       .concat(analytics.middleware)
-      .concat(site.middleware),
+      .concat(site.middleware)
+      .concat(notification.middleware),
 });

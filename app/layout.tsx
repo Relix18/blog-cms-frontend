@@ -3,6 +3,7 @@
 import type { AppProps } from "next/app";
 import localFont from "next/font/local";
 import "./globals.css";
+import { useEffect } from "react";
 import { ThemeProvider } from "../utils/ThemeProvider";
 import Loader from "@/components/Loader/Loader";
 import { SessionProvider } from "next-auth/react";
@@ -12,6 +13,9 @@ import { useGetUserQuery } from "@/state/api/user/userApi";
 import { Toaster } from "@/components/ui/toaster";
 import GlobalStyles from "@/utils/GlobalStyles";
 import { selectSettings } from "@/state/api/site/siteSlice";
+import socketIO from "socket.io-client";
+const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
+const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -58,6 +62,10 @@ export default function RootLayout({
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading } = useGetUserQuery({});
   const settings = useSelector(selectSettings);
+
+  useEffect(() => {
+    socketId.on("connection", () => {});
+  }, []);
 
   return <>{!settings || isLoading ? <Loader /> : <>{children}</>}</>;
 };

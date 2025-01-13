@@ -210,6 +210,17 @@ export interface ISiteSettings {
   updatedAt: Date;
 }
 
+export interface INotification {
+  id: string;
+  title: string;
+  message: string;
+  userId: string;
+  user: IUser;
+  isRead: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export function isApiResponse(error: unknown): error is ApiErrorResponse {
   return (
     typeof error === "object" &&

@@ -308,7 +308,7 @@ export default function Users() {
     },
     {
       accessorKey: "updatedAt",
-      header: "Created At",
+      header: "Updated At",
       cell: ({ row }) => (
         <div>{format(row.getValue("updatedAt"), "yyyy-MM-dd")}</div>
       ),
