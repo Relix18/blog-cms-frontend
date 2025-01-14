@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,6 @@ import {
   useCreatePostMutation,
   useGetCategoryQuery,
   useGetTagsQuery,
-  usePublishPostMutation,
 } from "@/state/api/post/postApi";
 import { useToast } from "@/hooks/use-toast";
 import Loader from "@/components/Loader/Loader";
@@ -44,35 +43,15 @@ interface TagResponse {
 export default function CreateNewPost() {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const { data: category } = useGetCategoryQuery(undefined, {
-    skip: false,
-  });
-  const { data: tag } = useGetTagsQuery(undefined, {
-    skip: false,
-  }) as { data: TagResponse };
+  const { data: category } = useGetCategoryQuery(undefined);
+  const { data: tag } = useGetTagsQuery(undefined) as { data: TagResponse };
   const [categories, setCategories] = useState<Option[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Option | null>(null);
   const [tags, setTags] = useState<Option[]>([]);
   const [selectedTags, setSelectedTags] = useState<Option[]>([]);
-  const [submitAction, setSubmitAction] = useState<"Draft" | "Publish">(
-    "Draft"
-  );
-  const [creatPost, { isLoading, isSuccess, error }] = useCreatePostMutation();
-  const [
-    publishPost,
-    { isLoading: publishLoading, isSuccess: isPublished, error: publishError },
-  ] = usePublishPostMutation();
+  const [createPost, { isLoading: creating }] = useCreatePostMutation();
   const { toast } = useToast();
   const router = useRouter();
-
-  useEffect(() => {
-    if (isPublished) {
-      toast({ title: "Post published successfully." });
-    }
-    if (isApiResponse(publishError)) {
-      toast({ title: publishError?.data?.message });
-    }
-  }, [isPublished, publishError, toast]);
 
   const postForm = useForm<z.infer<typeof PostSchema>>({
     resolver: zodResolver(PostSchema),
@@ -88,27 +67,16 @@ export default function CreateNewPost() {
   useEffect(() => {
     if (category) setCategories(category.categories as Option[]);
     if (tag) setTags(tag.tags);
+  }, [category, tag]);
 
-    if (isSuccess) {
-      toast({ title: "Post created and saved as draft." });
-      postForm.reset();
-      router.back();
-    }
-
-    if (isApiResponse(error)) {
-      toast({ title: error?.data?.message || "An error occurred." });
-    }
-  }, [isSuccess, error, toast, category, router, postForm, tag]);
-
-  const slug = (title: string) => {
-    return title
+  const slugify = (title: string) =>
+    title
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
       .replace(/^-+|-+$/g, "");
-  };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -116,11 +84,9 @@ export default function CreateNewPost() {
       try {
         const options = { maxWidthOrHeight: 800, useWebWorker: true };
         const compressedFile = await imageCompression(file, options);
-
         const base64 = await imageCompression.getDataUrlFromFile(
           compressedFile
         );
-
         setImage(compressedFile);
         setImagePreview(base64);
       } catch (error) {
@@ -140,23 +106,23 @@ export default function CreateNewPost() {
   const handleTagsChange = (selectedOptions: MultiValue<Option>) => {
     const selected = selectedOptions as Option[];
     setSelectedTags(selected);
-
     postForm.setValue(
       "tags",
       selected.map((option) => option.value)
     );
-
     selected.forEach((option) => {
-      if (!tags.some((tag) => tag.value === tag.value)) {
+      if (!tags.some((tag) => tag.value === option.value)) {
         setTags((prevTags) => [...prevTags, option]);
       }
     });
   };
 
-  const onSubmit = async (values: z.infer<typeof PostSchema>) => {
+  const onSubmit = async (values: z.infer<typeof PostSchema>, e: FormEvent) => {
+    const action = e?.nativeEvent?.submitter?.value;
+
     const formData = {
       ...values,
-      slug: slug(values.title),
+      slug: slugify(values.title),
       metaTitle: values.title,
       metaDescription: values.description,
       metaKeyword: selectedTags.map((tag) => tag.value).join(", "),
@@ -165,11 +131,24 @@ export default function CreateNewPost() {
       tags: selectedTags.map((tag) => tag.value),
     };
 
-    console.log(formData);
-    const { data } = await creatPost(formData);
+    console.log(action);
 
-    if (submitAction === "Publish" && data?.post?.id) {
-      await publishPost(data.post.id);
+    try {
+      if (action === "publish") {
+        const publishPost = { ...formData, publish: true };
+        await createPost(publishPost);
+        toast({ title: "Post published successfully." });
+      } else {
+        await createPost(formData);
+        toast({ title: "Post saved as draft successfully." });
+      }
+      postForm.reset();
+      router.back();
+    } catch (error) {
+      const message = isApiResponse(error)
+        ? error?.data?.message || "An error occurred."
+        : "An unexpected error occurred.";
+      toast({ title: message });
     }
   };
 
@@ -201,7 +180,7 @@ export default function CreateNewPost() {
                             <Input
                               {...field}
                               placeholder="Enter post title"
-                              disabled={isLoading}
+                              disabled={creating}
                               className="focus:border-accentColor focus:ring-accentColor"
                             />
                           </FormControl>
@@ -221,7 +200,7 @@ export default function CreateNewPost() {
                         <input
                           id="image"
                           type="file"
-                          disabled={isLoading}
+                          disabled={creating}
                           accept="image/*"
                           onChange={handleImageChange}
                           className="hidden"
@@ -268,7 +247,7 @@ export default function CreateNewPost() {
                           <FormControl>
                             <Controller
                               name="content"
-                              disabled={isLoading}
+                              disabled={creating}
                               control={postForm.control}
                               render={({ field }) => (
                                 <Editor
@@ -297,7 +276,7 @@ export default function CreateNewPost() {
                             <Input
                               {...field}
                               id="description"
-                              disabled={isLoading}
+                              disabled={creating}
                               placeholder="Enter a short description of your post"
                               className="focus:border-accentColor focus:ring-accentColor"
                             />
@@ -373,27 +352,21 @@ export default function CreateNewPost() {
                   <div className="flex justify-end space-x-4">
                     <Button
                       type="submit"
-                      onClick={() => {
-                        setSubmitAction("Draft");
-                        postForm.handleSubmit(onSubmit)();
-                      }}
-                      name="action"
                       variant="outline"
+                      name="action"
+                      value="draft"
+                      disabled={creating}
                     >
-                      Save as Draft {isLoading && <Loader isButton={true} />}
+                      Save as Draft {creating && <Loader isButton />}
                     </Button>
                     <Button
                       type="submit"
-                      onClick={() => {
-                        setSubmitAction("Publish");
-                        postForm.handleSubmit(onSubmit)();
-                      }}
+                      className="bg-accentColor hover:bg-accentColor/90 text-white"
                       name="action"
-                      className="bg-accentColor text-white hover:bg-accentColor/90"
+                      value="publish"
+                      disabled={creating}
                     >
-                      Publish Post{" "}
-                      {isLoading ||
-                        (publishLoading && <Loader isButton={true} />)}
+                      Publish Post {creating && <Loader isButton />}
                     </Button>
                   </div>
                 </form>

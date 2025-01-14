@@ -1,4 +1,4 @@
-import UserDetail from "@/components/Admin/UserDetail";
+import UserDetail from "@/components/Admin/User-Management/UserDetail";
 import React from "react";
 
 const page = () => {

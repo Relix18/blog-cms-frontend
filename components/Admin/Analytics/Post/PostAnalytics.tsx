@@ -4,8 +4,8 @@ import React from "react";
 import MultiplePost from "./MultiplePosts";
 import SinglePost from "./SinglePost";
 import { useGetPostAnalyticsQuery } from "@/state/api/analytics/analyticsApi";
-import Loader from "../Loader/Loader";
-import { Separator } from "../ui/separator";
+import Loader from "@/components/Loader/Loader";
+import { Separator } from "@/components/ui/separator";
 import PostChart from "./PostChart";
 
 export default function PostAnalytics() {

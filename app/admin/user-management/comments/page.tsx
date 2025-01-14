@@ -1,9 +1,7 @@
-import Comments from "@/components/Admin/Comments";
+import Comments from "@/components/Admin/User-Management/Comments";
 import React from "react";
 
-type Props = {};
-
-const page = (props: Props) => {
+const page = () => {
   return <Comments />;
 };
 

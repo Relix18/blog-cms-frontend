@@ -57,6 +57,14 @@ export const post = createApi({
       }),
       invalidatesTags: ["Post", "AuthorPost"],
     }),
+    deletePost: builder.mutation({
+      query: (id) => ({
+        url: `/delete-post/${id}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Post", "AuthorPost"],
+    }),
     getPosts: builder.query({
       query: () => ({
         url: "get-all-posts",
@@ -193,6 +201,7 @@ export const {
   useUnpublishPostMutation,
   useGetAuthorPostQuery,
   useGetPostsQuery,
+  useDeletePostMutation,
   useGetAllPostsQuery,
   useGetCategoryQuery,
   useGetTagsQuery,

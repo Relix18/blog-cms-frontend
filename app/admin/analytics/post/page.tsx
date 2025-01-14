@@ -1,4 +1,4 @@
-import PostAnalytics from "@/components/Admin/PostAnalytics";
+import PostAnalytics from "@/components/Admin/Analytics/Post/PostAnalytics";
 import React from "react";
 
 const page = () => {

@@ -1,4 +1,4 @@
-import SiteSettings from "@/components/Admin/SiteSettings";
+import SiteSettings from "@/components/Admin/Settings/SiteSettings";
 import React from "react";
 
 const page = () => {

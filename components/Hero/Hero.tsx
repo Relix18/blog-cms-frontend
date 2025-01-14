@@ -48,7 +48,7 @@ const Hero = () => {
           <div
             style={{
               background: settings.heroImageUrl
-                ? `linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.1)), url(${settings.heroImageUrl}) center/cover no-repeat`
+                ? `linear-gradient(to right,rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0)), url(${settings.heroImageUrl}) center/cover no-repeat`
                 : `linear-gradient(to right, ${settings.gradientStart}, ${settings.gradientEnd})`,
             }}
             className=" rounded-lg shadow-xl p-8 md:p-12 text-white relative overflow-hidden"

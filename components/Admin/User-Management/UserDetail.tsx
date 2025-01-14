@@ -45,7 +45,7 @@ import {
 } from "@/state/api/user/userApi";
 import { useParams } from "next/navigation";
 import { IPost, isApiResponse, IUser } from "@/types/types";
-import Loader from "../Loader/Loader";
+import Loader from "@/components/Loader/Loader";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 

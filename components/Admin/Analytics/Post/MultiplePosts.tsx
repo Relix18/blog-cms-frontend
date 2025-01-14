@@ -12,7 +12,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+
 import {
   Table,
   TableBody,
@@ -21,19 +23,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+import { MonthlyMetrics, MonthlyPostAnalytics } from "@/types/types";
+
 import {
-  DetailedPlatformUserAnalytics,
-  MonthlyUserActivity,
-} from "@/types/types";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { format } from "date-fns";
 
 type Posts = {
-  users: DetailedPlatformUserAnalytics;
+  posts: MonthlyPostAnalytics;
 };
 
-export const columns: ColumnDef<MonthlyUserActivity>[] = [
+export const columns: ColumnDef<MonthlyMetrics>[] = [
   {
     accessorKey: "month",
     header: ({ column }) => {
@@ -50,115 +56,115 @@ export const columns: ColumnDef<MonthlyUserActivity>[] = [
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <div className="font-medium">
-          {format(row.getValue("month"), "MMMM yy")}
+          {format(row.getValue("month"), "MMMM yyyy")}
         </div>
       </div>
     ),
   },
   {
-    accessorKey: "newUsers",
+    accessorKey: "posts",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          New Users
+          Total Posts
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("newUsers")}</div>
+        <div className="font-medium">{row.getValue("posts")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "activeUsers",
+    accessorKey: "views",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Active Users
+          Total Views
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("activeUsers")}</div>
+        <div className="font-medium">{row.getValue("views")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "newAuthors",
+    accessorKey: "likes",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          New Authors
+          Total Likes
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("activeUsers")}</div>
+        <div className="font-medium">{row.getValue("likes")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "interactions.views",
+    accessorKey: "comments",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Views
+          Total Comments
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("interactions_views")}</div>
+        <div className="font-medium">{row.getValue("comments")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "interactions.likes",
+    accessorKey: "replies",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Likes
+          Total Comments
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <div className="font-medium">{row.getValue("interactions_likes")}</div>
+        <div className="font-medium">{row.getValue("replies")}</div>
       </div>
     ),
   },
   {
-    accessorKey: "interactions.comments",
+    accessorKey: "viewsGrowth",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Comments
+          Views Growth
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -166,20 +172,20 @@ export const columns: ColumnDef<MonthlyUserActivity>[] = [
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <div className="font-medium">
-          {row.getValue("interactions_comments")}
+          {Math.floor(row.original.viewsGrowth || 0)}%
         </div>
       </div>
     ),
   },
   {
-    accessorKey: "interactions.replies",
+    accessorKey: "likesGrowth",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Replies
+          Likes Growth
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -187,26 +193,85 @@ export const columns: ColumnDef<MonthlyUserActivity>[] = [
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <div className="font-medium">
-          {row.getValue("interactions_replies")}
+          {Math.floor(row.original.likesGrowth || 0)}%
         </div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "commentsGrowth",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Comments Growth
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <div className="font-medium">
+          {Math.floor(row.original.commentsGrowth || 0)}%
+        </div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "repliesGrowth",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Replies Growth
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <div className="font-medium">
+          {Math.floor(row.original.repliesGrowth || 0)}%
+        </div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "totalEngagement",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Total Engagement
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <div className="font-medium">{row.getValue("totalEngagement")}</div>
       </div>
     ),
   },
 ];
 
-export default function UserActivity({ users }: Posts) {
-  const [data, setData] = useState<MonthlyUserActivity[]>([]);
+export default function MultiplePost({ posts }: Posts) {
+  const [data, setData] = useState<MonthlyMetrics[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  console.log(users);
-
   useEffect(() => {
-    setData(users?.allMonthlyActivity);
-  }, [users]);
+    setData(posts?.monthlyAnalytics);
+  }, [posts]);
 
   const table = useReactTable({
     data,
@@ -223,8 +288,8 @@ export default function UserActivity({ users }: Posts) {
   });
 
   return (
-    <div className="container px-2  mx-auto">
-      <div className="text-xl font-bold my-4">Monthly Breakdown Table</div>
+    <div className="container px-2 mx-auto">
+      <div className="text-xl font-bold my-4">Monthly Post Engagement</div>
       <div className="grid rounded-md border">
         <Table>
           <TableHeader>

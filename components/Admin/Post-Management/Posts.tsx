@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { format } from "date-fns";
+import React, { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,13 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ArrowUpDown,
-  ChevronDown,
-  MoreHorizontal,
-  X,
-  Check,
-} from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -44,6 +37,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  useDeletePostAdminMutation,
+  useGetAllPostsQuery,
+  useUnpublishPostMutation,
+} from "@/state/api/post/postApi";
+import Loader from "@/components/Loader/Loader";
+import { IPost, isApiResponse } from "@/types/types";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import Link from "next/link";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -53,37 +56,61 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { useEditTagMutation, useGetTagsQuery } from "@/state/api/post/postApi";
+} from "@/components/ui/select";
+import { SelectValue } from "@radix-ui/react-select";
 
-interface Tag {
-  id: number;
-  label: string;
-  value: string;
-  _count: { posts: number };
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const ActionCell = ({
-  tag,
-  onEdit,
-}: {
-  tag: Tag;
-  onEdit: (id: number) => void;
-}) => {
+const ActionCell = ({ post }: { post: IPost }) => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [Unpublish, { isSuccess, data, error, isLoading }] =
+    useUnpublishPostMutation();
+  const [
+    deletePost,
+    { isSuccess: deleteSuccess, error: deleteError, isLoading: deleteLoading },
+  ] = useDeletePostAdminMutation();
+  const [message, setMessage] = useState("");
+  const { toast } = useToast();
 
-  const handleDelete = () => {
-    console.log("Deleting tag:", tag.id);
+  const handleDelete = async () => {
+    await deletePost(post.id);
     setIsAlertOpen(false);
   };
+
+  const handleUnpublish = async () => {
+    const data = {
+      postId: post.id,
+      message,
+    };
+    await Unpublish(data);
+    setIsDialogOpen(false);
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast({ title: data.message });
+    }
+    if (isApiResponse(error)) {
+      toast({ variant: "destructive", title: error?.data.message });
+    }
+  }, [isSuccess, error, toast, data]);
+
+  useEffect(() => {
+    if (deleteSuccess) {
+      toast({ title: "Post deleted successfully" });
+    }
+    if (isApiResponse(deleteError)) {
+      toast({ variant: "destructive", title: deleteError?.data.message });
+    }
+  }, [deleteError, deleteSuccess, toast]);
 
   return (
     <>
@@ -97,39 +124,73 @@ const ActionCell = ({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(tag.id.toString())}
+            onClick={() => navigator.clipboard.writeText(post.id.toString())}
           >
-            Copy tag ID
+            Copy post ID
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => onEdit(tag.id)}>
-            Edit tag
-          </DropdownMenuItem>
+          <Link href={`/post/view/${post.slug}`}>
+            <DropdownMenuItem>View post</DropdownMenuItem>
+          </Link>
+          {post.published && (
+            <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+              Unpublish post
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             className="text-red-600"
             onClick={() => setIsAlertOpen(true)}
           >
-            Delete tag
+            Delete post
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
+      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You want to unpublish this post. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex flex-col">
+            <Label htmlFor="reason" className="mb-2">
+              Reason
+            </Label>
+            <Textarea
+              id="reason"
+              placeholder="reason..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleUnpublish}
+              disabled={message.length < 20}
+            >
+              Unpublish {isLoading && <Loader isButton={true} />}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the tag
-              and remove it from our servers.
+              You want to delete this post. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
               className="bg-destructive hover:bg-destructive/80"
+              onClick={handleDelete}
             >
-              Delete
+              Delete Post {deleteLoading && <Loader isButton={true} />}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -138,9 +199,120 @@ const ActionCell = ({
   );
 };
 
-export default function Tag() {
-  const [data, setData] = useState<Tag[]>([]);
+export const columns: ColumnDef<IPost>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "title",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Title
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("title")}</div>
+    ),
+  },
+  {
+    accessorKey: "category.label",
+    header: "Category",
+    cell: ({ row }) => <div>{row.getValue("category_label")}</div>,
+  },
+  {
+    accessorKey: "author.name",
+    header: "Author",
+    cell: ({ row }) => <div>{row.getValue("author_name")}</div>,
+  },
+  {
+    accessorKey: "publishedAt",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Published At
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div>{format(row.getValue("publishedAt"), "yyyy/MM/dd")}</div>
+    ),
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Created At
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div>{format(row.getValue("createdAt"), "yyyy/MM/dd")}</div>
+    ),
+  },
+  {
+    accessorKey: "views",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Views
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("views")}</div>,
+  },
+  {
+    accessorKey: "published",
+    header: "Status",
+    cell: ({ row }) => (
+      <Badge variant={row.original.published ? "default" : "secondary"}>
+        {row.getValue("published") ? "Published" : "Draft"}
+      </Badge>
+    ),
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => <ActionCell post={row.original} />,
+  },
+];
 
+export default function Posts() {
+  const [data, setData] = useState<IPost[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -148,201 +320,13 @@ export default function Tag() {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [globalFilter, setGlobalFilter] = useState("");
   const [rowSelection, setRowSelection] = useState({});
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editTag] = useEditTagMutation();
-
-  const columns: ColumnDef<Tag>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "label",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => {
-        const isEditing = editingId === row.original.id;
-        const [value, setValue] = useState(row.getValue("value"));
-        const [label, setLabel] = useState(row.getValue("label"));
-
-        useEffect(() => {
-          setValue(row.getValue("value"));
-          setLabel(row.getValue("label"));
-        }, [row]);
-
-        const onSave = async () => {
-          setData((prev) =>
-            prev.map((item) =>
-              item.id === row.original.id
-                ? { ...item, label: label as string }
-                : item
-            )
-          );
-          const data = {
-            id: row.original.id,
-            value,
-            label,
-          };
-          await editTag(data);
-          setEditingId(null);
-        };
-
-        if (isEditing) {
-          return (
-            <div className="flex items-center gap-2">
-              <Input
-                value={label as string}
-                onChange={(e) => setLabel(e.target.value)}
-                className="h-8 w-[180px]"
-              />
-              <Button size="icon" variant="ghost" onClick={onSave}>
-                <Check className="h-4 w-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setEditingId(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          );
-        }
-
-        return <div className="font-medium">{row.getValue("label")}</div>;
-      },
-    },
-    {
-      accessorKey: "value",
-      header: "Slug",
-      cell: ({ row }) => {
-        const isEditing = editingId === row.original.id;
-        const [value, setValue] = useState(row.getValue("value"));
-        const [label, setLabel] = useState(row.getValue("label"));
-
-        useEffect(() => {
-          setValue(row.getValue("value"));
-          setLabel(row.getValue("label"));
-        }, [row]);
-
-        const onSave = async () => {
-          setData((prev) =>
-            prev.map((item) =>
-              item.id === row.original.id
-                ? { ...item, value: value as string }
-                : item
-            )
-          );
-          const data = {
-            id: row.original.id,
-            value,
-            label,
-          };
-          await editTag(data);
-          setEditingId(null);
-        };
-
-        if (isEditing) {
-          return (
-            <div className="flex items-center gap-2">
-              <Input
-                value={value as string}
-                onChange={(e) => setValue(e.target.value)}
-                className="h-8 w-[180px]"
-              />
-              <Button size="icon" variant="ghost" onClick={onSave}>
-                <Check className="h-4 w-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setEditingId(null)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          );
-        }
-
-        return <div>{row.getValue("value")}</div>;
-      },
-    },
-
-    {
-      accessorKey: "postCount",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Post Count
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => <div>{row.getValue("postCount")}</div>,
-    },
-    {
-      accessorKey: "createdAt",
-      header: "Created At",
-      cell: ({ row }) => (
-        <div>{format(row.getValue("createdAt"), "yyyy-MM-dd")}</div>
-      ),
-    },
-    {
-      accessorKey: "updatedAt",
-      header: "Updated At",
-      cell: ({ row }) => (
-        <div>{format(row.getValue("updatedAt"), "yyyy-MM-dd")}</div>
-      ),
-    },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => (
-        <ActionCell
-          tag={row.original}
-          onEdit={() => setEditingId(row.original.id)}
-        />
-      ),
-    },
-  ];
-
-  const { data: tags } = useGetTagsQuery({});
+  const { data: posts } = useGetAllPostsQuery({});
 
   useEffect(() => {
-    const flattenedData = tags?.tags?.map((item: Tag) => ({
-      ...item,
-      postCount: item._count?.posts || 0,
-    }));
-    setData(flattenedData);
-  }, [tags]);
+    setData(posts?.posts);
+  }, [posts]);
 
   const table = useReactTable({
     data,
@@ -351,29 +335,37 @@ export default function Tag() {
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    onPaginationChange: setPagination,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const value = row.getValue(columnId);
+      return (
+        value !== null &&
+        value !== undefined &&
+        String(value).toLowerCase().includes(String(filterValue).toLowerCase())
+      );
+    },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
       pagination,
+      globalFilter,
     },
+    onGlobalFilterChange: setGlobalFilter,
   });
 
   return (
-    <div className="w-full px-2 mx-auto">
+    <div className="container px-2 mx-auto">
       <div className="flex items-center py-4 gap-2">
         <Input
-          placeholder="Filter tags..."
-          value={(table.getColumn("label")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("label")?.setFilterValue(event.target.value)
-          }
+          placeholder="Filter posts..."
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>

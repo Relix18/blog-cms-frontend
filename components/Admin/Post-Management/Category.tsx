@@ -59,7 +59,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import {
   useEditCategoryMutation,
   useGetCategoryQuery,
@@ -342,7 +342,7 @@ export default function Category() {
   const { data: categories } = useGetCategoryQuery({});
 
   useEffect(() => {
-    const flattenedData = categories?.categories?.map((item: Tag) => ({
+    const flattenedData = categories?.categories?.map((item: Category) => ({
       ...item,
       postCount: item._count?.post || 0,
     }));

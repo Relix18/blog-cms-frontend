@@ -3,11 +3,25 @@ import { TabsContent } from "../ui/tabs";
 import { Button } from "../ui/button";
 import { IPost, isApiResponse } from "@/types/types";
 import { format } from "date-fns";
-import { usePublishPostMutation } from "@/state/api/post/postApi";
+import {
+  useDeletePostMutation,
+  usePublishPostMutation,
+} from "@/state/api/post/postApi";
 import { ProfilePostLoader } from "../Loader/SkeletonLoader";
 import { useToast } from "@/hooks/use-toast";
 import Loader from "../Loader/Loader";
 import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
 
 type Props = {
   posts: IPost[];
@@ -18,11 +32,9 @@ const Drafts = ({ posts, isLoading }: Props) => {
   const [publishPost, { isLoading: publishLoading, isSuccess, error }] =
     usePublishPostMutation();
   const drafts = posts?.filter((post) => post.published === false);
+  const [deletePost, { isSuccess: deleteSuccess, error: deleteError }] =
+    useDeletePostMutation();
   const { toast } = useToast();
-
-  const publishHanlder = async (id: number) => {
-    await publishPost(id);
-  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -31,7 +43,20 @@ const Drafts = ({ posts, isLoading }: Props) => {
     if (isApiResponse(error)) {
       toast({ title: error?.data.message });
     }
-  }, [isSuccess, error, toast]);
+    if (deleteSuccess) {
+      toast({ title: "Post Deleted Successfully" });
+    }
+    if (isApiResponse(deleteError)) {
+      toast({ title: deleteError?.data.message });
+    }
+  }, [isSuccess, error, toast, deleteSuccess, deleteError]);
+
+  const publishHandler = async (id: number) => {
+    await publishPost(id);
+  };
+  const deleteHandler = async (id: number) => {
+    await deletePost(id);
+  };
 
   return (
     <TabsContent value="drafts" className="mt-10">
@@ -55,9 +80,41 @@ const Drafts = ({ posts, isLoading }: Props) => {
               </p>
               <div className="flex flex-wrap justify-between items-center gap-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  Last edited on June {format(post.updatedAt, "dd MMMM, yyyy")}
+                  Last edited on {format(post.updatedAt, "dd MMMM, yyyy")}
                 </span>
                 <div className="space-x-2">
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive border-destructive"
+                      >
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this draft post? This
+                          action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive hover:bg-destructive/80"
+                          onClick={() => deleteHandler(post.id)}
+                        >
+                          Delete Post
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+
                   <Button
                     variant="outline"
                     size="sm"
@@ -68,7 +125,7 @@ const Drafts = ({ posts, isLoading }: Props) => {
                   <Button
                     variant="default"
                     size="sm"
-                    onClick={() => publishHanlder(post.id)}
+                    onClick={() => publishHandler(post.id)}
                     className="bg-accentColor text-white hover:bg-accentColor/90"
                   >
                     Publish {publishLoading && <Loader isButton={true} />}

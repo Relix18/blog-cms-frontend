@@ -1,4 +1,4 @@
-import GrowthReport from "@/components/Admin/GrowthReport";
+import GrowthReport from "@/components/Admin/Analytics/Growth/GrowthReport";
 import React from "react";
 
 const page = () => {

@@ -1,4 +1,4 @@
-import Category from "@/components/Admin/Category";
+import Category from "@/components/Admin/Post-Management/Category";
 import React from "react";
 
 type Props = {};

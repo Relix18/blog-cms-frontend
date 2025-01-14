@@ -2,7 +2,7 @@
 import { useGetUserAnalyticsQuery } from "@/state/api/analytics/analyticsApi";
 import React from "react";
 import UserChart from "./UserChart";
-import Loader from "../Loader/Loader";
+import Loader from "@/components/Loader/Loader";
 import UserActivity from "./UserActivity";
 
 const UserAnalytics = () => {

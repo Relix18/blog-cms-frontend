@@ -22,7 +22,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MonthlyPostAnalytics, SinglePostAnalytics } from "@/types/types";
-import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 
 type Posts = {

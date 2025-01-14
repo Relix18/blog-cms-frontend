@@ -31,9 +31,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
+} from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import Loader from "../Loader/Loader";
+import Loader from "@/components/Loader/Loader";
 
 export default function SiteSettings() {
   const [siteName, setSiteName] = useState("My Awesome Site");

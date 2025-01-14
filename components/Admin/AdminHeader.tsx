@@ -66,7 +66,7 @@ const AdminHeader = () => {
           <PopoverTrigger asChild>
             <Button className="relative" variant={"ghost"}>
               <Bell className="w-[16px]" />
-              {data?.notifications.length > 0 && (
+              {notification.length > 0 && (
                 <span className="absolute top-1 right-2 flex h-3 w-3">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accentColor opacity-80"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-accentColor"></span>
@@ -90,6 +90,11 @@ const AdminHeader = () => {
                   View All
                 </Button>
               </Link>
+              {notification.length === 0 && (
+                <div className="flex items-center justify-center my-10">
+                  No notification yet.
+                </div>
+              )}
               {notification.map((item: INotification) => (
                 <div key={item.id} className="mt-2">
                   <h5 className="text-sm font-medium">{item.title}</h5>

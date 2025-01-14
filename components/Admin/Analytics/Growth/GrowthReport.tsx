@@ -2,7 +2,7 @@
 import { useGetGrowthReportsQuery } from "@/state/api/analytics/analyticsApi";
 import React from "react";
 import GrowthChart from "./GrowthChart";
-import Loader from "../Loader/Loader";
+import Loader from "@/components/Loader/Loader";
 
 const GrowthReport = () => {
   const { data, isLoading } = useGetGrowthReportsQuery({});

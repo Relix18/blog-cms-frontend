@@ -11,6 +11,7 @@ import {
   LucideContact,
   Menu,
   PenTool,
+  PlusSquare,
   UserCircle,
 } from "lucide-react";
 import Link from "next/link";
@@ -59,6 +60,12 @@ import { useToast } from "@/hooks/use-toast";
 import { selectSettings } from "@/state/api/site/siteSlice";
 import Image from "next/image";
 import socketIO from "socket.io-client";
+import { Separator } from "./ui/separator";
+import {
+  MdDashboard,
+  MdOutlineAnalytics,
+  MdOutlineDashboard,
+} from "react-icons/md";
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
@@ -376,6 +383,7 @@ const Header = ({ active, isProfile }: Props) => {
                   >
                     <LucideContact className="mr-2 h-5 w-5" /> Contact
                   </Link>
+                  <Separator />
                   {user?.role === "USER" && (
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -411,6 +419,32 @@ const Header = ({ active, isProfile }: Props) => {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                  )}
+                  {user?.role !== "USER" && (
+                    <div className="flex flex-col gap-4">
+                      <Link
+                        href="/admin/dashboard"
+                        className={`${
+                          user?.role !== "ADMIN" && "hidden"
+                        } text-gray-600 flex dark:text-gray-300 hover:text-accentColor dark:hover:text-accentColor/80`}
+                      >
+                        <MdOutlineDashboard className="h-5 w-5 mr-2" />{" "}
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/post/new-post"
+                        className="text-gray-600 flex dark:text-gray-300 hover:text-accentColor dark:hover:text-accentColor/80   "
+                      >
+                        <PlusSquare className="h-5 w-5 mr-2" /> New Post
+                      </Link>
+                      <Link
+                        href="/author/analytics"
+                        className="flex text-gray-600 dark:text-gray-300 hover:text-accentColor dark:hover:text-accentColor/80   "
+                      >
+                        <MdOutlineAnalytics className="h-5 w-5 mr-2" />{" "}
+                        Analytics
+                      </Link>
+                    </div>
                   )}
                 </nav>
 
