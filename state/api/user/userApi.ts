@@ -4,7 +4,7 @@ import { login } from "../auth/authSlice";
 export const user = createApi({
   reducerPath: "user",
   baseQuery: fetchBaseQuery({
-    baseUrl: `http://localhost:4000/api/v1/`,
+    baseUrl: process.env.NEXT_PUBLIC_SERVER_URL,
   }),
   tagTypes: ["User", "Users"],
   endpoints: (builder) => ({
@@ -55,6 +55,13 @@ export const user = createApi({
         method: "PUT",
         body: data,
         credentials: "include",
+      }),
+    }),
+    contactUs: builder.mutation({
+      query: (data) => ({
+        url: "contact-us",
+        method: "POST",
+        body: data,
       }),
     }),
     authorRequest: builder.mutation({
@@ -112,6 +119,7 @@ export const {
   useUpdateProfileMutation,
   useUpdateAvatarMutation,
   useChangePasswordMutation,
+  useContactUsMutation,
   useAuthorRequestMutation,
   useGetAllUserQuery,
   useGetAllCommentsQuery,

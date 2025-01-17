@@ -130,3 +130,16 @@ export const SiteSettingSchema = z.object({
   heroTitle: z.string().min(20, "Title must be atleast 20 characters"),
   siteName: z.string().min(3, "Site name is required"),
 });
+
+export const contactSchema = z.object({
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+
+  message: z.string().min(10, {
+    message: "Message must be at least 10 characters.",
+  }),
+});

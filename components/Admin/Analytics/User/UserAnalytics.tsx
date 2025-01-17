@@ -7,7 +7,6 @@ import UserActivity from "./UserActivity";
 
 const UserAnalytics = () => {
   const { data, isLoading } = useGetUserAnalyticsQuery({});
-  console.log(data);
 
   if (isLoading) return <Loader />;
 

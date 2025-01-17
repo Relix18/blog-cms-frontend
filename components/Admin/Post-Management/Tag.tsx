@@ -81,7 +81,6 @@ const ActionCell = ({
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const handleDelete = () => {
-    console.log("Deleting tag:", tag.id);
     setIsAlertOpen(false);
   };
 

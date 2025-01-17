@@ -90,53 +90,76 @@ export function FeaturedPostLoader() {
 }
 export function FilterPostLoader() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div className="space-y-2">
-        <Skeleton className="h-48" />
-        <div className="py-2 space-y-2 px-4">
-          <Skeleton className="h-7" />
-          <div className="py-2 space-y-2">
-            <Skeleton className="h-5" />
-            <Skeleton className="h-5" />
-            <Skeleton className="h-5" />
-            <Skeleton className="h-5" />
-          </div>
-          <div className="flex justify-between">
-            <Skeleton className="h-5 w-20" />
-            <Skeleton className="h-5 w-20" />
+    <div className="min-h-screen pt-10">
+      <main className="container mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row gap-8">
+          <aside className="w-full md:w-1/4 hidden md:block">
+            <Skeleton className="w-full h-[300px]" />
+          </aside>
+          <div className="w-full md:w-3/4">
+            <div className="flex flex-col gap-4 mb-6">
+              <div className="flex flex-wrap items-center justify-between md:justify-end gap-2">
+                <div className="md:hidden block w-full">
+                  <Skeleton className="w-full h-[50px]" />
+                </div>
+                <div className="flex w-full gap-2 md:justify-end justify-between">
+                  <Skeleton className="md:w-1/5 w-1/4 h-[50px]" />
+                  <Skeleton className="w-1/12 h-[50px]" />
+                </div>
+              </div>
+              <Skeleton className="h-[50px] w-1/3 md:1/4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="space-y-2">
+                  <Skeleton className="h-48" />
+                  <div className="py-2 space-y-2 px-4">
+                    <Skeleton className="h-7" />
+                    <div className="py-2 space-y-2">
+                      <Skeleton className="h-5" />
+                      <Skeleton className="h-5" />
+                      <Skeleton className="h-5" />
+                      <Skeleton className="h-5" />
+                    </div>
+                    <div className="flex justify-between">
+                      <Skeleton className="h-5 w-20" />
+                      <Skeleton className="h-5 w-20" />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-48" />
+                  <div className="py-2 space-y-2 px-4">
+                    <Skeleton className="h-7" />
+                    <div className="py-2 space-y-2">
+                      <Skeleton className="h-5" />
+                      <Skeleton className="h-5" />
+                      <Skeleton className="h-5" />
+                    </div>
+                    <div className="flex justify-between">
+                      <Skeleton className="h-5 w-20" />
+                      <Skeleton className="h-5 w-20" />
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-48" />
+                  <div className="py-2 space-y-2 px-4">
+                    <Skeleton className="h-7" />
+                    <div className="py-2 space-y-2">
+                      <Skeleton className="h-5" />
+                      <Skeleton className="h-5" />
+                      <Skeleton className="h-5" />
+                    </div>
+                    <div className="flex justify-between">
+                      <Skeleton className="h-5 w-20" />
+                      <Skeleton className="h-5 w-20" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-48" />
-        <div className="py-2 space-y-2 px-4">
-          <Skeleton className="h-7" />
-          <div className="py-2 space-y-2">
-            <Skeleton className="h-5" />
-            <Skeleton className="h-5" />
-            <Skeleton className="h-5" />
-          </div>
-          <div className="flex justify-between">
-            <Skeleton className="h-5 w-20" />
-            <Skeleton className="h-5 w-20" />
-          </div>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-48" />
-        <div className="py-2 space-y-2 px-4">
-          <Skeleton className="h-7" />
-          <div className="py-2 space-y-2">
-            <Skeleton className="h-5" />
-            <Skeleton className="h-5" />
-            <Skeleton className="h-5" />
-          </div>
-          <div className="flex justify-between">
-            <Skeleton className="h-5 w-20" />
-            <Skeleton className="h-5 w-20" />
-          </div>
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

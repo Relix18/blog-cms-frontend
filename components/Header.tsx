@@ -61,11 +61,7 @@ import { selectSettings } from "@/state/api/site/siteSlice";
 import Image from "next/image";
 import socketIO from "socket.io-client";
 import { Separator } from "./ui/separator";
-import {
-  MdDashboard,
-  MdOutlineAnalytics,
-  MdOutlineDashboard,
-} from "react-icons/md";
+import { MdOutlineAnalytics, MdOutlineDashboard } from "react-icons/md";
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
@@ -186,7 +182,7 @@ const Header = ({ active, isProfile }: Props) => {
                     {categories?.categories.map((category: Option) => (
                       <NavigationMenuLink asChild key={category.id}>
                         <Link
-                          href={`filter?categories=${category.label}`}
+                          href={`/filter?categories=${category.label}`}
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline min-w-40 outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
                         >
                           <div className="text-sm font-medium leading-none">
@@ -200,8 +196,12 @@ const Header = ({ active, isProfile }: Props) => {
               </NavigationMenuList>
             </NavigationMenu>
             <Link
-              href="#"
-              className="text-gray-600 dark:text-gray-300 hover:text-accentColor/80 dark:hover:text-accentColor"
+              href="/contact"
+              className={
+                active === 3
+                  ? "text-accentColor "
+                  : "text-gray-600 dark:text-gray-300 hover:text-accentColor/80 dark:hover:text-accentColor"
+              }
             >
               Contact
             </Link>
@@ -378,7 +378,7 @@ const Header = ({ active, isProfile }: Props) => {
                     </NavigationMenuList>
                   </NavigationMenu>
                   <Link
-                    href="/contact-us"
+                    href="/contact"
                     className="flex items-center text-gray-600 dark:text-gray-300 hover:text-accentColor/80 dark:hover:text-accentColor/80   "
                   >
                     <LucideContact className="mr-2 h-5 w-5" /> Contact

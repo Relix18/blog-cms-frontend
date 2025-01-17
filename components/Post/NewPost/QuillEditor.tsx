@@ -86,10 +86,8 @@ export default function Editor({ value, onChange }: EditorProps) {
         formats,
       });
 
-      // Set initial content in the editor
       quillInstance.clipboard.dangerouslyPasteHTML(value || "");
 
-      // Sync content changes with `onChange`
       quillInstance.on("text-change", () => {
         onChange(quillInstance.root.innerHTML);
       });
@@ -121,21 +119,20 @@ export default function Editor({ value, onChange }: EditorProps) {
       try {
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("upload_preset", "blog-post-images"); // Replace with your preset name
+        formData.append("upload_preset", "blog-post-images");
 
         const response = await axios.post(
-          "https://api.cloudinary.com/v1_1/dkjnrcbib/image/upload", // Replace with your Cloudinary URL
+          "https://api.cloudinary.com/v1_1/dkjnrcbib/image/upload",
           formData
         );
 
         const imageUrl = response.data.secure_url;
 
-        // Insert the uploaded image into the editor
         const range = quillInstance.getSelection();
         if (range) {
           quillInstance.insertEmbed(range.index, "image", imageUrl);
         } else {
-          quillInstance.insertEmbed(0, "image", imageUrl); // Default insertion
+          quillInstance.insertEmbed(0, "image", imageUrl);
         }
       } catch (error) {
         console.error("Image upload failed:", error);

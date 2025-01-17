@@ -21,6 +21,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
   useGetCategoryQuery,
   useGetPostsQuery,
   useGetTagsQuery,
@@ -38,7 +47,7 @@ export default function BlogFilterPage() {
   const [sortBy, setSortBy] = useState("date");
   const [isGridView, setIsGridView] = useState(true);
   const [searchQuery, setSearchQuery] = useState<string | null>("");
-
+  const [currentPage, setCurrentPage] = useState(1);
   const { data: currentPosts, isLoading } = useGetPostsQuery({});
   const { data: categoriesList } = useGetCategoryQuery({});
   const { data: tagsList } = useGetTagsQuery({});
@@ -141,55 +150,69 @@ export default function BlogFilterPage() {
     })
     ?.sort((a, b) => (sortPosts([a, b])[0] === a ? -1 : 1));
 
+  const ITEMS_PER_PAGE = 15;
+  const totalPages = Math.ceil(filteredPosts?.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentItems = filteredPosts?.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  if (isLoading) return <FilterPostLoader />;
+
   return (
     <div className="min-h-screen pt-10">
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           <aside className="w-full md:w-1/4 hidden md:block">
-            <div className="md:sticky md:top-20 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                Categories
-              </h2>
+            <div className="md:sticky md:top-20  bg-white dark:bg-gray-800 rounded-lg shadow">
+              <div className="px-4 py-2">
+                <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                  Categories
+                </h2>
 
-              <div className="space-y-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
-                {categories.map((category: string) => (
-                  <div key={category} className="flex items-center">
-                    <Checkbox
-                      id={category}
-                      checked={selectedCategories.includes(category)}
-                      onCheckedChange={() => toggleCategory(category)}
-                    />
-                    <label
-                      htmlFor={category}
-                      className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 dark:text-gray-300"
-                    >
-                      {category}
-                    </label>
-                  </div>
-                ))}
+                <div className="space-y-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
+                  {categories.map((category: string) => (
+                    <div key={category} className="flex items-center">
+                      <Checkbox
+                        id={category}
+                        checked={selectedCategories.includes(category)}
+                        onCheckedChange={() => toggleCategory(category)}
+                      />
+                      <label
+                        htmlFor={category}
+                        className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 dark:text-gray-300"
+                      >
+                        {category}
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="md:sticky md:top-20 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                Tags
-              </h2>
+              <div className="px-4 py-2">
+                <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                  Tags
+                </h2>
 
-              <div className="space-y-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
-                {tags.map((tag: string) => (
-                  <div key={tag} className="flex items-center">
-                    <Checkbox
-                      id={tag}
-                      checked={selectedTags.includes(tag)}
-                      onCheckedChange={() => toggleTags(tag)}
-                    />
-                    <label
-                      htmlFor={tag}
-                      className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 dark:text-gray-300"
-                    >
-                      {tag}
-                    </label>
-                  </div>
-                ))}
+                <div className="space-y-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
+                  {tags.map((tag: string) => (
+                    <div key={tag} className="flex items-center">
+                      <Checkbox
+                        id={tag}
+                        checked={selectedTags.includes(tag)}
+                        onCheckedChange={() => toggleTags(tag)}
+                      />
+                      <label
+                        htmlFor={tag}
+                        className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 dark:text-gray-300"
+                      >
+                        {tag}
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </aside>
@@ -221,6 +244,26 @@ export default function BlogFilterPage() {
                               className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 dark:text-gray-300"
                             >
                               {category}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      <DialogHeader>
+                        <DialogTitle>Filter by Tag</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+                        {tags.map((tag: string) => (
+                          <div key={tag} className="flex items-center">
+                            <Checkbox
+                              id={`mobile-${tag}`}
+                              checked={selectedCategories.includes(tag)}
+                              onCheckedChange={() => toggleCategory(tag)}
+                            />
+                            <label
+                              htmlFor={`mobile-${tag}`}
+                              className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 dark:text-gray-300"
+                            >
+                              {tag}
                             </label>
                           </div>
                         ))}
@@ -258,59 +301,113 @@ export default function BlogFilterPage() {
                 Blog Posts
               </h1>
             </div>
-
-            {isLoading ? (
-              <FilterPostLoader />
-            ) : (
-              <div
-                className={`grid gap-6 ${
-                  isGridView
-                    ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-                    : "grid-cols-1"
-                }`}
-              >
-                {filteredPosts?.map((post: IPost) => (
-                  <div
-                    key={post.id}
-                    className={`bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden ${
-                      isGridView ? "" : "flex"
-                    }`}
-                  >
-                    <Image
-                      src={post.featuredImage}
-                      alt={post.title}
-                      width={400}
-                      height={200}
-                      className={`object-cover ${
-                        isGridView ? "w-full h-48" : "w-1/3 h-full"
-                      }`}
-                    />
-                    <Link href={`post/view/${post.slug}`}>
-                      <div className="p-4">
-                        <h2 className="text-xl line-clamp-2 font-semibold mb-2 text-gray-900 dark:text-white">
-                          {post.title}
-                        </h2>
-                        <p className="text-gray-600 line-clamp-4 dark:text-gray-400 mb-4">
-                          {post.description}
-                        </p>
-                        <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                          <span className="font-bold">{post.author.name}</span>
-                          <span>
-                            {formatDistanceStrict(
-                              post.publishedAt,
-                              new Date(),
-                              {
-                                addSuffix: true,
-                              }
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
+            {currentItems?.length === 0 && (
+              <div className="w-full text-center text-muted-foreground font-semibold text-lg">
+                No post found.
               </div>
             )}
+
+            <div
+              className={`grid gap-6 ${
+                isGridView
+                  ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                  : "grid-cols-1"
+              }`}
+            >
+              {currentItems?.map((post: IPost) => (
+                <div
+                  key={post.id}
+                  className={`bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden ${
+                    isGridView ? "" : "flex"
+                  }`}
+                >
+                  <Image
+                    src={post.featuredImage}
+                    alt={post.title}
+                    width={400}
+                    height={200}
+                    className={`object-cover ${
+                      isGridView ? "w-full h-48" : "w-1/3 h-full"
+                    }`}
+                  />
+                  <Link href={`post/view/${post.slug}`}>
+                    <div className="p-4">
+                      <h2 className="text-xl line-clamp-2 font-semibold mb-2 text-gray-900 dark:text-white">
+                        {post.title}
+                      </h2>
+                      <p className="text-gray-600 line-clamp-4 dark:text-gray-400 mb-4">
+                        {post.description}
+                      </p>
+                      <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
+                        <span className="font-bold">{post.author.name}</span>
+                        <span>
+                          {formatDistanceStrict(post.publishedAt, new Date(), {
+                            addSuffix: true,
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+
+            <Pagination className="mt-10">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage > 1) handlePageChange(currentPage - 1);
+                    }}
+                  />
+                </PaginationItem>
+                {[...Array(totalPages)].map((_, index) => {
+                  const page = index + 1;
+                  if (
+                    page === 1 ||
+                    page === totalPages ||
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+                  ) {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          href="#"
+                          isActive={page === currentPage}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(page);
+                          }}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  } else if (
+                    (page === currentPage - 2 && currentPage > 3) ||
+                    (page === currentPage + 2 && currentPage < totalPages - 2)
+                  ) {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    );
+                  }
+                  return null;
+                })}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage < totalPages)
+                        handlePageChange(currentPage + 1);
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         </div>
       </main>

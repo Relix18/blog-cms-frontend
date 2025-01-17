@@ -52,7 +52,6 @@ const chartGrowthConfig: ChartConfig = {
 };
 
 const GrowthChart = ({ userGrowth, postGrowth }: GrowthChartProps) => {
-  // Combine data for the chart
   const chartData = useMemo(() => {
     const allMonths = Array.from(
       new Set([...userGrowth, ...postGrowth].map((item) => item.month))

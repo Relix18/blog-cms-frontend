@@ -84,7 +84,6 @@ const ActionCell = ({
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const handleDelete = () => {
-    console.log("Deleting category:", category.id);
     setIsAlertOpen(false);
   };
 

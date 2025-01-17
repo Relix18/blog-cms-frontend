@@ -4,9 +4,7 @@ import NewPost from "@/components/Post/NewPost/NewPost";
 import Heading from "@/utils/Heading";
 import React from "react";
 
-type Props = {};
-
-const page = (props: Props) => {
+const page = () => {
   return (
     <>
       <AuthorOrAdminProtected>

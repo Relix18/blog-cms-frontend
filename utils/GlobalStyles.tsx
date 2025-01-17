@@ -43,10 +43,6 @@ const GlobalStyles = () => {
         "--accent-color",
         hexToHSL(settings.accentColor) || "292 84.1% 60.6%"
       );
-      // document.documentElement.style.setProperty(
-      //   "--bg-gradient",
-      //   `linear-gradient(to right, ${settings.gradientStart}, ${settings.gradientEnd})`
-      // );
     }
   }, [settings, isLoading]);
 

@@ -96,14 +96,14 @@ const Profile = () => {
 
   const getTotalLikes = (post: IPost[]) => {
     return post
-      ?.map((post) => post.likes?.length || 0) // Get the count of likes for each post
-      .reduce((sum, likeCount) => sum + likeCount, 0); // Sum up all like counts
+      ?.map((post) => post.likes?.length || 0)
+      .reduce((sum, likeCount) => sum + likeCount, 0);
   };
 
   const getTotalComment = (post: IPost[]) => {
     return post
-      ?.map((post) => post.comments?.length || 0) // Get the count of likes for each post
-      .reduce((sum, commentCount) => sum + commentCount, 0); // Sum up all like counts
+      ?.map((post) => post.comments?.length || 0)
+      .reduce((sum, commentCount) => sum + commentCount, 0);
   };
 
   return (

@@ -159,8 +159,6 @@ export default function SinglePost({ posts }: Posts) {
     pageSize: 10,
   });
 
-  console.log(posts);
-
   useEffect(() => {
     setData(posts?.postAnalytics);
   }, [posts]);

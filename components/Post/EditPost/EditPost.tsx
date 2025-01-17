@@ -192,7 +192,6 @@ export default function EditPost({ slug }: Props) {
     };
 
     await updatePost(data);
-    console.log("Updated Post Data:", formData);
   };
 
   return (

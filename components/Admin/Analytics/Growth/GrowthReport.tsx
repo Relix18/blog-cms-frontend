@@ -8,7 +8,6 @@ const GrowthReport = () => {
   const { data, isLoading } = useGetGrowthReportsQuery({});
 
   if (isLoading) return <Loader />;
-  console.log(data);
   return (
     <div className="container m-auto rounded-lg px-4 py-8 min-h-screen">
       <GrowthChart

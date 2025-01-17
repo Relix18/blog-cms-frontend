@@ -131,8 +131,6 @@ export default function CreateNewPost() {
       tags: selectedTags.map((tag) => tag.value),
     };
 
-    console.log(action);
-
     try {
       if (action === "publish") {
         const publishPost = { ...formData, publish: true };

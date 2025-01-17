@@ -207,8 +207,6 @@ export default function UserActivity({ users }: Posts) {
     pageSize: 10,
   });
 
-  console.log(users);
-
   useEffect(() => {
     setData(users?.allMonthlyActivity);
   }, [users]);

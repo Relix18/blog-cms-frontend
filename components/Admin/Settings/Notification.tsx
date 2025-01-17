@@ -33,7 +33,6 @@ const Notification = () => {
     }
   }, [isSuccess, updated, toast, markedAll, markedAllSuccess]);
 
-  console.log(data);
   if (data?.notifications.length === 0) {
     return <div className="text-center">No notifications</div>;
   }

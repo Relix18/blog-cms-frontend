@@ -95,7 +95,6 @@ const ActionCell = ({
 
   const handleDelete = async () => {
     await deleteUser(user.id);
-    console.log("Deleting user:", user.id);
     setIsAlertOpen(false);
   };
 

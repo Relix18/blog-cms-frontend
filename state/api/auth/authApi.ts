@@ -4,7 +4,7 @@ import { login, logout } from "./authSlice";
 export const auth = createApi({
   reducerPath: "auth",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:4000/api/v1/",
+    baseUrl: process.env.NEXT_PUBLIC_SERVER_URL,
   }),
   endpoints: (builder) => ({
     register: builder.mutation({

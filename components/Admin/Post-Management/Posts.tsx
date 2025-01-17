@@ -77,7 +77,7 @@ const ActionCell = ({ post }: { post: IPost }) => {
     deletePost,
     { isSuccess: deleteSuccess, error: deleteError, isLoading: deleteLoading },
   ] = useDeletePostAdminMutation();
-  const [message, setMessage] = useState("");
+  const [reason, setReason] = useState("");
   const { toast } = useToast();
 
   const handleDelete = async () => {
@@ -88,7 +88,7 @@ const ActionCell = ({ post }: { post: IPost }) => {
   const handleUnpublish = async () => {
     const data = {
       postId: post.id,
-      message,
+      reason,
     };
     await Unpublish(data);
     setIsDialogOpen(false);
@@ -161,15 +161,15 @@ const ActionCell = ({ post }: { post: IPost }) => {
             <Textarea
               id="reason"
               placeholder="reason..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
             />
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleUnpublish}
-              disabled={message.length < 20}
+              disabled={reason.length < 20}
             >
               Unpublish {isLoading && <Loader isButton={true} />}
             </AlertDialogAction>
