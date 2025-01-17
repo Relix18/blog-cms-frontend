@@ -187,7 +187,7 @@ export default function Tag() {
       cell: ({ row }) => {
         const isEditing = editingId === row.original.id;
         const [value, setValue] = useState(row.getValue("value"));
-        const [label, setLabel] = useState(row.getValue("label"));
+        const [label, setLabel] = useState<string>(row.getValue("label"));
 
         useEffect(() => {
           setValue(row.getValue("value"));
@@ -197,9 +197,7 @@ export default function Tag() {
         const onSave = async () => {
           setData((prev) =>
             prev.map((item) =>
-              item.id === row.original.id
-                ? { ...item, label: label as string }
-                : item
+              item.id === row.original.id ? { ...item, label: label } : item
             )
           );
           const data = {
@@ -241,7 +239,7 @@ export default function Tag() {
       header: "Slug",
       cell: ({ row }) => {
         const isEditing = editingId === row.original.id;
-        const [value, setValue] = useState(row.getValue("value"));
+        const [value, setValue] = useState<string>(row.getValue("value"));
         const [label, setLabel] = useState(row.getValue("label"));
 
         useEffect(() => {
@@ -252,9 +250,7 @@ export default function Tag() {
         const onSave = async () => {
           setData((prev) =>
             prev.map((item) =>
-              item.id === row.original.id
-                ? { ...item, value: value as string }
-                : item
+              item.id === row.original.id ? { ...item, value: value } : item
             )
           );
           const data = {
