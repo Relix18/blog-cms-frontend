@@ -42,7 +42,7 @@ const Notification = () => {
   };
 
   const handleMarkAllAsRead = async () => {
-    await markAll();
+    await markAll({});
   };
 
   return (
