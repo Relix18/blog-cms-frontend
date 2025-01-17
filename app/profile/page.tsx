@@ -7,7 +7,7 @@ import Heading from "@/utils/Heading";
 import { useSelector } from "react-redux";
 import { getLoggedUser } from "@/state/api/auth/authSlice";
 
-const page = () => {
+const Page = () => {
   const user = useSelector(getLoggedUser);
 
   return (
@@ -25,4 +25,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

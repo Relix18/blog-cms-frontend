@@ -1,8 +1,15 @@
+"use client";
 import ResetPassword from "@/components/Auth/ResetPassword";
 import Heading from "@/utils/Heading";
 import React from "react";
 
-const page = ({ params }: any) => {
+interface Props {
+  params: Promise<{ token: string }>;
+}
+
+const Page = ({ params }: Props) => {
+  const { token } = React.use(params);
+
   return (
     <>
       <Heading
@@ -10,9 +17,9 @@ const page = ({ params }: any) => {
         description="OrbitBlog is a blog site with good looking UI design."
         keywords="OrbitBlog, reset, resetpassword, password, change"
       />
-      <ResetPassword token={params.token} />
+      <ResetPassword token={token} />
     </>
   );
 };
 
-export default page;
+export default Page;

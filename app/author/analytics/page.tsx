@@ -9,7 +9,7 @@ import Heading from "@/utils/Heading";
 import React from "react";
 import { useSelector } from "react-redux";
 
-const page = () => {
+const Page = () => {
   const user = useSelector(getLoggedUser);
   return (
     <>
@@ -28,4 +28,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

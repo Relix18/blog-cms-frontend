@@ -48,11 +48,11 @@ const AdminHeader = () => {
       audio.play();
     };
 
-    socketId.on("newNotification", (data) => {
+    socketId.on("newNotification", () => {
       refetch();
       playAudio();
     });
-  }, []);
+  }, [audio, refetch]);
 
   const updateNotificationHandler = async (id: string) => {
     await updateNotification(id);
