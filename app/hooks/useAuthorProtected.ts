@@ -11,7 +11,7 @@ interface Props {
 const AuthorOrAdminProtected = ({ children }: Props) => {
   const user = useSelector(getLoggedUser);
 
-  if (user.role === "AUTHOR" || user.role === "ADMIN") {
+  if (user?.role === "AUTHOR" || user?.role === "ADMIN") {
     return children;
   } else {
     return redirect("/");
