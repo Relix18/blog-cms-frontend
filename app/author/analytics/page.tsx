@@ -11,12 +11,15 @@ import { useSelector } from "react-redux";
 
 const Page = () => {
   const user = useSelector(getLoggedUser);
+
+  if (!user) return null;
+
   return (
     <>
       <Protected>
         <AuthorOrAdminProtected>
           <Heading
-            title={user?.name}
+            title={user.name}
             description="Author analytics section"
             keywords="OrbitBlog, Blog, Orbit, author, analytics"
           />
