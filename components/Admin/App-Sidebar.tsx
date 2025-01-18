@@ -182,6 +182,8 @@ const AppSidebar: React.FC = ({
   const { setOpen } = useSidebar();
   const settings = useSelector(selectSettings);
 
+  if (!settings) return null;
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
