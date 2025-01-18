@@ -58,10 +58,10 @@ export default function BlogFilterPage() {
   const tags = tagsList?.tags?.map((tag: Option) => tag.label) || [];
 
   useEffect(() => {
-    const categoriesFromParams = searchParams.get("categories");
-    const tagsFromParams = searchParams.get("tags");
-    const sortByFromParams = searchParams.get("sortBy");
-    const searchQueryFromParams = searchParams.get("search");
+    const categoriesFromParams = searchParams?.get("categories");
+    const tagsFromParams = searchParams?.get("tags");
+    const sortByFromParams = searchParams?.get("sortBy");
+    const searchQueryFromParams = searchParams?.get("search");
 
     if (categoriesFromParams) {
       setSelectedCategories(categoriesFromParams.split(","));
@@ -148,7 +148,7 @@ export default function BlogFilterPage() {
         post.author.name?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearchQuery && matchesTag;
     })
-    ?.sort((a, b) => (sortPosts([a, b])[0] === a ? -1 : 1));
+    ?.sort((a: IPost, b: IPost) => (sortPosts([a, b])[0] === a ? -1 : 1));
 
   const ITEMS_PER_PAGE = 15;
   const totalPages = Math.ceil(filteredPosts?.length / ITEMS_PER_PAGE);
