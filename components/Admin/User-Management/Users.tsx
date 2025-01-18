@@ -78,7 +78,7 @@ type User = {
   name: string;
   resetPasswordExpire: Date | null;
   resetPasswordToken: Date | null;
-  role: "ADMIN" | "AUTHOR" | "USER";
+  role: string;
   updatedAt: Date;
 };
 
@@ -231,7 +231,7 @@ export default function Users() {
       cell: ({ row }) => {
         const user = row.original;
         const isEditing = editingId === user.id;
-        const [value, setValue] = useState(user.role);
+        const [value, setValue] = useState<string>(user.role);
 
         useEffect(() => {
           setValue(user.role);
