@@ -145,7 +145,7 @@ const Header = ({ active, isProfile }: Props) => {
       <header className=" backdrop-blur w-full fixed top-0 left-0 shadow-sm dark:bg-gray-900/70 bg-slate-50/60  z-50 dark:border-b-2">
         <div className="mx-2 px-2 py-2 flex items-center justify-between">
           <Link href="/" className="flex items-center ">
-            {settings.logoUrl ? (
+            {settings?.logoUrl ? (
               <Image
                 className="mr-4 h-6 w-6"
                 src={settings.logoUrl}
@@ -158,7 +158,7 @@ const Header = ({ active, isProfile }: Props) => {
             )}
 
             <span className="text-xl font-bold font-Poppins md:flex hidden">
-              {settings.siteName || "OrbitBlog"}
+              {settings?.siteName || "OrbitBlog"}
             </span>
           </Link>
           <nav className="hidden items-center md:flex space-x-4">

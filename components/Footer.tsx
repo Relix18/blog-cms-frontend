@@ -12,7 +12,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">About Us</h3>
             <p className="text-gray-400">
-              {settings.siteName} is your go-to source for insightful articles,
+              {settings?.siteName} is your go-to source for insightful articles,
               expert opinions, and the latest trends in technology, lifestyle,
               and more.
             </p>
@@ -99,7 +99,7 @@ const Footer = () => {
         </div>
         <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
           <p>
-            &copy; {new Date().getFullYear()} {settings.siteName}. All rights
+            &copy; {new Date().getFullYear()} {settings?.siteName}. All rights
             reserved.
           </p>
         </div>
