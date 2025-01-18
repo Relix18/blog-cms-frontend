@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -69,7 +69,7 @@ export default function CreateNewPost() {
     if (tag) setTags(tag.tags);
   }, [category, tag]);
 
-  const slugify = (title: string) =>
+  const slugify = (title: string): string =>
     title
       .toLowerCase()
       .trim()
@@ -117,8 +117,11 @@ export default function CreateNewPost() {
     });
   };
 
-  const onSubmit = async (values: z.infer<typeof PostSchema>, e: FormEvent) => {
-    const action = e?.nativeEvent?.submitter?.value;
+  const onSubmit = async (values: z.infer<typeof PostSchema>) => {
+    const submitter = document.activeElement as
+      | HTMLButtonElement
+      | HTMLInputElement;
+    const action = submitter?.value;
 
     const formData = {
       ...values,

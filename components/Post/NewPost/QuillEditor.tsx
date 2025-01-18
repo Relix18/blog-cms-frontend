@@ -60,7 +60,7 @@ export default function Editor({ value, onChange }: EditorProps) {
             matchers: [
               [
                 Node.ELEMENT_NODE,
-                (node, delta) => {
+                (node: HTMLElement, delta: Delta) => {
                   const newDelta = new Delta();
 
                   delta.ops.forEach((op) => {
@@ -73,7 +73,7 @@ export default function Editor({ value, onChange }: EditorProps) {
                         newDelta.insert(op.insert);
                       }
                     } else {
-                      newDelta.insert(op.insert);
+                      newDelta.insert(op.insert ?? "");
                     }
                   });
 

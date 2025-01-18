@@ -106,7 +106,9 @@ export default function SingleBlogPost({ data }: Props) {
   }, [data, viewUpdate]);
 
   const cleanUpExpiredViews = () => {
-    const viewedPosts = JSON.parse(localStorage.getItem("viewedPosts") || "{}");
+    const viewedPosts: Record<string, number> = JSON.parse(
+      localStorage.getItem("viewedPosts") || "{}"
+    );
     const now = Date.now();
 
     const validEntries = Object.fromEntries(

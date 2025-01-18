@@ -88,7 +88,7 @@ const Header = ({ active, isProfile }: Props) => {
   const settings = useSelector(selectSettings);
 
   useEffect(() => {
-    const existingQuery = searchParams.get("search") || "";
+    const existingQuery = searchParams?.get("search") || "";
     setSearchQuery(existingQuery);
   }, [searchParams]);
 
@@ -119,7 +119,7 @@ const Header = ({ active, isProfile }: Props) => {
   }, [isSuccess, error, requestSuccess, toast, user]);
 
   const authorRequestHanlder = async () => {
-    await authorRequest();
+    await authorRequest({});
   };
 
   const logoutHandler = async () => {
