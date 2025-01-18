@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { site } from "./siteApi";
+import { RootState } from "@/state/store";
 
 const settingsSlice = createSlice({
   name: "settings",
@@ -16,4 +17,4 @@ const settingsSlice = createSlice({
 });
 
 export default settingsSlice.reducer;
-export const selectSettings = (state) => state.settings;
+export const selectSettings = (state: RootState) => state.settings;

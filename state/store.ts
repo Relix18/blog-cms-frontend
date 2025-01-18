@@ -31,3 +31,5 @@ export const store = configureStore({
       .concat(site.middleware)
       .concat(notification.middleware),
 });
+
+export type RootState = ReturnType<typeof store.getState>;
