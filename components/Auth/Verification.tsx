@@ -83,7 +83,7 @@ const Verificaiton = () => {
   const resendOtpHandler = async () => {
     setSuccess("");
     setError("");
-    await resendOTP();
+    await resendOTP({});
   };
 
   return (
