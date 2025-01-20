@@ -4,11 +4,11 @@ import { RootState } from "@/state/store";
 import { ISiteSettings } from "@/types/types";
 
 interface InitialState {
-  settings: ISiteSettings | null;
+  siteSettings: ISiteSettings | null;
 }
 
 const initialState: InitialState = {
-  settings: null,
+  siteSettings: null,
 };
 
 const settingsSlice = createSlice({
@@ -19,11 +19,11 @@ const settingsSlice = createSlice({
     builder.addMatcher(
       site.endpoints.getSiteSettings.matchFulfilled,
       (state, { payload }) => {
-        return payload.siteSettings;
+        return payload;
       }
     );
   },
 });
 
 export default settingsSlice.reducer;
-export const selectSettings = (state: RootState) => state.settings;
+export const selectSettings = (state: RootState) => state.settings.siteSettings;
