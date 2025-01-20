@@ -26,4 +26,4 @@ const settingsSlice = createSlice({
 });
 
 export default settingsSlice.reducer;
-export const selectSettings = (state: RootState) => state.settings.settings;
+export const selectSettings = (state: RootState) => state.settings;
