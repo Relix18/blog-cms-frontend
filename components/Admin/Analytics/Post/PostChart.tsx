@@ -35,10 +35,6 @@ const chartConfig: ChartConfig = {
     label: "Replies",
     color: "hsl(var(--chart-4))",
   },
-  totalEngagement: {
-    label: "Total",
-    color: "hsl(var(--chart-5))",
-  },
 };
 
 type Props = {
@@ -61,10 +57,6 @@ const PostChart = ({ posts }: Props) => {
         (acc, curr) => acc + curr.replies,
         0
       ),
-      totalEngagement: posts.monthlyAnalytics.reduce(
-        (acc, curr) => acc + curr.totalEngagement,
-        0
-      ),
     }),
     [posts]
   );
@@ -79,26 +71,24 @@ const PostChart = ({ posts }: Props) => {
           </CardDescription>
         </div>
         <div className="flex">
-          {["views", "likes", "comments", "replies", "totalEngagement"].map(
-            (key) => {
-              const chart = key as keyof typeof chartConfig;
-              return (
-                <button
-                  key={chart}
-                  data-active={activeChart === chart}
-                  className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 lg:px-8 lg:py-6"
-                  onClick={() => setActiveChart(chart)}
-                >
-                  <span className="text-xs text-muted-foreground">
-                    {chartConfig[chart].label}
-                  </span>
-                  <span className="text-lg font-bold leading-none sm:text-3xl">
-                    {total[key as keyof typeof total]}
-                  </span>
-                </button>
-              );
-            }
-          )}
+          {["views", "likes", "comments", "replies"].map((key) => {
+            const chart = key as keyof typeof chartConfig;
+            return (
+              <button
+                key={chart}
+                data-active={activeChart === chart}
+                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 lg:px-8 lg:py-6"
+                onClick={() => setActiveChart(chart)}
+              >
+                <span className="text-xs text-muted-foreground">
+                  {chartConfig[chart].label}
+                </span>
+                <span className="text-lg font-bold leading-none sm:text-3xl">
+                  {total[key as keyof typeof total]}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">

@@ -268,7 +268,7 @@ export default function SiteSettings() {
 
               <div className="space-y-2">
                 <Label>Hero Background Gradient</Label>
-                <div className="flex space-x-4">
+                <div className="flex flex-col md:flex-row gap-4">
                   <FormField
                     control={siteForm.control}
                     name="gradientStart"
