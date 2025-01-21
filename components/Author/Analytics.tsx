@@ -175,10 +175,7 @@ export default function AuthorAnalytics({ user }: props) {
                     <CardTitle>Top Categories</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ChartContainer
-                      config={chartConfig}
-                      className="h-[300px] w-full"
-                    >
+                    <ChartContainer config={chartConfig}>
                       <PieChart>
                         <Pie
                           data={analytics?.categoryPercentages}
@@ -212,10 +209,7 @@ export default function AuthorAnalytics({ user }: props) {
                     <CardTitle>Content Performance by Category</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ChartContainer
-                      config={chartConfig}
-                      className="h-[300px] w-full"
-                    >
+                    <ChartContainer config={chartConfig}>
                       <BarChart data={analytics?.categoryMetrics}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="category" />
