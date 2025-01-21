@@ -62,11 +62,11 @@ input::-webkit-inner-spin-button {
   vertical-align: middle;
 }
 
-li[data-list="bullet"] {
+article li[data-list="bullet"] {
   list-style-type: disc;
 }
 
-li[data-list="ordered"] {
+article li[data-list="ordered"] {
   list-style-type: decimal;
 }
 
