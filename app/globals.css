@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@import "quill/dist/quill.snow.css"; /* For the Snow theme */
-@import "quill/dist/quill.bubble.css"; /* For the Bubble theme */
+@import "quill/dist/quill.snow.css";
+@import "quill/dist/quill.bubble.css";
 
 :root {
   --font-geist-sans: "GeistSans", sans-serif;
@@ -62,8 +62,15 @@ input::-webkit-inner-spin-button {
   vertical-align: middle;
 }
 
-.quillcontent ul {
+li[data-list="bullet"] {
   list-style-type: disc;
+}
+
+li[data-list="ordered"] {
+  list-style-type: decimal;
+}
+
+ol {
   -webkit-margin-before: 1em;
   margin-block-start: 1em;
   -webkit-margin-after: 1em;
@@ -76,18 +83,33 @@ input::-webkit-inner-spin-button {
   padding-inline-start: 40px;
 }
 
-.quillcontent ol {
-  list-style-type: decimal;
-  -webkit-margin-before: 1em;
-  margin-block-start: 1em;
-  -webkit-margin-after: 1em;
-  margin-block-end: 1em;
-  -webkit-margin-start: 0;
-  margin-inline-start: 0;
-  -webkit-margin-end: 0;
-  margin-inline-end: 0;
-  -webkit-padding-start: 40px;
-  padding-inline-start: 40px;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.5em;
+}
+
+h3 {
+  font-size: 1.17em;
+}
+
+h5 {
+  font-size: 0.83em;
+}
+
+h6 {
+  font-size: 0.67em;
 }
 
 @layer base {
