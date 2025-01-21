@@ -420,7 +420,7 @@ const Header = ({ active, isProfile }: Props) => {
                       </AlertDialogContent>
                     </AlertDialog>
                   )}
-                  {user?.role !== "USER" && (
+                  {user && (
                     <div className="flex flex-col gap-4">
                       <Link
                         href="/admin/dashboard"
