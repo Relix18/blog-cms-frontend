@@ -42,10 +42,6 @@ interface Props {
   data: IPost;
 }
 
-interface RelatedPost {
-  post: IPost;
-}
-
 export default function SingleBlogPost({ data }: Props) {
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState("");
@@ -467,33 +463,30 @@ export default function SingleBlogPost({ data }: Props) {
               Related Posts
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {relatedPosts?.post[0].posts.map((relatedPost: RelatedPost) => (
-                <Card key={relatedPost.post.id}>
-                  <Link href={`/post/view/${relatedPost.post.slug}`}>
+              {relatedPosts?.post[0].post.map((relatedPost: IPost) => (
+                <Card key={relatedPost.id}>
+                  <Link href={`/post/view/${relatedPost.slug}`}>
                     <CardContent className="p-4">
                       <Image
-                        src={relatedPost.post.featuredImage}
-                        alt={relatedPost.post.title}
+                        src={relatedPost.featuredImage}
+                        alt={relatedPost.title}
                         width={200}
                         height={100}
                         className="rounded-lg mb-2 w-full object-cover"
                       />
                       <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {relatedPost.post.title}
+                        {relatedPost.title}
                       </h3>
                       <div className="flex items-center mt-2 text-[14px]">
                         <div className="flex font-bold items-center text-gray-600 dark:text-gray-400">
-                          {relatedPost.post.author.name}
+                          {relatedPost.author.name}
                         </div>
                         <Separator
                           orientation="vertical"
                           className="mx-2 h-4"
                         />
                         <div className="flex items-center text-gray-600 dark:text-gray-400">
-                          {format(
-                            relatedPost.post.publishedAt,
-                            "MMMM dd, yyyy"
-                          )}
+                          {format(relatedPost.publishedAt, "MMMM dd, yyyy")}
                         </div>
                       </div>
                     </CardContent>
