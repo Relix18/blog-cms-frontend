@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Quill, { Delta } from "quill";
+import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import axios from "axios";
 
@@ -56,32 +56,7 @@ export default function Editor({ value, onChange }: EditorProps) {
               image: () => handleImageUpload(quillInstance),
             },
           },
-          clipboard: {
-            matchers: [
-              [
-                Node.ELEMENT_NODE,
-                (node: HTMLElement, delta: Delta) => {
-                  const newDelta = new Delta();
-
-                  delta.ops.forEach((op) => {
-                    if (typeof op.insert === "string") {
-                      const isBold = node.querySelector("strong, b") !== null;
-
-                      if (isBold) {
-                        newDelta.insert(op.insert, { bold: true });
-                      } else {
-                        newDelta.insert(op.insert);
-                      }
-                    } else {
-                      newDelta.insert(op.insert ?? "");
-                    }
-                  });
-
-                  return newDelta;
-                },
-              ],
-            ],
-          },
+          clipboard: true,
         },
         formats,
       });
