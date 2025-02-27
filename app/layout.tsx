@@ -7,12 +7,11 @@ import { useEffect } from "react";
 import { ThemeProvider } from "../utils/ThemeProvider";
 import Loader from "@/components/Loader/Loader";
 import { SessionProvider } from "next-auth/react";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { store } from "@/state/store";
 import { useGetUserQuery } from "@/state/api/user/userApi";
 import { Toaster } from "@/components/ui/toaster";
 import GlobalStyles from "@/utils/GlobalStyles";
-import { selectSettings } from "@/state/api/site/siteSlice";
 import socketIO from "socket.io-client";
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
@@ -61,11 +60,18 @@ export default function RootLayout({
 
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isLoading } = useGetUserQuery({});
-  const settings = useSelector(selectSettings);
 
   useEffect(() => {
-    socketId.on("connection", () => {});
+    const handleConnection = () => {
+      console.log("Socket connected");
+    };
+
+    socketId.on("connection", handleConnection);
+
+    return () => {
+      socketId.off("connection", handleConnection); // Cleanup to prevent memory leaks
+    };
   }, []);
 
-  return <>{!settings || isLoading ? <Loader /> : <>{children}</>}</>;
+  return <>{isLoading ? <Loader /> : <>{children}</>}</>;
 };

@@ -57,11 +57,11 @@ import {
 } from "./ui/navigation-menu";
 import { useAuthorRequestMutation } from "@/state/api/user/userApi";
 import { useToast } from "@/hooks/use-toast";
-import { selectSettings } from "@/state/api/site/siteSlice";
 import Image from "next/image";
 import socketIO from "socket.io-client";
 import { Separator } from "./ui/separator";
 import { MdOutlineAnalytics, MdOutlineDashboard } from "react-icons/md";
+import { selectSettings } from "@/state/api/site/siteSlice";
 const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
 const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
 
@@ -85,7 +85,10 @@ const Header = ({ active, isProfile }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const settings = useSelector(selectSettings);
+  const reduxSettings = useSelector(selectSettings);
+  const localSettings = localStorage.getItem("settings");
+  const parsedSetting = localSettings ? JSON.parse(localSettings) : null;
+  const settings = parsedSetting ?? reduxSettings;
 
   useEffect(() => {
     const existingQuery = searchParams?.get("search") || "";

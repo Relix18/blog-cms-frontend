@@ -4,7 +4,11 @@ import React from "react";
 import { useSelector } from "react-redux";
 
 const Footer = () => {
-  const settings = useSelector(selectSettings);
+  const reduxSettings = useSelector(selectSettings);
+  const localSettings = localStorage.getItem("settings");
+  const parsedSetting = localSettings ? JSON.parse(localSettings) : null;
+  const settings = parsedSetting ?? reduxSettings;
+
   return (
     <footer className="bg-gray-800 dark:bg-gray-900 text-white py-8">
       <div className="container mx-auto px-4">

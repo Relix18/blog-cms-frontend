@@ -18,7 +18,7 @@ import {
   useLatestPostQuery,
   usePopularTagQuery,
 } from "@/state/api/feature/featureApi";
-import { IPost, Option, IAuthor } from "@/types/types";
+import { IPost, Option, IAuthor, ISiteSettings } from "@/types/types";
 import Link from "next/link";
 import { FeaturedPostLoader, LatestPostLoader } from "../Loader/SkeletonLoader";
 import useUIStore from "@/app/hooks/useUIStore";
@@ -34,7 +34,10 @@ const Hero = () => {
   const { data: tag } = usePopularTagQuery({});
   const { data: featuredAuthor } = useFeaturedAuthorQuery({});
   const { setActiveTab } = useUIStore();
-  const settings = useSelector(selectSettings);
+  const reduxSettings = useSelector(selectSettings);
+  const localSettings = localStorage.getItem("settings");
+  const parsedSetting = localSettings ? JSON.parse(localSettings) : null;
+  const settings: ISiteSettings = parsedSetting ?? reduxSettings;
 
   const author: IAuthor = featuredAuthor?.featuredAuthor;
   useEffect(() => {
@@ -56,11 +59,10 @@ const Hero = () => {
             <div className="absolute inset-0 bg-black opacity-20"></div>
             <div className="relative z-10">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in-up">
-                Welcome to OrbitBlog
+                {settings?.heroTitle}
               </h1>
               <p className="text-lg md:text-xl mb-6 animate-fade-in-up animation-delay-200">
-                Discover insightful articles, expert opinions, and the latest
-                trends.
+                {settings?.heroDescription}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-400">
                 <Link href={"/filter"}>

@@ -1,11 +1,20 @@
 import { useGetSiteSettingsQuery } from "@/state/api/site/siteApi";
 import { ISiteSettings } from "@/types/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const GlobalStyles = () => {
-  const { data, isLoading } = useGetSiteSettingsQuery({});
+  const localSetting = localStorage.getItem("settings");
+  const [settings, setSettings] = useState<ISiteSettings | null>(
+    localSetting ? JSON.parse(localSetting) : null
+  );
+  const { data } = useGetSiteSettingsQuery({}, { skip: !!settings });
 
-  const settings: ISiteSettings = data?.siteSettings;
+  useEffect(() => {
+    if (!settings && data?.siteSettings) {
+      setSettings(data.siteSettings);
+      localStorage.setItem("settings", JSON.stringify(data.siteSettings));
+    }
+  }, [data, settings]);
 
   function hexToHSL(hex: string) {
     hex = hex.replace(/^#/, "");
@@ -38,13 +47,13 @@ const GlobalStyles = () => {
   }
 
   useEffect(() => {
-    if (settings && !isLoading) {
+    if (settings) {
       document.documentElement.style.setProperty(
         "--accent-color",
         hexToHSL(settings.accentColor) || "292 84.1% 60.6%"
       );
     }
-  }, [settings, isLoading]);
+  }, [settings]);
 
   return null;
 };
