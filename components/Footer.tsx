@@ -1,3 +1,4 @@
+"use client";
 import { selectSettings } from "@/state/api/site/siteSlice";
 import Link from "next/link";
 import React from "react";

@@ -3,7 +3,10 @@ import { ISiteSettings } from "@/types/types";
 import { useEffect, useState } from "react";
 
 const GlobalStyles = () => {
-  const localSetting = localStorage.getItem("settings");
+  let localSetting = null;
+  if (typeof window !== "undefined") {
+    localSetting = localStorage.getItem("settings");
+  }
   const [settings, setSettings] = useState<ISiteSettings | null>(
     localSetting ? JSON.parse(localSetting) : null
   );
