@@ -37,8 +37,9 @@ import {
   UserCog,
 } from "lucide-react";
 import { MdNotes, MdOutlineAnalytics, MdOutlineCategory } from "react-icons/md";
-import { selectSettings } from "@/state/api/site/siteSlice";
 import { useSelector } from "react-redux";
+import { selectSettings } from "@/state/api/site/siteSlice";
+import { ISiteSettings } from "@/types/types";
 
 interface MenuItem {
   title: string;
@@ -182,8 +183,6 @@ const AppSidebar: React.FC = ({
   const { setOpen } = useSidebar();
   const settings = useSelector(selectSettings);
 
-  if (!settings) return null;
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -194,7 +193,7 @@ const AppSidebar: React.FC = ({
             </div>
             <div className="grid flex-1 text-left text-lg leading-tight">
               <span className="truncate font-semibold">
-                {settings.siteName}
+                {settings?.siteName}
               </span>
             </div>
           </SidebarMenuButton>

@@ -18,7 +18,7 @@ import {
   useLatestPostQuery,
   usePopularTagQuery,
 } from "@/state/api/feature/featureApi";
-import { IPost, Option, IAuthor, ISiteSettings } from "@/types/types";
+import { IPost, Option, IAuthor } from "@/types/types";
 import Link from "next/link";
 import { FeaturedPostLoader, LatestPostLoader } from "../Loader/SkeletonLoader";
 import useUIStore from "@/app/hooks/useUIStore";
@@ -34,10 +34,7 @@ const Hero = () => {
   const { data: tag } = usePopularTagQuery({});
   const { data: featuredAuthor } = useFeaturedAuthorQuery({});
   const { setActiveTab } = useUIStore();
-  const reduxSettings = useSelector(selectSettings);
-  const localSettings = localStorage.getItem("settings");
-  const parsedSetting = localSettings ? JSON.parse(localSettings) : null;
-  const settings: ISiteSettings = parsedSetting ?? reduxSettings;
+  const settings = useSelector(selectSettings);
 
   const author: IAuthor = featuredAuthor?.featuredAuthor;
   useEffect(() => {

@@ -85,10 +85,7 @@ const Header = ({ active, isProfile }: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const reduxSettings = useSelector(selectSettings);
-  const localSettings = localStorage.getItem("settings");
-  const parsedSetting = localSettings ? JSON.parse(localSettings) : null;
-  const settings = parsedSetting ?? reduxSettings;
+  const settings = useSelector(selectSettings);
 
   useEffect(() => {
     const existingQuery = searchParams?.get("search") || "";

@@ -50,31 +50,39 @@ const Dashboard = () => {
 
   const overview: AdminAnalytics = data?.overview;
 
-  const filteredData = overview?.viewsChart.filter((item) => {
-    const date = new Date(item.month);
-    const startDate = new Date();
-    let daysToSubtract = 90;
-    if (chartRange === "30") {
-      daysToSubtract = 30;
-    } else if (chartRange === "180") {
-      daysToSubtract = 180;
+  function generateMonthRange(months: number): string[] {
+    const result = [];
+    const now = new Date();
+    for (let i = months - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      result.push(format(d, "yyyy-MM"));
     }
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+    return result;
+  }
 
-  const filteredDataUsers = overview?.usersChart.filter((item) => {
-    const date = new Date(item.month);
-    const startDate = new Date();
-    let daysToSubtract = 90;
-    if (chartRange === "30") {
-      daysToSubtract = 30;
-    } else if (chartRange === "180") {
-      daysToSubtract = 180;
-    }
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+  const monthsToShow = chartRange === "180" ? 6 : chartRange === "30" ? 1 : 3;
+  const monthKeys = generateMonthRange(monthsToShow);
+
+  const usersMap = new Map(
+    (overview?.usersChart || []).map((item) => [
+      format(item.month, "yyyy-MM"),
+      { month: format(item.month, "yyyy-MM"), value: item.users },
+    ])
+  );
+
+  const viewsMap = new Map(
+    (overview?.viewsChart || []).map((item) => [
+      format(item.month, "yyyy-MM"),
+      { month: format(item.month, "yyyy-MM"), value: item.views },
+    ])
+  );
+
+  const usersData = monthKeys.map(
+    (month) => usersMap.get(month) || { month, value: 0 }
+  );
+  const viewsData = monthKeys.map(
+    (month) => viewsMap.get(month) || { month, value: 0 }
+  );
 
   if (isLoading) return <DashboardLoader />;
 
@@ -187,7 +195,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig}>
-                  <AreaChart accessibilityLayer data={filteredData}>
+                  <AreaChart accessibilityLayer data={viewsData}>
                     <CartesianGrid vertical={false} />
                     <XAxis
                       dataKey="month"
@@ -231,9 +239,10 @@ const Dashboard = () => {
                       Trending up by {overview?.growth.views.percentage}% this
                       month <TrendingUp className="h-4 w-4" />
                     </div>
+
                     <div className="flex items-center gap-2 leading-none text-muted-foreground">
-                      {`${format(filteredData[0].month, "MMMM")} - ${format(
-                        filteredData[filteredData.length - 1].month,
+                      {`${format(viewsData[0].month, "MMMM")} - ${format(
+                        viewsData[viewsData.length - 1].month,
                         "MMMM yy"
                       )}`}
                     </div>
@@ -250,7 +259,7 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <ChartContainer config={chartConfig}>
-                  <BarChart accessibilityLayer data={filteredDataUsers}>
+                  <BarChart accessibilityLayer data={usersData}>
                     <CartesianGrid vertical={false} />
                     <XAxis
                       dataKey="month"
@@ -298,11 +307,8 @@ const Dashboard = () => {
                       month <TrendingUp className="h-4 w-4" />
                     </div>
                     <div className="flex items-center gap-2 leading-none text-muted-foreground">
-                      {`${format(
-                        filteredDataUsers[0].month,
-                        "MMMM"
-                      )} - ${format(
-                        filteredDataUsers[filteredDataUsers.length - 1].month,
+                      {`${format(usersData[0].month, "MMMM")} - ${format(
+                        usersData[usersData.length - 1].month,
                         "MMMM yy"
                       )}`}
                     </div>

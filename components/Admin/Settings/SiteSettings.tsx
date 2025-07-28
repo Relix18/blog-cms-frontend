@@ -136,7 +136,7 @@ export default function SiteSettings() {
         <CardHeader>
           <CardTitle>Site Settings</CardTitle>
           <CardDescription>
-            Customize your site's appearance and branding
+            Customize your site&#39;s appearance and branding
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -420,7 +420,7 @@ export default function SiteSettings() {
                 Content Preview
               </h2>
               <p>
-                This is a preview of how your site's header and hero section
+                This is a preview of how your site&#39;s header and hero section
                 might look with the current settings.
               </p>
             </div>

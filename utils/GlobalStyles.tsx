@@ -3,21 +3,9 @@ import { ISiteSettings } from "@/types/types";
 import { useEffect, useState } from "react";
 
 const GlobalStyles = () => {
-  let localSetting = null;
-  if (typeof window !== "undefined") {
-    localSetting = localStorage.getItem("settings");
-  }
-  const [settings, setSettings] = useState<ISiteSettings | null>(
-    localSetting ? JSON.parse(localSetting) : null
-  );
-  const { data } = useGetSiteSettingsQuery({}, { skip: !!settings });
+  const { data, isLoading } = useGetSiteSettingsQuery({});
 
-  useEffect(() => {
-    if (!settings && data?.siteSettings) {
-      setSettings(data.siteSettings);
-      localStorage.setItem("settings", JSON.stringify(data.siteSettings));
-    }
-  }, [data, settings]);
+  const settings: ISiteSettings = data?.siteSettings;
 
   function hexToHSL(hex: string) {
     hex = hex.replace(/^#/, "");
@@ -50,13 +38,13 @@ const GlobalStyles = () => {
   }
 
   useEffect(() => {
-    if (settings) {
+    if (!isLoading && settings) {
       document.documentElement.style.setProperty(
         "--accent-color",
         hexToHSL(settings.accentColor) || "292 84.1% 60.6%"
       );
     }
-  }, [settings]);
+  }, [isLoading]);
 
   return null;
 };
