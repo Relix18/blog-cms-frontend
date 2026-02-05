@@ -74,49 +74,51 @@ const PublishedPost = ({ posts, isLoading, isAuthorProfile }: Props) => {
                   Published on {format(post.publishedAt, "dd MMMM, yyyy")}
                 </span>
                 <div className="space-x-2">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-destructive border-destructive"
-                      >
-                        Delete
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Are you absolutely sure?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete this published post?
-                          This action will: Permanently remove the post from
-                          this site. Delete all associated views, likes, and
-                          comments.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-destructive hover:bg-destructive/80"
-                          onClick={() => deleteHandler(post.id)}
+                  {!isAuthorProfile && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive border-destructive"
                         >
-                          Delete Post
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this published post?
+                            This action will: Permanently remove the post from
+                            this site. Delete all associated views, likes, and
+                            comments.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-destructive hover:bg-destructive/80"
+                            onClick={() => deleteHandler(post.id)}
+                          >
+                            Delete Post
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                   <Button
                     asChild
                     variant="outline"
                     size="sm"
                     className={cn(
                       isAuthorProfile ? "hidden" : "inline-flex",
-                      "text-accentColor  border-accentColor"
+                      "text-accentColor  border-accentColor",
                     )}
                   >
-                    <Link href={`post/edit-post/${post.slug}`}>Edit</Link>
+                    <Link href={`/post/edit-post/${post.slug}`}>Edit</Link>
                   </Button>
                   <Button
                     asChild
@@ -124,7 +126,7 @@ const PublishedPost = ({ posts, isLoading, isAuthorProfile }: Props) => {
                     size={"sm"}
                     className="bg-accentColor text-white hover:bg-accentColor/90 "
                   >
-                    <Link href={`post/view/${post.slug}`}>View</Link>
+                    <Link href={`/post/view/${post.slug}`}>View</Link>
                   </Button>
                 </div>
               </div>
